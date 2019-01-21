@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import movement.MovementController;
 
+//Equation for Drift on tile where y is drift in clicks and x is velocity in clicks/100 ms
+// Y=7.029608995X - 592.3469424, wher domain is defined on (90,1700)
 /**
  * Main Robot class. Does networking and Teleop control by thinking very hard and very carefully.
  * @author Alex for teleop control, Warren for networking, FIRST provided an empty class template
@@ -277,7 +279,7 @@ public class Robot extends TimedRobot {
 		double turn = Math.signum(driverController.getRawAxis(0))*(driverController.getRawAxis(0)*driverController.getRawAxis(0));
 		if (Math.abs(turn) < 0.1) turn = 0.0;
 		
-		Motors.drive.arcadeDrive(dif, (turn) * 0.8); // TODO SENS IS TURNED DOWN
+		Motors.drive.arcadeDrive(dif, turn);
 	}
 
 	@Override
