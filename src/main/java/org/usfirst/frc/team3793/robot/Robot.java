@@ -8,9 +8,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import movement.MovementController;
-//lmao
+
 //Equation for Drift on tile where y is drift in clicks and x is velocity in clicks/100 ms
-// Y=7.029608995X - 592.3469424, wher domain is defined on (90,1700)
+// Y=7.029608995X - 592.3469424, where domain is defined on (90,1700)
 /**
  * Main Robot class. Does networking and Teleop control by thinking very hard and very carefully.
  * @author Alex for teleop control, Warren for networking, FIRST provided an empty class template
