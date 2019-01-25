@@ -28,7 +28,7 @@ public class Turn extends MovementAction implements PIDOutput{
 	    turnController.setOutputRange(-1.0, 1.0);
 	    turnController.setAbsoluteTolerance(kTolerance);
 	    turnController.setContinuous(true);
-	    turnController.setSetpoint(degrees);
+	    turnController.setSetpoint(this.degrees);
 	    turnController.enable();
 	}
 	
