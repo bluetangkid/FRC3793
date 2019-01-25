@@ -19,6 +19,11 @@ public class Robot extends TimedRobot {
 	
 	static XboxController driverController = new XboxController(0);
 	static XboxController operatorController = new XboxController(1);
+	public XboxController[] controllers = new XboxController[2];
+	private boolean singleControllerMode = true;
+	public int controllerSelector = 0;
+
+	public XboxController Master = null;
 	
 	static RoboState state = RoboState.RobotInit;
 	Thread t;
@@ -54,7 +59,13 @@ public class Robot extends TimedRobot {
 	public void robotInit() {
 		Motors.initialize();
 		Sensors.initialize();
-		
+
+		controllers[0] = driverController;
+		controllers[1] = operatorController;
+		if(singleControllerMode){
+			Master = controllers[0];
+			System.out.println("controller 0");
+		}
 		state = RoboState.RobotInit;
 		
 //		try {
@@ -70,6 +81,11 @@ public class Robot extends TimedRobot {
 //			e.printStackTrace();
 //		}
 		//pdp = new PowerDistributionPanel();
+
+		t = new MovementController();
+		t.start();
+
+		
 	}
 
 	@Override
@@ -94,26 +110,29 @@ public class Robot extends TimedRobot {
 		scissorTimerStarted = false;
 		//Motors.vacuumMotor.set(1);
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
-		System.out.println("gameData is " + gameData);
+		//System.out.println("gameData is " + gameData);
 		switchNum = 0;
-		
-		t = new MovementController();
-		t.start();
 
 		if (Sensors.switch1.get()) switchNum += 1;
 		if (Sensors.switch2.get()) switchNum += 2;
 		if (Sensors.switch3.get()) switchNum += 4;
 		if (Sensors.switch4.get()) switchNum += 8;
 		
-		Sensors.navX.reset();
+		//Sensors.navX.reset();
+		System.out.println(Sensors.navX.getYaw()+" AutoInit");
 		
-		System.out.println(switchNum);
+		//System.out.println(switchNum);
 	}
 	
 	@Override
 	public void autonomousPeriodic() {
+		
 		state = RoboState.Autonomous;
 		Scheduler.getInstance().run();
+		// System.out.println(Sensors.navX.getYaw()+ "autoPeriodic");
+
+		
+
 	}
 
 	@Override
@@ -121,16 +140,37 @@ public class Robot extends TimedRobot {
 		state = RoboState.TeleopInit;
 	}
 
-	@Override
+	@Override																																																																					
 	public void teleopPeriodic() {
+		
+
+		if(singleControllerMode && Master.getStartButton()){
+			controllerSelector++;
+			XboxController c;
+			if(controllerSelector > controllers.length -1){
+				
+				controllerSelector = 0;
+				c = controllers[0]; 
+				controllers[0] = controllers[1];
+				controllers[1] = c;
+			}
+			if(controllerSelector == 1){
+				c = controllers[1];
+				controllers[1] = controllers[0];
+				controllers[0] = c; 
+			}
+			System.out.println(controllerSelector + " controllerSelector");
+			Master = controllers[controllerSelector];
+		}
+		
 		state = RoboState.Teleop;
 
 		vaccumTimer--;
 		cubeIntakeTimer--;
 		cubeEjectTimer--;
 
-		scissorSpeed = operatorController.getRawAxis(1);
-		speedOfVacuumPivot = operatorController.getRawAxis(5);
+		scissorSpeed = controllers[1].getRawAxis(1);
+		speedOfVacuumPivot = controllers[1].getRawAxis(5);
 
 		Scheduler.getInstance().run();
 		
@@ -138,7 +178,7 @@ public class Robot extends TimedRobot {
 		//SmartDashboard.putNumber("Min Voltage", minVoltage);
 		
 		/*
-		if(driverController.getBumper(Hand.kRight)) {
+		if(controllers[0].getBumper(Hand.kRight)) {
 			byte[] data = new byte[1];
 			data[0] = 1;
 			DatagramPacket p = new DatagramPacket(data, 1, pi, 5808);
@@ -210,14 +250,21 @@ public class Robot extends TimedRobot {
 
 		// ----------------------------------------------------------------------
 		Motors.blinkin.set(-0.01);
+
 	}
+	public boolean masterIsDriver(){
+		return Master == controllers[0];
+			} 
+	public boolean masterIsOperator(){
+		return Master == controllers[1];
+			} 
 
 	private void drive() {
 		driveControl();
 	}
 
 	private void turnVacuumOn() {
-		if (operatorController.getAButton() && vaccumTimer < 0) {
+		if (controllers[1].getAButton() && vaccumTimer < 0) {
 			vaccumTimer = 50;
 
 			if (!vacuumOn) {
@@ -235,11 +282,13 @@ public class Robot extends TimedRobot {
 	}
 
 	private void cubeDispenser() {
-		if (operatorController.getXButton()) {
+		if (controllers[1].getXButton()) {
 			// Intake cube
 			Motors.cubeMotorLeft.set(-0.7); // -0.7
 			Motors.cubeMotorRight.set(0.7); // 0.7
-		} else if (operatorController.getYButton()) {// Eject cube
+			// t = new MovementController();
+		    // t.start();
+		} else if (controllers[1].getYButton()) {// Eject cube
 			Motors.cubeMotorLeft.set(0.6); // 0.5
 			Motors.cubeMotorRight.set(-0.6); // -0.5
 		} else {
@@ -259,7 +308,7 @@ public class Robot extends TimedRobot {
 	}
 
 	private boolean vacuumPivot(double speedOfVacuumPivot) {
-		System.out.println(Sensors.vacuumPivotSwitch.get());
+		//System.out.println(Sensors.vacuumPivotSwitch.get());
 		// FALSE means the switch is being PRESSED
 		// TRUE means the switch is NOT being PRESSED
 		if (Math.abs(speedOfVacuumPivot) >= 0.2) { // Checking if speed of vacuum is above the dead zone
@@ -273,10 +322,10 @@ public class Robot extends TimedRobot {
 	}
 
 	private void driveControl() {
-		double dif = Math.signum(driverController.getRawAxis(2) - driverController.getRawAxis(3))*((driverController.getRawAxis(2) - driverController.getRawAxis(3)) * (driverController.getRawAxis(2) - driverController.getRawAxis(3)));
+		double dif = Math.signum(controllers[0].getRawAxis(2) - controllers[0].getRawAxis(3))*((controllers[0].getRawAxis(2) - controllers[0].getRawAxis(3)) * (controllers[0].getRawAxis(2) - controllers[0].getRawAxis(3)));
 		if (Math.abs(dif) < 0.1) dif = 0.0;
 
-		double turn = Math.signum(driverController.getRawAxis(0))*(driverController.getRawAxis(0)*driverController.getRawAxis(0));
+		double turn = Math.signum(controllers[0].getRawAxis(0))*(controllers[0].getRawAxis(0)*controllers[0].getRawAxis(0));
 		if (Math.abs(turn) < 0.1) turn = 0.0;
 		
 		Motors.drive.arcadeDrive(dif, turn);
