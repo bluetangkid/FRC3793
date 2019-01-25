@@ -23,16 +23,20 @@ public class MovementController extends Thread {
 		while(Sensors.navX.isCalibrating());
 		// Make speed for turns 0.8f
 		actions.add(new Turn(90, 0.8f));
-		
-		action = actions.removeFirst();
+		//actions.add(new Turn (45,.8f));
 		// Put actions here for autonomous like so: actions.add(new Turn(1, 90, 0.7));
+		action = actions.removeFirst();
+		
+
+
 	}
 	
 	public void run() {
 		long loopStart;
 		Sensors.navX.resetDisplacement();
+		//System.out.println(Sensors.navX.getYaw());
 		while(!Thread.interrupted()) {
-			System.out.println(System.currentTimeMillis());
+			//System.out.println(System.currentTimeMillis());
 			//SmartDashboard.putString("State", Robot.getState().name());
 			//SmartDashboard.putNumber("Angle", Sensors.navX.getYaw());
 			loopStart = System.currentTimeMillis();
