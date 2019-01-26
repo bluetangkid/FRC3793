@@ -19,6 +19,7 @@ public class MovementController extends Thread {
 	static MovementAction action;
 	static boolean teleopEnabled = false;
 	public MovementController() {
+		action = null;
 		actions = new ArrayDeque<MovementAction>();
 		while(Sensors.navX.isCalibrating());
 		// Make speed for turns 0.8f
