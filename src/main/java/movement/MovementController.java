@@ -16,19 +16,17 @@ import org.usfirst.frc.team3793.robot.RoboState;
 
 public class MovementController extends Thread {
 	static ArrayDeque<MovementAction> actions;
-	static MovementAction action = null;
+	static MovementAction action;
 	static boolean teleopEnabled = false;
 	public MovementController() {
+		action = null;
 		actions = new ArrayDeque<MovementAction>();
 		while(Sensors.navX.isCalibrating());
 		// Make speed for turns 0.8f
 		actions.add(new Turn(90, 0.8f));
-		//actions.add(new Turn (45,.8f));
 		// Put actions here for autonomous like so: actions.add(new Turn(1, 90, 0.7));
+		//actions.add(new Turn (45,.8f));
 		action = actions.removeFirst();
-		
-
-
 	}
 	
 	public void run() {
@@ -64,8 +62,9 @@ public class MovementController extends Thread {
 			}
 			try {
 				long thingo = 10l-(System.currentTimeMillis()-loopStart);
-				if(thingo > 0)
+				if(thingo < 0)
 					Thread.sleep(0);
+				else Thread.sleep(thingo);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
