@@ -82,8 +82,7 @@ public class Robot extends TimedRobot {
 //		}
 		//pdp = new PowerDistributionPanel();
 
-		t = new MovementController();
-		t.start();
+		
 
 		
 	}
@@ -92,7 +91,11 @@ public class Robot extends TimedRobot {
 	public void disabledInit() {
 		state = RoboState.Disabled;
 		Motors.blinkin.set(-0.59);
+		try{
 		t.interrupt();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -120,7 +123,8 @@ public class Robot extends TimedRobot {
 		
 		//Sensors.navX.reset();
 		System.out.println(Sensors.navX.getYaw()+" AutoInit");
-		
+		t = new MovementController();
+		t.start();
 		//System.out.println(switchNum);
 	}
 	

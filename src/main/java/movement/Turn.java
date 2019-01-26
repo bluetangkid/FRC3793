@@ -16,7 +16,7 @@ public class Turn extends MovementAction implements PIDOutput{
 	final static float kI = 0.000f;//.0002
 	final static float kD = 0.0f;
 	final static float kF = 0f;
-	final static float kTolerance = 1;
+	final static float kTolerance = 5;
 	static float targetTime = 0;
 	public int framedoodad = 0;
 	
@@ -24,15 +24,22 @@ public class Turn extends MovementAction implements PIDOutput{
 		super((int)Math.signum(degrees), maxSpeed);
 
 		this.degrees = Sensors.navX.getYaw()+degrees;
+		if(this.degrees > 180){
+			this.degrees -= 360;
+		} else if(this.degrees < -180){
+			this.degrees += 360;
+		}
+		
 		//this.degrees = Sensors.navX.getYaw()+degrees;
 		turnController = new PIDController(kP, kI, kD, kF, Sensors.navX, this);
 	    turnController.setInputRange(-180.0f,  180.0f);
 	    turnController.setOutputRange(-1.0, 1.0);
 	    turnController.setAbsoluteTolerance(kTolerance);
 	    turnController.setContinuous(true);
-	    turnController.setSetpoint(degrees);
+	    turnController.setSetpoint(this.degrees);
 	    turnController.enable();
-		System.out.println(Sensors.navX.getYaw()+"Start of turn");
+		System.out.println(Sensors.navX.getYaw()+" Start of turn");
+		System.out.println(turnController.getSetpoint() + " setPoint");
 
 	}
 	
@@ -51,8 +58,11 @@ public class Turn extends MovementAction implements PIDOutput{
 	 * @return whether or not the turn is within tolerance according to the PID controller
 	 */
 	public boolean isComplete() {
-		if(turnController.onTarget()) framedoodad++;
-		else framedoodad = 0;
+		if(turnController.onTarget()){ 
+			framedoodad++;
+			System.out.println(framedoodad + " framedoodad");
+		}else framedoodad = 0;
+
 		if(framedoodad > 30) {
 			System.out.println("Here's Johnny");
 			System.out.println(Sensors.navX.getYaw()+" end of turn");
