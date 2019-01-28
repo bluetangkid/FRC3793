@@ -19,11 +19,11 @@ public class Robot extends TimedRobot {
 	
 	static GenericHID driverController = new GenericHID(0);
 	static GenericHID operatorController = new GenericHID(1);
-	public XboxController[] controllers = new GenericHID[2];
+	public GenericHID[] controllers = new GenericHID[2];
 	private boolean singleControllerMode = true;
 	public int controllerSelector = 0;
 
-	public XboxController Master = null;
+	public GenericHID Master = null;
 	
 	static RoboState state = RoboState.RobotInit;
 	Thread t;
