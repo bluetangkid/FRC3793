@@ -17,9 +17,9 @@ import movement.MovementController;
  */
 public class Robot extends TimedRobot {
 	
-	static XboxController driverController = new XboxController(0);
-	static XboxController operatorController = new XboxController(1);
-	public XboxController[] controllers = new XboxController[2];
+	static GenericHID driverController = new GenericHID(0);
+	static GenericHID operatorController = new GenericHID(1);
+	public XboxController[] controllers = new GenericHID[2];
 	private boolean singleControllerMode = true;
 	public int controllerSelector = 0;
 
@@ -150,7 +150,7 @@ public class Robot extends TimedRobot {
 
 		if(singleControllerMode && Master.getStartButton()){
 			controllerSelector++;
-			XboxController c;
+			GenericHID c;
 			if(controllerSelector > controllers.length -1){
 				
 				controllerSelector = 0;
@@ -268,7 +268,7 @@ public class Robot extends TimedRobot {
 	}
 
 	private void turnVacuumOn() {
-		if (controllers[1].getAButton() && vaccumTimer < 0) {
+		if (controllers[1].getRawButton(1) && vaccumTimer < 0) { //A button
 			vaccumTimer = 50;
 
 			if (!vacuumOn) {
@@ -286,13 +286,13 @@ public class Robot extends TimedRobot {
 	}
 
 	private void cubeDispenser() {
-		if (controllers[1].getXButton()) {
+		if (controllers[1].getRawButton(3)) { // X Button
 			// Intake cube
 			Motors.cubeMotorLeft.set(-0.7); // -0.7
 			Motors.cubeMotorRight.set(0.7); // 0.7
 			// t = new MovementController();
 		    // t.start();
-		} else if (controllers[1].getYButton()) {// Eject cube
+		} else if (controllers[1].getRawButton(4)) {// Eject cube - Y Button
 			Motors.cubeMotorLeft.set(0.6); // 0.5
 			Motors.cubeMotorRight.set(-0.6); // -0.5
 		} else {
