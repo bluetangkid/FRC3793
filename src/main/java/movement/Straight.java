@@ -1,5 +1,6 @@
 package movement;
 
+import org.usfirst.frc.team3793.robot.Motors;
 import org.usfirst.frc.team3793.robot.Sensors;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
@@ -14,9 +15,9 @@ public class Straight extends MovementAction implements PIDOutput{
 	Point startPos;
 	PIDController straightPID;
 	
-	final static float kP = 0.1f;
-	final static float kI = 0.00002f;
-	final static float kD = 0.0f;
+	final static float kP = 0.42f;
+	final static float kI = 1.11666f;
+	final static float kD = 0.0378f;
 	final static float kF = 0.0f;
 	final static float kTolerance = 0;
 	
@@ -27,9 +28,9 @@ public class Straight extends MovementAction implements PIDOutput{
 		super((int)Math.signum(distance), maxSpeed);
 		this.distance = distance;
 		degrees = Sensors.navX.getYaw();
-		startPos = new Point((float)Sensors.navX.getDisplacementX(), (float)Sensors.navX.getDisplacementY(), (float)Sensors.navX.getDisplacementZ());
+		startPos = new Point(Motors.talonLeft.getSelectedSensorPosition(0), Motors.talonRight.getSelectedSensorPosition(0));
 		
-		straightPID = new PIDController(kP, kI, kD, kF, Sensors.navX, this);
+		straightPID = new PIDController(kP, kI, kD, kF, Sensors.navX, this, 0.005);
 		straightPID.setInputRange(-180.0f,  180.0f);
 		straightPID.setOutputRange(-1.0, 1.0);
 		straightPID.setAbsoluteTolerance(kTolerance);
@@ -44,14 +45,7 @@ public class Straight extends MovementAction implements PIDOutput{
 	 */
 	public Speed getSpeed() {
 		double pidOut;
-		if(direction) {
-			pidOut = 1-straightPID.get();
-			System.out.println(Sensors.navX.getDisplacementX() + " ::: " + Sensors.navX.getDisplacementY() + " ::: " + Sensors.navX.getDisplacementZ());
-			
-			return new Speed(maxSpeed, maxSpeed*pidOut);
-		}
 		pidOut = straightPID.get();
-		
 		
 		return new Speed(-maxSpeed*pidOut, -maxSpeed);
 	}
@@ -60,7 +54,7 @@ public class Straight extends MovementAction implements PIDOutput{
 	 * @return the distance traveled so far by the robot
 	 */
 	private double distTraveled() {
-		return startPos.getDist(new Point(Sensors.navX.getDisplacementX(), Sensors.navX.getDisplacementY(), Sensors.navX.getDisplacementZ()));
+		return (startPos.getDist(new Point(Motors.talonLeft.getSelectedSensorPosition(0), Motors.talonRight.getSelectedSensorPosition(0)))/4096)*0.15*Math.PI;
 	}
 	
 	/**
