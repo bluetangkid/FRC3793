@@ -3,6 +3,8 @@ package org.usfirst.frc.team3793.robot;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -17,8 +19,8 @@ import movement.MovementController;
  */
 public class Robot extends TimedRobot {
 	
-	static GenericHID driverController = new GenericHID(0);
-	static GenericHID operatorController = new GenericHID(1);
+	static GenericHID driverController = new XboxController(0);
+	static GenericHID operatorController = new XboxController(1);
 	public GenericHID[] controllers = new GenericHID[2];
 	private boolean singleControllerMode = true;
 	public int controllerSelector = 0;
