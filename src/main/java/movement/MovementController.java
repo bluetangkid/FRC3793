@@ -22,26 +22,23 @@ public class MovementController extends Thread {
 	MovementAction action;
 	boolean teleopEnabled = false;
 
-	public MovementController() {
+	public MovementController() {}
+
+	public void run() {
+		while (Sensors.navX.isCalibrating());
+
 		action = null;
 		actions = new ArrayDeque<MovementAction>();
-		while (Sensors.navX.isCalibrating());
 		// Make speed for turns 0.8f
 		actions.add(new Turn(90, 0.7f));
 		// Put actions here for autonomous like so: actions.add(new Turn(1, 90, 0.7));
 		// actions.add(new Turn (45,.8f));
 		action = actions.removeFirst();
-	}
 
-	public void run() {
-		long loopStart;
-		Sensors.navX.resetDisplacement();
-		// System.out.println(Sensors.navX.getYaw());
 		while (!Thread.interrupted()) {
 			// System.out.println(System.currentTimeMillis());
 			// SmartDashboard.putString("State", Robot.getState().name());
 			// SmartDashboard.putNumber("Angle", Sensors.navX.getYaw());
-			loopStart = System.currentTimeMillis();
 			if (action != null && action.isComplete()) {
 				action = null;
 				Motors.drive.tankDrive(0, 0);
@@ -67,7 +64,7 @@ public class MovementController extends Thread {
 				actions.clear();
 			}
 			try {
-				Thread.sleep(1);
+				Thread.sleep(5);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				return;

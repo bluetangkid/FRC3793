@@ -22,7 +22,6 @@ public class Turn extends MovementAction implements PIDOutput {
 	private int timer = 0;
 
 	public Turn(float degrees, float maxSpeed) {
-		
 		super((int) Math.signum(degrees), maxSpeed);
 		System.out.println(Sensors.navX.getYaw() + " Start of turn");
 
@@ -36,7 +35,7 @@ public class Turn extends MovementAction implements PIDOutput {
 		}
 		System.out.println(this.degrees + " setPoint post wrap");
 
-		turnController = new PIDController(kP, kI, kD, kF, Sensors.navX, this,.005);
+		turnController = new PIDController(kP, kI, kD, kF, Sensors.navX, this, 0.005);
 		turnController.setInputRange(-180.0f, 180.0f);
 		turnController.setOutputRange(-1.0, 1.0);
 		turnController.setAbsoluteTolerance(kTolerance);
@@ -51,11 +50,7 @@ public class Turn extends MovementAction implements PIDOutput {
 	 * @return required {@link Speed} to turn correctly
 	 */
 	public Speed getSpeed() {
-		
-		double pidOut = turnController.get();
-		// System.out.println(Sensors.navX.getYaw());
-		// return new Speed(0,0);
-		return new Speed(maxSpeed * pidOut, -maxSpeed * pidOut);
+		return PID;
 	}
 
 	/**
@@ -82,14 +77,14 @@ public class Turn extends MovementAction implements PIDOutput {
 
 	@Override
 	public void pidWrite(double output) {
-		PID = output;
+		PID = new Speed(maxSpeed * output, -maxSpeed * output);
 	}
 
 	public boolean onSetpoint() {
 		if(timer > 0){
 			timer--;
 		}else{
-			timer =10;
+			timer = 10;
 			//System.out.println(Math.abs(turnController.getSetpoint() - Sensors.navX.getYaw()) + " distance from target");
 		}
 

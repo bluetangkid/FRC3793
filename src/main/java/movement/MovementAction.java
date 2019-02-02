@@ -7,7 +7,7 @@ public abstract class MovementAction {
 	protected long beginTime;
 	protected boolean direction;
 	protected float maxSpeed;
-	protected double PID;
+	protected Speed PID;
 	protected float degrees;
 	
 	public MovementAction(int direction, float maxSpeed) {
