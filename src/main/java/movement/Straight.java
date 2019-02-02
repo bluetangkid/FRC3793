@@ -14,9 +14,9 @@ public class Straight extends MovementAction implements PIDOutput{
 	Point startPos;
 	PIDController straightPID;
 	
-	final static float kP = 0.42f;
-	final static float kI = 1.11666f;
-	final static float kD = 0.0378f;
+	final static float kP = 0.23f;
+	final static float kI = 0;
+	final static float kD = 0;
 	final static float kF = 0.0f;
 	final static float kTolerance = 0;
 	
@@ -31,7 +31,7 @@ public class Straight extends MovementAction implements PIDOutput{
 		
 		straightPID = new PIDController(kP, kI, kD, kF, Sensors.navX, this, 0.005);
 		straightPID.setInputRange(-180.0f,  180.0f);
-		straightPID.setOutputRange(-1.0, 1.0);
+		straightPID.setOutputRange(0.8f, 1.2f);
 		straightPID.setAbsoluteTolerance(kTolerance);
 		straightPID.setContinuous(true);
 	    straightPID.setSetpoint(degrees);
@@ -62,6 +62,6 @@ public class Straight extends MovementAction implements PIDOutput{
 
 	@Override
 	public void pidWrite(double output) {
-		PID = new Speed(-maxSpeed*output, -maxSpeed);
+		PID = new Speed(maxSpeed*output, maxSpeed);
 	}
 }

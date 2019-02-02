@@ -26,10 +26,11 @@ public class MovementController extends Thread {
 
 	public void run() {
 		while (Sensors.navX.isCalibrating());
-		
+
 		action = null;
 		actions = new ArrayDeque<MovementAction>();
-		// Make speed for turns 0.8f
+		// Make speed for everything 0.8f(reccomended)
+		//actions.add(new Turn(90, 0.8f));
 		actions.add(new Turn(90, 0.8f));
 		// Put actions here for autonomous like so: actions.add(new Turn(1, 90, 0.7));
 		// actions.add(new Turn (45,.8f));
@@ -38,8 +39,6 @@ public class MovementController extends Thread {
 
 		while (!Thread.interrupted()) {
 			// System.out.println(System.currentTimeMillis());
-			// SmartDashboard.putString("State", Robot.getState().name());
-			// SmartDashboard.putNumber("Angle", Sensors.navX.getYaw());
 			if (action != null && action.isComplete()) {
 				action = null;
 				Motors.drive.tankDrive(0, 0);

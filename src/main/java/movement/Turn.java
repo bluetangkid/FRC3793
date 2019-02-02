@@ -12,11 +12,11 @@ import edu.wpi.first.wpilibj.PIDOutput;
  */
 public class Turn extends MovementAction implements PIDOutput {
 	PIDController turnController;
-	// 0.72s oscillaty
-	final static float kP = .42f;// .03f
-	final static float kI = 1.11666f;// .0002
-	final static float kD = 0.0378f;
-	final static float kF = 0.0f;
+	// 0.58s oscillaty
+	final static float kP = .35f;// .03f
+	final static float kI = 1.2f;//0.11666f;// .0002
+	final static float kD = 0.0261f;//0.0378f;
+	final static float kF = 0f;
 	final static float kTolerance = 3;
 	public int framedoodad = 0;
 	private int timer = 0;
@@ -61,6 +61,7 @@ public class Turn extends MovementAction implements PIDOutput {
 			System.out.println(Sensors.navX.getYaw() + " End of turn");
 		}
 		return onSetpoint();
+		//return false;
 		// if (onSetpoint()) {
 		// 	framedoodad++;
 		// 	System.out.println(framedoodad + " framedoodad");

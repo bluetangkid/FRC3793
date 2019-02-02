@@ -120,9 +120,9 @@ public class Robot extends TimedRobot {
 	
 	@Override
 	public void autonomousPeriodic() {
-		double a = SmartDashboard.getNumber("Color", 0);
-		Motors.blinkin.set(a);
-
+		SmartDashboard.putString("State", Robot.getState().name());
+		SmartDashboard.putNumber("Angle", Sensors.navX.getYaw());
+		
 		state = RoboState.Autonomous;
 		Scheduler.getInstance().run();
 		// System.out.println(Sensors.navX.getYaw()+ "autoPeriodic");
@@ -135,8 +135,6 @@ public class Robot extends TimedRobot {
 
 	@Override																																																																					
 	public void teleopPeriodic() {
-		
-
 		if(singleControllerMode && Master.getRawButton(8)){
 			controllerSelector++;
 			GenericHID c;
