@@ -18,8 +18,8 @@ public class Sensors {
 	
 	public static void initialize() {
 		vacuumPivotSwitch = new DigitalInput(4);
-		navX = new AHRS(SerialPort.Port.kUSB);
-		jeVois1 = new SerialPort(921600, SerialPort.Port.kUSB1);
-		jeVois2 = new SerialPort(921600, SerialPort.Port.kUSB2);
+		navX = new AHRS(SerialPort.Port.kMXP);
+		//jeVois1 = new SerialPort(921600, SerialPort.Port.kUSB1);
+		//jeVois2 = new SerialPort(921600, SerialPort.Port.kUSB2);
 	}
 }

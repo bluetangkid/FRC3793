@@ -14,6 +14,7 @@ public abstract class MovementAction {
 		beginTime = System.currentTimeMillis();
 		this.direction = direction > 0;
 		this.maxSpeed = maxSpeed;
+		this.PID = new Speed(0, 0);
 	}
 	
 	/*

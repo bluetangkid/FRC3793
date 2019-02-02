@@ -26,13 +26,14 @@ public class MovementController extends Thread {
 
 	public void run() {
 		while (Sensors.navX.isCalibrating());
-
+		
 		action = null;
 		actions = new ArrayDeque<MovementAction>();
 		// Make speed for turns 0.8f
-		actions.add(new Turn(90, 0.7f));
+		actions.add(new Turn(90, 0.8f));
 		// Put actions here for autonomous like so: actions.add(new Turn(1, 90, 0.7));
 		// actions.add(new Turn (45,.8f));
+
 		action = actions.removeFirst();
 
 		while (!Thread.interrupted()) {

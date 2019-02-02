@@ -108,25 +108,21 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousInit() {
-		Sensors.navX.reset();
 		state = RoboState.AutonomousInit;
 		Motors.blinkin.set(-0.43);
 		timerStarted = false;
 		scissorTimerStarted = false;
-		//Motors.vacuumMotor.set(1);
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
-		//System.out.println("gameData is " + gameData);
 		
-		//Sensors.navX.reset();
-		System.out.println(Sensors.navX.getYaw()+" AutoInit");
 		t = new MovementController();
 		t.start();
-		//System.out.println(switchNum);
 	}
 	
 	@Override
 	public void autonomousPeriodic() {
-		
+		double a = SmartDashboard.getNumber("Color", 0);
+		Motors.blinkin.set(a);
+
 		state = RoboState.Autonomous;
 		Scheduler.getInstance().run();
 		// System.out.println(Sensors.navX.getYaw()+ "autoPeriodic");

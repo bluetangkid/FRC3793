@@ -24,7 +24,7 @@ public class Turn extends MovementAction implements PIDOutput {
 	public Turn(float degrees, float maxSpeed) {
 		super((int) Math.signum(degrees), maxSpeed);
 		System.out.println(Sensors.navX.getYaw() + " Start of turn");
-
+		
 		this.degrees = Sensors.navX.getYaw() + (degrees);
 		System.out.println(this.degrees + " setPoint Pre wrap");
 
@@ -43,7 +43,6 @@ public class Turn extends MovementAction implements PIDOutput {
 		turnController.setSetpoint(this.degrees);
 		turnController.enable();
 		System.out.println(turnController.getSetpoint() + " setPoint");
-
 	}
 
 	/**
