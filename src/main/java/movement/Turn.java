@@ -13,9 +13,9 @@ import edu.wpi.first.wpilibj.PIDOutput;
 public class Turn extends MovementAction implements PIDOutput {
 	PIDController turnController;
 	// 0.58s oscillaty
-	final static float kP = .35f;// .03f
-	final static float kI = 1.2f;//0.11666f;// .0002
-	final static float kD = 0.0261f;//0.0378f;
+	final static float kP = .175f;// .03f .42f .175
+	final static float kI = 0.000001f;// .0002 1.11666
+	final static float kD = 1f;//.0378
 	final static float kF = 0f;
 	final static float kTolerance = 3;
 	public int framedoodad = 0;
@@ -57,22 +57,21 @@ public class Turn extends MovementAction implements PIDOutput {
 	 *         controller
 	 */
 	public boolean isComplete() {
-		if(onSetpoint()){
-			System.out.println(Sensors.navX.getYaw() + " End of turn");
-		}
-		return onSetpoint();
-		//return false;
-		// if (onSetpoint()) {
-		// 	framedoodad++;
-		// 	System.out.println(framedoodad + " framedoodad");
-		// } else framedoodad = 0;
-
-		// if (framedoodad > 14) {
-		// 	System.out.println("Yes Papa, No Papa, No Papa, This is rape");
-		// 	System.out.println(Sensors.navX.getYaw() + " end of turn");
-		// 	return true;
+		// if(onSetpoint()){
+		// 	System.out.println(Sensors.navX.getYaw() + " End of turn");
 		// }
-		// return false;
+		// return onSetpoint();
+		if (onSetpoint()) {
+			framedoodad++;
+			System.out.println(framedoodad + " framedoodad");
+		} else framedoodad = 0;
+
+		if (framedoodad > 14) {
+			System.out.println("Yes Papa, No Papa, No Papa, This is rape");
+			System.out.println(Sensors.navX.getYaw() + " end of turn");
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -81,12 +80,13 @@ public class Turn extends MovementAction implements PIDOutput {
 	}
 
 	public boolean onSetpoint() {
-		if(timer > 0){
-			timer--;
-		}else{
-			timer = 10;
-			//System.out.println(Math.abs(turnController.getSetpoint() - Sensors.navX.getYaw()) + " distance from target");
-		}
+		
+		// if(timer > 0){
+		// 	timer--;
+		// }else{
+		// 	timer = 10;
+		// 	//System.out.println(Math.abs(turnController.getSetpoint() - Sensors.navX.getYaw()) + " distance from target");
+		// }
 
 		return Math.abs(turnController.getSetpoint() - Sensors.navX.getYaw()) < kTolerance;
 	}
