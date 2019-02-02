@@ -116,12 +116,6 @@ public class Robot extends TimedRobot {
 		//Motors.vacuumMotor.set(1);
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
 		//System.out.println("gameData is " + gameData);
-		switchNum = 0;
-
-		if (Sensors.switch1.get()) switchNum += 1;
-		if (Sensors.switch2.get()) switchNum += 2;
-		if (Sensors.switch3.get()) switchNum += 4;
-		if (Sensors.switch4.get()) switchNum += 8;
 		
 		//Sensors.navX.reset();
 		System.out.println(Sensors.navX.getYaw()+" AutoInit");
@@ -136,9 +130,6 @@ public class Robot extends TimedRobot {
 		state = RoboState.Autonomous;
 		Scheduler.getInstance().run();
 		// System.out.println(Sensors.navX.getYaw()+ "autoPeriodic");
-
-		
-
 	}
 
 	@Override
@@ -150,7 +141,7 @@ public class Robot extends TimedRobot {
 	public void teleopPeriodic() {
 		
 
-		if(singleControllerMode && Master.getStartButton()){
+		if(singleControllerMode && Master.getRawButton(8)){
 			controllerSelector++;
 			GenericHID c;
 			if(controllerSelector > controllers.length -1){
