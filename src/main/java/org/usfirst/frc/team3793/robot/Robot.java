@@ -15,7 +15,7 @@ import movement.MovementController;
 // Y=7.029608995X - 592.3469424, where domain is defined on (90,1700)
 /**
  * Main Robot class. Does networking and Teleop control by thinking very hard and very carefully.
- * @author Alex for teleop control, Warren for networking, FIRST provided an empty class template
+ * @author Faris for teleop control, Warren for networking, FIRST provided an empty class template
  */
 public class Robot extends TimedRobot {
 	
