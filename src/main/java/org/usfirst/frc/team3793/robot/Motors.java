@@ -18,8 +18,8 @@ public class Motors {
 	
 	// ----------------------------- Driving Motors -----------------------------
 	
-	private static WPI_TalonSRX talonLeft;
-	private static WPI_TalonSRX talonRight;
+	public static WPI_TalonSRX talonLeft;
+	public static WPI_TalonSRX talonRight;
 	private static WPI_VictorSPX victorLeft;
 	private static WPI_VictorSPX victorRight;
 	private static SpeedControllerGroup left;
