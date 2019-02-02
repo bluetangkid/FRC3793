@@ -6,73 +6,93 @@ import edu.wpi.first.wpilibj.PIDOutput;
 
 /**
  * Class to cause a desired stationary turn to a specified number of degrees
+ * 
  * @author Warren Funk
  *
  */
-public class Turn extends MovementAction implements PIDOutput{
+public class Turn extends MovementAction implements PIDOutput {
 	PIDController turnController;
-	
-	final static float kP = 1f;//.03f
-	final static float kI = 0.000f;//.0002
-	final static float kD = 0.0f;
-	final static float kF = 0f;
-	final static float kTolerance = 5;
-	static float targetTime = 0;
+	// 0.72s oscillaty
+	final static float kP = .42f;// .03f
+	final static float kI = 1.11666f;// .0002
+	final static float kD = 0.0378f;
+	final static float kF = 0.0f;
+	final static float kTolerance = 3;
 	public int framedoodad = 0;
-	
-	public Turn(float degrees, float maxSpeed) {
-		super((int)Math.signum(degrees), maxSpeed);
+	private int timer = 0;
 
-		this.degrees = Sensors.navX.getYaw()+degrees;
-		if(this.degrees > 180){
-			this.degrees -= 360;
-		} else if(this.degrees < -180){
-			this.degrees += 360;
-		}
+	public Turn(float degrees, float maxSpeed) {
 		
-		//this.degrees = Sensors.navX.getYaw()+degrees;
-		turnController = new PIDController(kP, kI, kD, kF, Sensors.navX, this);
-	    turnController.setInputRange(-180.0f,  180.0f);
-	    turnController.setOutputRange(-1.0, 1.0);
-	    turnController.setAbsoluteTolerance(kTolerance);
-	    turnController.setContinuous(true);
-	    turnController.setSetpoint(this.degrees);
-	    turnController.enable();
-		System.out.println(Sensors.navX.getYaw()+" Start of turn");
+		super((int) Math.signum(degrees), maxSpeed);
+		System.out.println(Sensors.navX.getYaw() + " Start of turn");
+
+		this.degrees = Sensors.navX.getYaw() + (degrees);
+		System.out.println(this.degrees + " setPoint Pre wrap");
+
+		if (this.degrees > 180) {
+			this.degrees = -180 + this.degrees % 180;
+		} else if (this.degrees < -180) {
+			this.degrees = 180 - this.degrees % 180;
+		}
+		System.out.println(this.degrees + " setPoint post wrap");
+
+		turnController = new PIDController(kP, kI, kD, kF, Sensors.navX, this,.005);
+		turnController.setInputRange(-180.0f, 180.0f);
+		turnController.setOutputRange(-1.0, 1.0);
+		turnController.setAbsoluteTolerance(kTolerance);
+		turnController.setContinuous(true);
+		turnController.setSetpoint(this.degrees);
+		turnController.enable();
 		System.out.println(turnController.getSetpoint() + " setPoint");
 
 	}
-	
+
 	/**
 	 * @return required {@link Speed} to turn correctly
 	 */
 	public Speed getSpeed() {
+		
 		double pidOut = turnController.get();
-		//System.out.println(Sensors.navX.getYaw());
-		if(direction) return new Speed(-maxSpeed*pidOut, maxSpeed*pidOut);
-		//return new Speed(0,0);
-		return new Speed(maxSpeed*pidOut, -maxSpeed*pidOut);
+		// System.out.println(Sensors.navX.getYaw());
+		// return new Speed(0,0);
+		return new Speed(maxSpeed * pidOut, -maxSpeed * pidOut);
 	}
-	
+
 	/**
-	 * @return whether or not the turn is within tolerance according to the PID controller
+	 * @return whether or not the turn is within tolerance according to the PID
+	 *         controller
 	 */
 	public boolean isComplete() {
-		if(turnController.onTarget()){ 
-			framedoodad++;
-			System.out.println(framedoodad + " framedoodad");
-		}else framedoodad = 0;
+		if(onSetpoint()){
+			System.out.println(Sensors.navX.getYaw() + " End of turn");
+		}
+		return onSetpoint();
+		// if (onSetpoint()) {
+		// 	framedoodad++;
+		// 	System.out.println(framedoodad + " framedoodad");
+		// } else framedoodad = 0;
 
-		if(framedoodad > 30) {
-			System.out.println("Here's Johnny");
-			System.out.println(Sensors.navX.getYaw()+" end of turn");
-		return true;
-	}
-		return false;
+		// if (framedoodad > 14) {
+		// 	System.out.println("Yes Papa, No Papa, No Papa, This is rape");
+		// 	System.out.println(Sensors.navX.getYaw() + " end of turn");
+		// 	return true;
+		// }
+		// return false;
 	}
 
 	@Override
 	public void pidWrite(double output) {
 		PID = output;
+	}
+
+	public boolean onSetpoint() {
+		if(timer > 0){
+			timer--;
+		}else{
+			timer =10;
+			//System.out.println(Math.abs(turnController.getSetpoint() - Sensors.navX.getYaw()) + " distance from target");
+		}
+
+		return Math.abs(turnController.getSetpoint() - Sensors.navX.getYaw()) < kTolerance;
 	}
 }
