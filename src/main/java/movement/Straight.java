@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.PIDOutput;
 /**
  * class to calculate the desired speed to make the robot go in a straight line
  * @author Warren Funk
- *
  */
 public class Straight extends MovementAction implements PIDOutput{
 	float distance;
@@ -39,15 +38,11 @@ public class Straight extends MovementAction implements PIDOutput{
 	    straightPID.enable();
 	}
 	
-	
 	/**
 	 * @return {@link Speed} required to go in a straight line
 	 */
 	public Speed getSpeed() {
-		double pidOut;
-		pidOut = straightPID.get();
-		
-		return new Speed(-maxSpeed*pidOut, -maxSpeed);
+		return PID;
 	}
 	
 	/**
@@ -67,6 +62,6 @@ public class Straight extends MovementAction implements PIDOutput{
 
 	@Override
 	public void pidWrite(double output) {
-		PID = output;
+		PID = new Speed(-maxSpeed*output, -maxSpeed);
 	}
 }
