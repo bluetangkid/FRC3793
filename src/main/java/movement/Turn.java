@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 /**
  * Class to cause a desired stationary turn to a specified number of degrees
  * 
- * @author Warren Funk
+ * @author Warren Funk, Ethan Durham, Faris Prasetiawan
  *
  */
 public class Turn extends MovementAction implements PIDOutput {
