@@ -28,7 +28,6 @@ public class Straight extends MovementAction implements PIDOutput{
 		this.distance = distance;
 		degrees = Sensors.navX.getYaw();
 		startPos = new Point(Motors.talonLeft.getSelectedSensorPosition(0), Motors.talonRight.getSelectedSensorPosition(0));
-		
 		straightPID = new PIDController(kP, kI, kD, kF, Sensors.navX, this, 0.005);
 		straightPID.setInputRange(-180.0f,  180.0f);
 		straightPID.setOutputRange(0.8f, 1.2f);
@@ -56,8 +55,7 @@ public class Straight extends MovementAction implements PIDOutput{
 	 * @return whether or not the action is complete
 	 */
 	public boolean isComplete() {
-		if(distTraveled() >= distance) return true;
-		return false;
+		return distTraveled() >= distance;
 	}
 
 	@Override
