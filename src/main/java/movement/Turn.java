@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 /**
  * Class to cause a desired stationary turn to a specified number of degrees
  * 
- * @author Warren Funk
+ * @author Warren Funk, Ethan Durham, Faris Prasetiawan
  *
  */
 public class Turn extends MovementAction implements PIDOutput {
@@ -20,7 +20,6 @@ public class Turn extends MovementAction implements PIDOutput {
 	final static float kF = 0f;
 	final static float kTolerance = 1;
 	public int framedoodad = 0;
-	private int timer = 0;
 
 	public Turn(float degrees, float maxSpeed) {
 		super((int) Math.signum(degrees), maxSpeed);

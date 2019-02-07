@@ -33,7 +33,4 @@ public class Point {
 	public double getY() {
 		return y;
 	}
-	/**
-	 * @return z component of the 3 dimensional vector
-	 */
 }

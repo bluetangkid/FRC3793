@@ -24,8 +24,8 @@ public class Speed {
 	public double getR() {
 		return r;
 	}
-	
-	public String justWork() {
+
+	public String toString() {
 		return l + " : " + r;
 	}
 }
