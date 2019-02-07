@@ -68,6 +68,10 @@ public class Robot extends TimedRobot {
 			Master = controllers[0];
 			System.out.println("controller 0");
 		}
+		Motors.compressor.setClosedLoopControl(false);
+		Motors.landingGear.set(false);
+		Motors.avocadoSlide.set(false);
+
 		state = RoboState.RobotInit;
 		
 //		try {
@@ -98,6 +102,9 @@ public class Robot extends TimedRobot {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
+		Motors.compressor.setClosedLoopControl(false);
+		Motors.landingGear.set(false);
+		Motors.avocadoSlide.set(false);
 	}
 
 	@Override
@@ -116,6 +123,9 @@ public class Robot extends TimedRobot {
 		
 		t = new MovementController();
 		t.start();
+
+		Motors.compressor.setClosedLoopControl(false);
+		Motors.avocadoSlide.set(false);
 	}
 	
 	@Override
@@ -252,6 +262,46 @@ public class Robot extends TimedRobot {
 
 	private void drive() {
 		driveControl();
+	}
+
+	private void avocadoControl(){
+		if(controllers[1].getRawButton(0)){ //supposed to be B button
+			Motors.avocadoSlide.set(true); // extended
+		}
+		if(controllers[1].getRawButton(0)){ //supposedd to be X button
+			Motors.avocadoSlide.set(false); // retracted
+		}
+	}
+
+	private void landingGear(){
+		if(controllers[1].getRawButton(0)){ // supposed to be start button
+			Motors.landingGear.set(true);
+		}
+
+		if(controllers[1].getRawButton(0)){ // supposed to be back button
+			Motors.landingGear.set(false);
+		}
+	}
+
+	private void climbingArm(){
+		double armMovement = controllers[1].getRawAxis(0); // supposed to be right stick Y axis
+		if(Math.abs(armMovement) > .3){
+			Motors.armMotor.set(armMovement);
+		}
+	}
+
+	private void cargoIntake(){
+		final double GOING_UP = -1.0;
+		final double GOING_DOWN = 1.0;
+
+		if (controllers[1].getRawButton(0)) { // y button
+			Motors.hippy.set(true);  // extended
+		}
+
+	    if (controllers[1].getRawButton(0)) { // a button
+			Motors.hippy.set(false); // retracted
+		}
+	
 	}
 
 	private void turnVacuumOn() {
