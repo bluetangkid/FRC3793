@@ -1,5 +1,6 @@
 package movement;
 
+import org.usfirst.frc.team3793.robot.Motors;
 import org.usfirst.frc.team3793.robot.Sensors;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
@@ -13,11 +14,11 @@ import edu.wpi.first.wpilibj.PIDOutput;
 public class Turn extends MovementAction implements PIDOutput {
 	PIDController turnController;
 	// 0.58s oscillaty
-	final static float kP = .175f;// .03f .42f .175
-	final static float kI = 0.000001f;// .0002 1.11666
-	final static float kD = 1f;//.0378
+	final static float kP = .1f;// .175
+	final static float kI = 0.00000f;// .000001
+	final static float kD = 1f;//1
 	final static float kF = 0f;
-	final static float kTolerance = 3;
+	final static float kTolerance = 1;
 	public int framedoodad = 0;
 	private int timer = 0;
 
@@ -61,17 +62,23 @@ public class Turn extends MovementAction implements PIDOutput {
 		// 	System.out.println(Sensors.navX.getYaw() + " End of turn");
 		// }
 		// return onSetpoint();
+		
 		if (onSetpoint()) {
 			framedoodad++;
 			System.out.println(framedoodad + " framedoodad");
 		} else framedoodad = 0;
 
-		if (framedoodad > 14) {
+		if (framedoodad > 9) {
 			System.out.println("Yes Papa, No Papa, No Papa, This is rape");
+			System.out.println(" Matthew Schmidt beats his wife pt 2 electric bugaloo");
 			System.out.println(Sensors.navX.getYaw() + " end of turn");
 			return true;
 		}
 		return false;
+		// if(onSetpoint() && !Sensors.navX.isMoving()){
+			// System.out.println(" Baby girl what you doin' where's your man, I just popped a xan, 50,000 in Japan");
+		// }
+		// return onSetpoint() && !Sensors.navX.isMoving();
 	}
 
 	@Override
@@ -88,6 +95,6 @@ public class Turn extends MovementAction implements PIDOutput {
 		// 	//System.out.println(Math.abs(turnController.getSetpoint() - Sensors.navX.getYaw()) + " distance from target");
 		// }
 
-		return Math.abs(turnController.getSetpoint() - Sensors.navX.getYaw()) < kTolerance;
+		return Sensors.navX.getYaw() > turnController.getSetpoint() - 3 && Sensors.navX.getYaw() < turnController.getSetpoint() + 3;
 	}
 }
