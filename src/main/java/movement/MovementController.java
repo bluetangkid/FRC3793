@@ -42,6 +42,7 @@ public class MovementController extends Thread {
 			if (action != null && action.isComplete()) {
 				action = null;
 				Motors.drive.tankDrive(0, 0);
+				// System.out.println("The action is complete");
 			}
 			if (Robot.getState() == RoboState.Autonomous) {
 				if (!actions.isEmpty()) {

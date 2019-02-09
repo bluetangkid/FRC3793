@@ -14,7 +14,7 @@ public class Straight extends MovementAction implements PIDOutput{
 	Point startPos;
 	PIDController straightPID;
 	
-	final static float kP = 0.23f;
+	final static float kP = .23f;
 	final static float kI = 0;
 	final static float kD = 0;
 	final static float kF = 0.0f;
@@ -26,6 +26,7 @@ public class Straight extends MovementAction implements PIDOutput{
 	public Straight(float distance, float maxSpeed) {
 		super((int)Math.signum(distance), maxSpeed);
 		this.distance = distance;
+		System.out.println(" straight trying to initialize");
 		degrees = Sensors.navX.getYaw();
 		startPos = new Point(Motors.talonLeft.getSelectedSensorPosition(0), Motors.talonRight.getSelectedSensorPosition(0));
 		straightPID = new PIDController(kP, kI, kD, kF, Sensors.navX, this, 0.005);

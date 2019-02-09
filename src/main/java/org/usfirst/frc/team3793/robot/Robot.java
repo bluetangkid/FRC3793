@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import movement.MovementController;
+import edu.wpi.first.wpilibj.Timer;
 
 //Equation for Drift on tile where y is drift in clicks and x is velocity in clicks/100 ms
 // Y=7.029608995X - 592.3469424, where domain is defined on (90,1700)
@@ -52,6 +53,16 @@ public class Robot extends TimedRobot {
 	
 	static DatagramSocket socket;
 	static InetAddress pi;
+
+	static final int DRIVER = 0;
+	static final int OPERATOR = 0;
+
+	static int avocadoPos = 180;
+	static boolean isAvocadoTurning = false;
+	static boolean avocadoLimitReleased = false;
+
+	static Timer avocadoTimer = new Timer();
+
 	
 	static SmartDashboard dashboard;
 	//static PowerDistributionPanel pdp;
@@ -62,15 +73,15 @@ public class Robot extends TimedRobot {
 		Motors.initialize();
 		Sensors.initialize();
 
-		controllers[0] = driverController;
-		controllers[1] = operatorController;
+		controllers[DRIVER] = driverController;
+		controllers[OPERATOR] = operatorController;
 		if(singleControllerMode){
-			Master = controllers[0];
+			Master = controllers[DRIVER];
 			System.out.println("controller 0");
 		}
-		Motors.compressor.setClosedLoopControl(false);
-		Motors.landingGear.set(false);
-		Motors.avocadoSlide.set(false);
+		// Motors.compressor.setClosedLoopControl(false);
+		// Motors.landingGear.set(false);
+		// Motors.avocadoSlide.set(false);
 
 		state = RoboState.RobotInit;
 		
@@ -102,9 +113,9 @@ public class Robot extends TimedRobot {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		Motors.compressor.setClosedLoopControl(false);
-		Motors.landingGear.set(false);
-		Motors.avocadoSlide.set(false);
+		// Motors.compressor.setClosedLoopControl(false);
+		// Motors.landingGear.set(false);
+		// Motors.avocadoSlide.set(false);
 	}
 
 	@Override
@@ -124,8 +135,8 @@ public class Robot extends TimedRobot {
 		t = new MovementController();
 		t.start();
 
-		Motors.compressor.setClosedLoopControl(false);
-		Motors.avocadoSlide.set(false);
+		// Motors.compressor.setClosedLoopControl(false);
+		// Motors.avocadoSlide.set(false);
 	}
 	
 	@Override
@@ -151,14 +162,14 @@ public class Robot extends TimedRobot {
 			if(controllerSelector > controllers.length -1){
 				
 				controllerSelector = 0;
-				c = controllers[0]; 
-				controllers[0] = controllers[1];
-				controllers[1] = c;
+				c = controllers[DRIVER]; 
+				controllers[DRIVER] = controllers[OPERATOR];
+				controllers[OPERATOR] = c;
 			}
 			if(controllerSelector == 1){
-				c = controllers[1];
-				controllers[1] = controllers[0];
-				controllers[0] = c; 
+				c = controllers[OPERATOR];
+				controllers[OPERATOR] = controllers[DRIVER];
+				controllers[DRIVER] = c; 
 			}
 			System.out.println(controllerSelector + " controllerSelector");
 			Master = controllers[controllerSelector];
@@ -170,8 +181,8 @@ public class Robot extends TimedRobot {
 		cubeIntakeTimer--;
 		cubeEjectTimer--;
 
-		scissorSpeed = controllers[1].getRawAxis(1);
-		speedOfVacuumPivot = controllers[1].getRawAxis(5);
+		scissorSpeed = controllers[OPERATOR].getRawAxis(1);
+		speedOfVacuumPivot = controllers[OPERATOR].getRawAxis(5);
 
 		Scheduler.getInstance().run();
 		
@@ -179,7 +190,7 @@ public class Robot extends TimedRobot {
 		//SmartDashboard.putNumber("Min Voltage", minVoltage);
 		
 		/*
-		if(controllers[0].getBumper(Hand.kRight)) {
+		if(controllers[DRIVER].getBumper(Hand.kRight)) {
 			byte[] data = new byte[1];
 			data[0] = 1;
 			DatagramPacket p = new DatagramPacket(data, 1, pi, 5808);
@@ -254,58 +265,110 @@ public class Robot extends TimedRobot {
 
 	}
 	public boolean masterIsDriver(){
-		return Master == controllers[0];
+		return Master == controllers[DRIVER];
 			} 
 	public boolean masterIsOperator(){
-		return Master == controllers[1];
+		return Master == controllers[OPERATOR];
 			} 
 
 	private void drive() {
 		driveControl();
 	}
 
+	public void avocadoSlideControl(){
+		// int povPos = controllers[OPERATOR].getPOV(0);
+
+		// if(povPos >= 0){
+		// 	if(povPos >= 45 && povPos <135){ // right D-Pad
+		// 		Motors.avocadoSlide.set(true); //extendio
+		// 	}
+
+		// 	if(povPos >= 225 && povPos <315){ // left D-Pad
+		// 		Motors.avocadoSlide.set(false); //retractio
+		// 	}
+		// }
+	}
+
+	public void avocadoTurningControl(){
+	// 	int povPos = controllers[OPERATOR].getPOV(0);
+
+	// 	if(povPos >= 135 && povPos <225 && avocadoPos >= 180 && !isAvocadoTurning){ // Up D-pad
+	// 		Motors.avocadoMotor.set(-1.0); // at full speed
+	// 		avocadoTimer.reset();  // we won't test for ...
+	// 		avocadoTimer.start();  // ... stopping for 1 second 
+	// 		isAvocadoTurning = true;
+	// 		System.out.println("In avocado turning motor ON"); 
+	// 		avocadoLimitReleased = false;
+	// 	}
+
+	// 	if(povPos >= 315 && povPos < 45 && avocadoPos <= 0 && !isAvocadoTurning){ // Down D-pad
+	// 		Motors.avocadoMotor.set(-1.0); // at full speed
+	// 		avocadoTimer.reset();  // we won't test for ...
+	// 		avocadoTimer.start();  // ... stopping for 1 second
+	// 		isAvocadoTurning = true;
+	// 		System.out.println("In avocado turning motor ON");
+	// 		avocadoLimitReleased = false;
+	// 	}
+
+	// 	if (!Sensors.avocadoLimit.get() && !avocadoLimitReleased) {
+	// 		avocadoLimitReleased = true;
+	// 		System.out.println("In avocado -- avocadoLimitReleased");
+	// 	}
+
+	// 	if (isAvocadoTurning) {
+	// 		// is it time to stop yet? 
+	// 		// Wait a second before testing if the limit switch is closed
+	// 		// if (avocadoTimer.get() >= 1.0) {
+	// 			if (Sensors.avocadoLimit.get() && avocadoLimitReleased) {  //active when true
+	// 				Motors.avocadoMotor.set(0.0);
+	// 				System.out.println("In avocado turning motor OFF");
+	// 				// set new position
+	// 				avocadoPos = 180 - avocadoPos;
+	// 				avocadoTimer.reset();
+	// 				isAvocadoTurning = false;
+	// 			}
+	// 	//	}
+	// }
+	}
+
 	private void avocadoControl(){
-		if(controllers[1].getRawButton(0)){ //supposed to be B button
-			Motors.avocadoSlide.set(true); // extended
-		}
-		if(controllers[1].getRawButton(0)){ //supposedd to be X button
-			Motors.avocadoSlide.set(false); // retracted
-		}
+		avocadoSlideControl();
+		avocadoTurningControl();
 	}
 
 	private void landingGear(){
-		if(controllers[1].getRawButton(0)){ // supposed to be start button
-			Motors.landingGear.set(true);
-		}
+		// if(!Motors.landingGear.get() && controllers[OPERATOR].getRawButton(0)){ // supposed to be start button
+		// 	Motors.landingGear.set(true);// extend
+		// }
 
-		if(controllers[1].getRawButton(0)){ // supposed to be back button
-			Motors.landingGear.set(false);
-		}
+		// if(Motors.landingGear.get() && controllers[OPERATOR].getRawButton(0)){ // supposed to be back button
+		// 	Motors.landingGear.set(false);// retract
+		// }
 	}
 
 	private void climbingArm(){
-		double armMovement = controllers[1].getRawAxis(0); // supposed to be right stick Y axis
-		if(Math.abs(armMovement) > .3){
-			Motors.armMotor.set(armMovement);
-		}
+		// double armMovement = controllers[OPERATOR].getRawAxis(0); // supposed to be right stick Y axis
+		// if(Math.abs(armMovement) > .3){
+		// 	Motors.armMotor.set(armMovement);
+		// }
 	}
 
 	private void cargoIntake(){
-		final double GOING_UP = -1.0;
-		final double GOING_DOWN = 1.0;
+		// final double GOING_UP = -1.0;
+		// final double GOING_DOWN = 1.0;
 
-		if (controllers[1].getRawButton(0)) { // y button
-			Motors.hippy.set(true);  // extended
-		}
+		// if (controllers[OPERATOR].getRawButton(0)) { // y button
+		// 	Motors.hippy.set(true);  // extended
+		// }
 
-	    if (controllers[1].getRawButton(0)) { // a button
-			Motors.hippy.set(false); // retracted
-		}
+	    // if (controllers[OPERATOR].getRawButton(0)) { // a button
+		// 	Motors.hippy.set(false); // retracted
+		// }
 	
 	}
 
 	private void turnVacuumOn() {
-		if (controllers[1].getRawButton(1) && vaccumTimer < 0) { //A button
+		if (controllers[OPERATOR].getRawButton(1) && vaccumTimer < 0) { //A button
 			vaccumTimer = 50;
 
 			if (!vacuumOn) {
@@ -323,13 +386,13 @@ public class Robot extends TimedRobot {
 	}
 
 	private void cubeDispenser() {
-		if (controllers[1].getRawButton(3)) { // X Button
+		if (controllers[OPERATOR].getRawButton(3)) { // X Button
 			// Intake cube
 			Motors.cubeMotorLeft.set(-0.7); // -0.7
 			Motors.cubeMotorRight.set(0.7); // 0.7
 			// t = new MovementController();
 		    // t.start();
-		} else if (controllers[1].getRawButton(4)) {// Eject cube - Y Button
+		} else if (controllers[OPERATOR].getRawButton(4)) {// Eject cube - Y Button
 			Motors.cubeMotorLeft.set(0.6); // 0.5
 			Motors.cubeMotorRight.set(-0.6); // -0.5
 		} else {
@@ -363,10 +426,10 @@ public class Robot extends TimedRobot {
 	}
 
 	private void driveControl() {
-		double dif = Math.signum(controllers[0].getRawAxis(2) - controllers[0].getRawAxis(3))*((controllers[0].getRawAxis(2) - controllers[0].getRawAxis(3)) * (controllers[0].getRawAxis(2) - controllers[0].getRawAxis(3)));
+		double dif = Math.signum(controllers[DRIVER].getRawAxis(2) - controllers[DRIVER].getRawAxis(3))*((controllers[DRIVER].getRawAxis(2) - controllers[DRIVER].getRawAxis(3)) * (controllers[DRIVER].getRawAxis(2) - controllers[DRIVER].getRawAxis(3)));
 		if (Math.abs(dif) < 0.1) dif = 0.0;
 
-		double turn = Math.signum(controllers[0].getRawAxis(0))*(controllers[0].getRawAxis(0)*controllers[0].getRawAxis(0));
+		double turn = Math.signum(controllers[DRIVER].getRawAxis(0))*(controllers[DRIVER].getRawAxis(0)*controllers[DRIVER].getRawAxis(0));
 		if (Math.abs(turn) < 0.1) turn = 0.0;
 		
 		Motors.drive.arcadeDrive(dif, turn);

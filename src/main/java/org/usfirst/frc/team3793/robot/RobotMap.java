@@ -34,6 +34,8 @@ public enum RobotMap {
 	AVACADO_SLIDE(0),
 	LANDING_GEAR(2),
 	HIPPY(1),
+
+	AVOCADO_LIMIT_SWITCH(8),
 	LMAO(1);
 	
 	private int pinNum;

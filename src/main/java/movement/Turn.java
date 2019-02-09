@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 public class Turn extends MovementAction implements PIDOutput {
 	PIDController turnController;
 	// 0.58s oscillaty
-	final static float kP = .1f;// .175
+	final static float kP = .05f;// .175
 	final static float kI = 0.00000f;// .000001
 	final static float kD = 1f;//1
 	final static float kF = 0f;
@@ -68,8 +68,6 @@ public class Turn extends MovementAction implements PIDOutput {
 		} else framedoodad = 0;
 
 		if (framedoodad > 9) {
-			System.out.println("Yes Papa, No Papa, No Papa, This is rape");
-			System.out.println(" Matthew Schmidt beats his wife pt 2 electric bugaloo");
 			System.out.println(Sensors.navX.getYaw() + " end of turn");
 			return true;
 		}
