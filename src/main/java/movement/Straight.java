@@ -61,6 +61,6 @@ public class Straight extends MovementAction implements PIDOutput{
 
 	@Override
 	public void pidWrite(double output) {
-		PID = new Speed(maxSpeed*output, maxSpeed);
+		PID = new Speed(maxSpeed*output, -maxSpeed);
 	}
 }

@@ -9,8 +9,8 @@ package org.usfirst.frc.team3793.robot;
  */
 public enum RobotMap {
 	// DRIVE MOTORS
-	TALON_LEFT(42), 
-	TALON_RIGHT(41), 
+	TALON_LEFT(41), 
+	TALON_RIGHT(42), 
 	VICTOR_LEFT(43), 
 	VICTOR_RIGHT(44), 
 	// SCISSOR MOTORS

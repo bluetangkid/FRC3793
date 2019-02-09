@@ -22,8 +22,8 @@ public class Motors {
 	
 	public static WPI_TalonSRX talonLeft;
 	public static WPI_TalonSRX talonRight;
-	private static WPI_VictorSPX victorLeft;
-	private static WPI_VictorSPX victorRight;
+	public static WPI_VictorSPX victorLeft;
+	public static WPI_VictorSPX victorRight;
 	private static SpeedControllerGroup left;
 	private static SpeedControllerGroup right;
 	public static DifferentialDrive drive;
