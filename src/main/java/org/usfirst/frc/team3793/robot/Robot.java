@@ -145,17 +145,17 @@ public class Robot extends TimedRobot {
 
 	@Override																																																																					
 	public void teleopPeriodic() {
-		if(singleControllerMode && Master.getRawButton(8)){
+		if(singleControllerMode && Master.getRawButton(ControllerMap.leftClick)){
 			controllerSelector++;
 			GenericHID c;
 			if(controllerSelector > controllers.length -1){
 				
-				controllerSelector = 0;
+				controllerSelector = DRIVER;
 				c = controllers[DRIVER]; 
 				controllers[DRIVER] = controllers[OPERATOR];
 				controllers[OPERATOR] = c;
 			}
-			if(controllerSelector == 1){
+			if(controllerSelector == OPERATOR){
 				c = controllers[OPERATOR];
 				controllers[OPERATOR] = controllers[DRIVER];
 				controllers[DRIVER] = c; 
@@ -313,7 +313,7 @@ public class Robot extends TimedRobot {
 	}
 
 	private void climbingArm(){
-		double armMovement = controllers[OPERATOR].getRawAxis(0); // supposed to be right stick Y axis
+		double armMovement = controllers[OPERATOR].getRawAxis(ControllerMap.rightY); // supposed to be right stick Y axis
 		if(Math.abs(armMovement) > .3){
 			Motors.armMotor.set(armMovement);
 		}
@@ -388,11 +388,11 @@ public class Robot extends TimedRobot {
 	}
 
 	private void hippyControl(){
-		if (controllers[OPERATOR].getRawButton(0)) { // y button
+		if (controllers[OPERATOR].getRawButton(ControllerMap.Y)) { // y button
 			Motors.hippy.set(true);  // extended
 		}
 
-	    if (controllers[OPERATOR].getRawButton(0)) { // a button
+	    if (controllers[OPERATOR].getRawButton(ControllerMap.A)) { // a button
 			Motors.hippy.set(false); // retracted
 		}
 	}
