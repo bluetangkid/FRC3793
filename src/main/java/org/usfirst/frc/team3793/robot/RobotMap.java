@@ -35,7 +35,7 @@ public enum RobotMap {
 	LANDING_GEAR(2),
 
 	//HIPPY - used to change the height of the output of ball.
-	HIPPY(1),
+	HINGE(1),
 
 	
 	END(1);

@@ -40,7 +40,7 @@ public class Motors {
 	public static Compressor compressor;
 	public static Solenoid avocadoSlide;
 	public static Solenoid landingGear;
-	public static Solenoid hippy;
+	public static Solenoid hinge;
 		
 	/**
 	 * initializes all of the motors using the pins as specified in {@link RobotMap}
@@ -72,7 +72,7 @@ public class Motors {
 		compressor = new Compressor(RobotMap.COMPRESSOR.getPin());
 		avocadoSlide = new Solenoid(RobotMap.AVACADO_SLIDE.getPin());
 		landingGear = new Solenoid(RobotMap.LANDING_GEAR.getPin());
-		hippy = new Solenoid(RobotMap.HIPPY.getPin());
+		hinge = new Solenoid(RobotMap.HINGE.getPin());
 		
 		Motors.victorRight.follow(Motors.talonRight);
 		Motors.victorLeft.follow(Motors.talonLeft);
