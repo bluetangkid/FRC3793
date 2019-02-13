@@ -24,6 +24,8 @@ public class ControllerMap {
 
     static final int leftX = 0;
     static final int leftY = 1;
+    static final int leftTrigger = 2;
+    static final int rightTrigger = 3;
     static final int rightX = 4;
     static final int rightY = 5;
     static public boolean xButtonEnabled = false;

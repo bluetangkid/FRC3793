@@ -60,14 +60,14 @@ public class Motors {
 		// ------------------------------ Other Motors ------------------------------
 
 
-		blinkin = new Spark(RobotMap.BLINKIN.getPin());
+		//blinkin = new Spark(RobotMap.BLINKIN.getPin());
 
 		armMotor = new Spark(RobotMap.ARM_MOTOR.getPin());
 		
 		avocadoMotor = new Talon(RobotMap.AVACADO_MOTOR.getPin());
 		
 		beltMotor = new Spark(RobotMap.BELT_MOTOR.getPin());
-		blinkin2019 = new Spark(RobotMap.BLINKIN.getPin());
+		//blinkin2019 = new Spark(RobotMap.BLINKIN.getPin());
 
 		compressor = new Compressor(RobotMap.COMPRESSOR.getPin());
 		avocadoSlide = new Solenoid(RobotMap.AVACADO_SLIDE.getPin());

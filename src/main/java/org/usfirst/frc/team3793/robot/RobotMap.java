@@ -26,7 +26,7 @@ public enum RobotMap {
 	BELT_MOTOR(0),
 	BELT_LIMIT(9),
 	//BLINKIN - lights
-	BLINKIN(6),
+	//BLINKIN(6),
 
 	//COMPRESSOR - pneumatics compressor
 	COMPRESSOR(0),

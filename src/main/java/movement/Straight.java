@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 /**
  * class to calculate the desired speed to make the robot go in a straight line
  * 
- * @author Warren Funk
+ * @author Warren Funk and Ethan Durham
  */
 public class Straight extends MovementAction implements PIDOutput {
 	float distance;

@@ -51,6 +51,10 @@ public class Robot extends TimedRobot {
 	static boolean avocadoLimitReleased = false;
 	static Timer avocadoTimer = new Timer();
 
+	static boolean isAvocadoOut = false;
+
+	static boolean isHingeUp = false;
+
 	//beltstates
 	public enum beltStates {STOPPED, MOVING_UP, LIMIT_HIT, EJECTING, MOVING_DOWN}
 	beltStates beltState = beltStates.STOPPED;
@@ -61,6 +65,7 @@ public class Robot extends TimedRobot {
 	static SmartDashboard dashboard;
 	//static PowerDistributionPanel pdp;
 	static double minVoltage = 30;
+	boolean compressorOn = false;
 
 	@Override
 	public void robotInit() {
@@ -97,7 +102,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void disabledInit() {
 		state = RoboState.Disabled;
-		Motors.blinkin.set(-0.59);
+		//Motors.blinkin.set(-0.59);
 		try{
 		t.interrupt();
 		}catch(Exception e){
@@ -117,7 +122,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		state = RoboState.AutonomousInit;
-		Motors.blinkin.set(-0.43);
+		//Motors.blinkin.set(-0.43);
 		
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
 		
@@ -141,6 +146,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		state = RoboState.TeleopInit;
+		Motors.compressor.setClosedLoopControl(compressorOn);
 	}
 
 	@Override																																																																					
@@ -217,19 +223,19 @@ public class Robot extends TimedRobot {
 
 		// ---------------------------- ARCADE DRIVE ----------------------------
 
-		driveControl();
+		driveControl(); // work Driver
 		avocadoControl();
-		landingGear();
-		climbingArm();
-		cargoIntake();
-		hippyControl();
+		//landingGear();
+		climbingArm(); // work Driver
+		cargoIntake(); // work Driver
+		hingeControl();// work driver
 
 		// ----------------------------------------------------------------------
 
 
 
 		// ----------------------------------------------------------------------
-		Motors.blinkin.set(-0.01);
+		//Motors.blinkin.set(-0.01);
 
 	}
 	public boolean masterIsDriver(){
@@ -242,21 +248,36 @@ public class Robot extends TimedRobot {
 	
 
 	public void avocadoSlideControl(){
-		int povPos = controllers[OPERATOR].getPOV(0);
+		
 
-		if(povPos >= 0){
-			if(povPos >= 45 && povPos <135){ // right D-Pad
-				Motors.avocadoSlide.set(true); //extendio
-			}
+		if(controllers[DRIVER].getRawButton(ControllerMap.A) && isAvocadoOut){
+			isAvocadoOut = false;
+		} else if(controllers[DRIVER].getRawButton(ControllerMap.A)){
+			isAvocadoOut = true;
+		}
 
-			if(povPos >= 225 && povPos <315){ // left D-Pad
-				Motors.avocadoSlide.set(false); //retractio
-			}
-		 }
+
+		if(isAvocadoOut){
+			Motors.avocadoSlide.set(true);
+		}
+		else{
+			Motors.avocadoSlide.set(false);
+		}
+
+		 
 	}
 
 	public void avocadoTurningControl(){
 		int povPos = controllers[OPERATOR].getPOV(0);
+
+		double left = controllers[OPERATOR].getRawAxis(ControllerMap.rightX);
+
+		if(left<-.1){
+		Motors.avocadoMotor.set(left*.6);
+		}else{
+			Motors.avocadoMotor.set(0);
+		}
+
 
 		if(povPos >= 135 && povPos <225 && avocadoPos >= 180 && !isAvocadoTurning){ // Up D-pad
 			Motors.avocadoMotor.set(-1.0); // at full speed
@@ -313,9 +334,12 @@ public class Robot extends TimedRobot {
 	}
 
 	private void climbingArm(){
-		double armMovement = controllers[OPERATOR].getRawAxis(ControllerMap.rightY); // supposed to be right stick Y axis
-		if(Math.abs(armMovement) > .3){
-			Motors.armMotor.set(armMovement);
+		double armMovement = controllers[DRIVER].getRawAxis(ControllerMap.rightY); // supposed to be right stick Y axis
+		
+		if(Math.abs(armMovement) > .1){
+			Motors.armMotor.set(armMovement *.6);
+		}else{
+			Motors.armMotor.set(0);
 		}
 	}
 
@@ -326,7 +350,7 @@ public class Robot extends TimedRobot {
 		final double GOING_DOWN = 1.0;
 
 		if (beltState == beltStates.MOVING_UP) {
-			if (controllers[OPERATOR].getRawButton(ControllerMap.X) && xButtonEnabled) {
+			if (controllers[DRIVER].getRawButton(ControllerMap.X) && xButtonEnabled) {
 				// X button hit, stop the motor and change state
 				Motors.beltMotor.set(0.0);
 				beltState = beltStates.STOPPED;
@@ -345,7 +369,7 @@ public class Robot extends TimedRobot {
 		}
 		
 		if (beltState == beltStates.STOPPED) {	
-			if (controllers[OPERATOR].getRawButton(ControllerMap.B) && bButtonEnabled) { 
+			if (controllers[DRIVER].getRawButton(ControllerMap.B) && bButtonEnabled) { 
 				// operator wants to run intake until X button or 
 				// the limit switch is active
 				Motors.beltMotor.set(GOING_UP);
@@ -354,7 +378,7 @@ public class Robot extends TimedRobot {
 				// prevent from going immediately backwards
 				bButtonEnabled = false;
 			}
-			else if (controllers[OPERATOR].getRawButton(ControllerMap.X) && xButtonEnabled) {
+			else if (controllers[DRIVER].getRawButton(ControllerMap.X) && xButtonEnabled) {
 				// operator wants to run intake in reverse until the B is hit
 				Motors.beltMotor.set(GOING_DOWN);
 				beltState = beltStates.MOVING_DOWN;
@@ -364,7 +388,7 @@ public class Robot extends TimedRobot {
 		
 		if (beltState == beltStates.LIMIT_HIT) { 
 			// only X button can override the limit switch
-			if (controllers[OPERATOR].getRawButton(ControllerMap.X)) {
+			if (controllers[DRIVER].getRawButton(ControllerMap.X)) {
 				Motors.beltMotor.set(GOING_UP);
 				beltState = beltStates.EJECTING;
 				System.out.println("beltState is " + beltState);
@@ -387,24 +411,32 @@ public class Robot extends TimedRobot {
 	
 	}
 
-	private void hippyControl(){
-		if (controllers[OPERATOR].getRawButton(ControllerMap.Y)) { // y button
-			Motors.hippy.set(true);  // extended
+	private void hingeControl(){
+		
+
+		if(controllers[DRIVER].getRawButton(ControllerMap.Y) && isHingeUp){
+			isHingeUp = false;
+		}else if(controllers[DRIVER].getRawButton(ControllerMap.Y)){
+			isHingeUp = true;
 		}
 
-	    if (controllers[OPERATOR].getRawButton(ControllerMap.A)) { // a button
-			Motors.hippy.set(false); // retracted
+		if(isHingeUp){
+			Motors.hinge.set(true);
+		}else{
+			Motors.hinge.set(false);
 		}
 	}
 
 	private void driveControl() {
-		double dif = Math.signum(controllers[DRIVER].getRawAxis(2) - controllers[DRIVER].getRawAxis(3))*((controllers[DRIVER].getRawAxis(2) - controllers[DRIVER].getRawAxis(3)) * (controllers[DRIVER].getRawAxis(2) - controllers[DRIVER].getRawAxis(3)));
+		double dif = Math.signum(Math.pow(controllers[DRIVER].getRawAxis(ControllerMap.leftY),3));
 		if (Math.abs(dif) < 0.1) dif = 0.0;
 
-		double turn = Math.signum(controllers[DRIVER].getRawAxis(0))*(controllers[DRIVER].getRawAxis(0)*controllers[DRIVER].getRawAxis(0));
+		
+		double turn =Math.signum(Math.pow(controllers[DRIVER].getRawAxis(ControllerMap.leftX),3));
 		if (Math.abs(turn) < 0.1) turn = 0.0;
 		
-		Motors.drive.arcadeDrive(dif, turn);
+		
+		Motors.drive.arcadeDrive(turn * .6, -dif * .6);
 	}
 
 	@Override
