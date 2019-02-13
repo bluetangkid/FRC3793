@@ -22,7 +22,7 @@ public class Sensors {
 	public static void initialize() {
 		vacuumPivotSwitch = new DigitalInput(4);
 		navX = new AHRS(SerialPort.Port.kUSB);
-		navX.getAngle();
+		
 		avocadoLimit = new DigitalInput(RobotMap.AVOCADO_LIMIT_SWITCH.getPin());
 		beltLimit = new DigitalInput(RobotMap.BELT_LIMIT.getPin());
 		//jeVois1 = new SerialPort(921600, SerialPort.Port.kUSB1);
