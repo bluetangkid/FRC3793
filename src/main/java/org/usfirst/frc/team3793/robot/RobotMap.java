@@ -8,9 +8,9 @@ package org.usfirst.frc.team3793.robot;
  * @author Warren Funk
  */
 public enum RobotMap {
-	// DRIVE MOTORS - drive robot
-	TALON_LEFT(42), 
-	TALON_RIGHT(41), 
+	// DRIVE MOTORS
+	TALON_LEFT(41), 
+	TALON_RIGHT(42), 
 	VICTOR_LEFT(43), 
 	VICTOR_RIGHT(44), 
 

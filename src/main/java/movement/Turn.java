@@ -80,7 +80,7 @@ public class Turn extends MovementAction implements PIDOutput {
 
 	@Override
 	public void pidWrite(double output) {
-		PID = new Speed(maxSpeed * output, -maxSpeed * output);
+		PID = new Speed(maxSpeed * output, maxSpeed * output);
 	}
 
 	public boolean onSetpoint() {

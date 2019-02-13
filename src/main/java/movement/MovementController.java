@@ -30,8 +30,7 @@ public class MovementController extends Thread {
 		action = null;
 		actions = new ArrayDeque<MovementAction>();
 		// Make speed for everything 0.8f(reccomended)
-		//actions.add(new Turn(90, 0.8f));
-		actions.add(new Turn(90, 0.8f));
+		actions.add(new Straight(3, 0.8f));
 		// Put actions here for autonomous like so: actions.add(new Turn(1, 90, 0.7));
 		// actions.add(new Turn (45,.8f));
 
