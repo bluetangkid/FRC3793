@@ -11,4 +11,17 @@ package org.usfirst.frc.team3793.robot;
  * Add your docs here.
  */
 public class ControllerMap {
+    static final int A = 1;
+    static final int B = 2;
+    static final int X = 3;
+    static final int Y = 4;
+    static final int LB = 5;
+    static final int RB = 6;
+    static final int back = 7;
+    static final int start = 8;
+    static final int leftClick = 9;
+    static final int rightClick = 10;
+
+    static public boolean xButtonEnabled = false;
+    static public boolean bButtonEnabled = false;
 }

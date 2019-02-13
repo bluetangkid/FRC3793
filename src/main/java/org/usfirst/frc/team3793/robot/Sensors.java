@@ -17,12 +17,14 @@ public class Sensors {
 	public static SerialPort jeVois2;
 
 	public static DigitalInput avocadoLimit;
+	public static DigitalInput beltLimit;
 	
 	public static void initialize() {
 		vacuumPivotSwitch = new DigitalInput(4);
 		navX = new AHRS(SerialPort.Port.kUSB);
 		navX.getAngle();
 		avocadoLimit = new DigitalInput(RobotMap.AVOCADO_LIMIT_SWITCH.getPin());
+		beltLimit = new DigitalInput(RobotMap.BELT_LIMIT.getPin());
 		//jeVois1 = new SerialPort(921600, SerialPort.Port.kUSB1);
 		//jeVois2 = new SerialPort(921600, SerialPort.Port.kUSB2);
 	}

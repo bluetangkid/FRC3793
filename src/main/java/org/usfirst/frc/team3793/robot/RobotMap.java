@@ -8,35 +8,37 @@ package org.usfirst.frc.team3793.robot;
  * @author Warren Funk
  */
 public enum RobotMap {
-	// DRIVE MOTORS
+	// DRIVE MOTORS - drive robot
 	TALON_LEFT(42), 
 	TALON_RIGHT(41), 
 	VICTOR_LEFT(43), 
 	VICTOR_RIGHT(44), 
-	// SCISSOR MOTORS
-	SCISSOR1(0), 
-	SCISSOR2(1), 
-	// VACUUM MOTORS
-	VACUUM_PIVOT(2), 
-	VACUUM_MOTOR(5), 
-	// INTAKE MOTORS
-	INTAKE_LEFT(3), 
-	INTAKE_RIGHT(4), 
-	// BLINKIN CONTROLER(S)
+
+	//ARM MOTOR - flip down to push front end of robot up to climb up platform
+	ARM_MOTOR(9),
+
+	//AVOCADO - avocado shaped object that rotates/ slides out to pick up a latch
+	AVACADO_MOTOR(1),
+	AVACADO_SLIDE(0),
+	AVOCADO_LIMIT_SWITCH(8),
+
+	//BELT - succ up ball
+	BELT_MOTOR(0),
+	BELT_LIMIT(9),
+	//BLINKIN - lights
 	BLINKIN(6),
 
-	// 2019 stuff
-	ARM_MOTOR(9),
-	AVACADO_MOTOR(1),
-	BELT_MOTOR(0),
-	BLINKIN_2019(6),
+	//COMPRESSOR - pneumatics compressor
 	COMPRESSOR(0),
-	AVACADO_SLIDE(0),
+	
+	//LANDING GEAR - used to lift up back end of robot to climb
 	LANDING_GEAR(2),
+
+	//HIPPY - used to change the height of the output of ball.
 	HIPPY(1),
 
-	AVOCADO_LIMIT_SWITCH(8),
-	LMAO(1);
+	
+	END(1);
 	
 	private int pinNum;
 	RobotMap(int num) {

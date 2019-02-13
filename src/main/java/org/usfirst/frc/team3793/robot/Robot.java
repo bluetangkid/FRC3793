@@ -54,6 +54,8 @@ public class Robot extends TimedRobot {
 	//beltstates
 	public enum beltStates {STOPPED, MOVING_UP, LIMIT_HIT, EJECTING, MOVING_DOWN}
 	beltStates beltState = beltStates.STOPPED;
+	boolean xButtonEnabled = false;
+	boolean bButtonEnabled = false;
 
 
 	static SmartDashboard dashboard;
@@ -216,6 +218,11 @@ public class Robot extends TimedRobot {
 		// ---------------------------- ARCADE DRIVE ----------------------------
 
 		driveControl();
+		avocadoControl();
+		landingGear();
+		climbingArm();
+		cargoIntake();
+		hippyControl();
 
 		// ----------------------------------------------------------------------
 
@@ -312,44 +319,14 @@ public class Robot extends TimedRobot {
 		}
 	}
 
-	void beltGoingUp(){
-
-	}
-
-	void beltStopped(){
-
-	}
 	
-	void beltAtLimit(){
-
-	}
-
-	void beltEjecting(){
-
-	}
 
 	private void cargoIntake(){
 		final double GOING_UP = -1.0;
 		final double GOING_DOWN = 1.0;
 
-		switch(beltState){
-			case MOVING_UP:
-				beltGoingUp();
-				break;
-			case STOPPED:
-				beltStopped();
-				break;
-			case LIMIT_HIT:
-				beltAtLimit();
-				break;
-			case EJECTING:
-				beltEject();
-				break;
-
-		}
-
 		if (beltState == beltStates.MOVING_UP) {
-			if (controllers[OPERATOR].getRawButton(xButton) && xButtonEnabled) {
+			if (controllers[OPERATOR].getRawButton(ControllerMap.X) && xButtonEnabled) {
 				// X button hit, stop the motor and change state
 				Motors.beltMotor.set(0.0);
 				beltState = beltStates.STOPPED;
@@ -368,7 +345,7 @@ public class Robot extends TimedRobot {
 		}
 		
 		if (beltState == beltStates.STOPPED) {	
-			if (controllers[OPERATOR].getRawButton(bButton) && bButtonEnabled) { 
+			if (controllers[OPERATOR].getRawButton(ControllerMap.B) && bButtonEnabled) { 
 				// operator wants to run intake until X button or 
 				// the limit switch is active
 				Motors.beltMotor.set(GOING_UP);
@@ -377,7 +354,7 @@ public class Robot extends TimedRobot {
 				// prevent from going immediately backwards
 				bButtonEnabled = false;
 			}
-			else if (controllers[OPERATOR].getRawButton(xButton) && xButtonEnabled) {
+			else if (controllers[OPERATOR].getRawButton(ControllerMap.X) && xButtonEnabled) {
 				// operator wants to run intake in reverse until the B is hit
 				Motors.beltMotor.set(GOING_DOWN);
 				beltState = beltStates.MOVING_DOWN;
@@ -387,7 +364,7 @@ public class Robot extends TimedRobot {
 		
 		if (beltState == beltStates.LIMIT_HIT) { 
 			// only X button can override the limit switch
-			if (controllers[OPERATOR].getRawButton(xButton)) {
+			if (controllers[OPERATOR].getRawButton(ControllerMap.X)) {
 				Motors.beltMotor.set(GOING_UP);
 				beltState = beltStates.EJECTING;
 				System.out.println("beltState is " + beltState);
@@ -396,7 +373,7 @@ public class Robot extends TimedRobot {
 		
 		if (beltState == beltStates.EJECTING  || beltState == beltStates.MOVING_DOWN) {
 			// only B button can stop the belt in these states
-			if (controllers[OPERATOR].getRawButton(bButton) && bButtonEnabled) {
+			if (controllers[OPERATOR].getRawButton(ControllerMap.B) && bButtonEnabled) {
 				Motors.beltMotor.set(0.0);
 				beltState = beltStates.STOPPED;
 				System.out.println("beltState is " + beltState);
@@ -405,8 +382,8 @@ public class Robot extends TimedRobot {
 			}
 		}
 		// re-enable button once it is released
-		if (! controllers[OPERATOR].getRawButton(xButton) ) xButtonEnabled = true;
-		if (! controllers[OPERATOR].getRawButton(bButton) ) bButtonEnabled = true;
+		if (! controllers[OPERATOR].getRawButton(ControllerMap.X) ) xButtonEnabled = true;
+		if (! controllers[OPERATOR].getRawButton(ControllerMap.B) ) bButtonEnabled = true;
 	
 	}
 
