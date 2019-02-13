@@ -20,13 +20,14 @@ import edu.wpi.first.wpilibj.Timer;
  */
 public class Robot extends TimedRobot {
 	
+	//Controller initialization
 	static GenericHID driverController = new XboxController(0);
 	static GenericHID operatorController = new XboxController(1);
 	public GenericHID[] controllers = new GenericHID[2];
 	private boolean singleControllerMode = true;
 	public int controllerSelector = 0;
-
 	public GenericHID Master = null;
+	
 	
 	static RoboState state = RoboState.RobotInit;
 	Thread t;
@@ -34,20 +35,7 @@ public class Robot extends TimedRobot {
 	public static float targetDegrees;
 	public static float targetDistance;
 
-	static int vaccumTimer;
-	static int cubeIntakeTimer;
-	static int cubeEjectTimer;
-
 	static int switchNum = 0;
-
-	static double scissorSpeed;
-	static double speedOfVacuumPivot;
-
-	static boolean vacuumOn;
-
-	static boolean timerStarted;
-
-	static boolean scissorTimerStarted;
 
 	static String gameData;
 	
@@ -55,15 +43,19 @@ public class Robot extends TimedRobot {
 	static InetAddress pi;
 
 	static final int DRIVER = 0;
-	static final int OPERATOR = 0;
+	static final int OPERATOR = 1;
 
+	//avocado initialization
 	static int avocadoPos = 180;
 	static boolean isAvocadoTurning = false;
 	static boolean avocadoLimitReleased = false;
-
 	static Timer avocadoTimer = new Timer();
 
-	
+	//beltstates
+	public enum beltStates {STOPPED, MOVING_UP, LIMIT_HIT, EJECTING, MOVING_DOWN}
+	beltStates beltState = beltStates.STOPPED;
+
+
 	static SmartDashboard dashboard;
 	//static PowerDistributionPanel pdp;
 	static double minVoltage = 30;
@@ -98,10 +90,6 @@ public class Robot extends TimedRobot {
 //			e.printStackTrace();
 //		}
 		//pdp = new PowerDistributionPanel();
-
-		
-
-		
 	}
 
 	@Override
@@ -128,8 +116,7 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		state = RoboState.AutonomousInit;
 		Motors.blinkin.set(-0.43);
-		timerStarted = false;
-		scissorTimerStarted = false;
+		
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
 		
 		t = new MovementController();
@@ -177,12 +164,6 @@ public class Robot extends TimedRobot {
 		
 		state = RoboState.Teleop;
 
-		vaccumTimer--;
-		cubeIntakeTimer--;
-		cubeEjectTimer--;
-
-		scissorSpeed = controllers[OPERATOR].getRawAxis(1);
-		speedOfVacuumPivot = controllers[OPERATOR].getRawAxis(5);
 
 		Scheduler.getInstance().run();
 		
@@ -234,31 +215,11 @@ public class Robot extends TimedRobot {
 
 		// ---------------------------- ARCADE DRIVE ----------------------------
 
-		drive();
+		driveControl();
 
 		// ----------------------------------------------------------------------
 
-		// --------------------------- VACUUM CONTROL ---------------------------
 
-		turnVacuumOn();
-
-		// ----------------------------------------------------------------------
-
-		// ----------------------- CUBE INTAKE AND EJECT ------------------------
-
-		cubeDispenser();
-
-		// ----------------------------------------------------------------------
-
-		// -------------------------- SCISSOR CONTROL ---------------------------
-
-		scissorSpeed(scissorSpeed);
-
-		// ----------------------------------------------------------------------
-
-		// ----------------------- VACUUM PIVOT CONTROL -------------------------
-
-		vacuumPivot(speedOfVacuumPivot);
 
 		// ----------------------------------------------------------------------
 		Motors.blinkin.set(-0.01);
@@ -271,64 +232,62 @@ public class Robot extends TimedRobot {
 		return Master == controllers[OPERATOR];
 			} 
 
-	private void drive() {
-		driveControl();
-	}
+	
 
 	public void avocadoSlideControl(){
-		// int povPos = controllers[OPERATOR].getPOV(0);
+		int povPos = controllers[OPERATOR].getPOV(0);
 
-		// if(povPos >= 0){
-		// 	if(povPos >= 45 && povPos <135){ // right D-Pad
-		// 		Motors.avocadoSlide.set(true); //extendio
-		// 	}
+		if(povPos >= 0){
+			if(povPos >= 45 && povPos <135){ // right D-Pad
+				Motors.avocadoSlide.set(true); //extendio
+			}
 
-		// 	if(povPos >= 225 && povPos <315){ // left D-Pad
-		// 		Motors.avocadoSlide.set(false); //retractio
-		// 	}
-		// }
+			if(povPos >= 225 && povPos <315){ // left D-Pad
+				Motors.avocadoSlide.set(false); //retractio
+			}
+		 }
 	}
 
 	public void avocadoTurningControl(){
-	// 	int povPos = controllers[OPERATOR].getPOV(0);
+		int povPos = controllers[OPERATOR].getPOV(0);
 
-	// 	if(povPos >= 135 && povPos <225 && avocadoPos >= 180 && !isAvocadoTurning){ // Up D-pad
-	// 		Motors.avocadoMotor.set(-1.0); // at full speed
-	// 		avocadoTimer.reset();  // we won't test for ...
-	// 		avocadoTimer.start();  // ... stopping for 1 second 
-	// 		isAvocadoTurning = true;
-	// 		System.out.println("In avocado turning motor ON"); 
-	// 		avocadoLimitReleased = false;
-	// 	}
+		if(povPos >= 135 && povPos <225 && avocadoPos >= 180 && !isAvocadoTurning){ // Up D-pad
+			Motors.avocadoMotor.set(-1.0); // at full speed
+			avocadoTimer.reset();  // we won't test for ...
+			avocadoTimer.start();  // ... stopping for 1 second 
+			isAvocadoTurning = true;
+			System.out.println("In avocado turning motor ON"); 
+			avocadoLimitReleased = false;
+		}
 
-	// 	if(povPos >= 315 && povPos < 45 && avocadoPos <= 0 && !isAvocadoTurning){ // Down D-pad
-	// 		Motors.avocadoMotor.set(-1.0); // at full speed
-	// 		avocadoTimer.reset();  // we won't test for ...
-	// 		avocadoTimer.start();  // ... stopping for 1 second
-	// 		isAvocadoTurning = true;
-	// 		System.out.println("In avocado turning motor ON");
-	// 		avocadoLimitReleased = false;
-	// 	}
+		if(povPos >= 315 && povPos < 45 && avocadoPos <= 0 && !isAvocadoTurning){ // Down D-pad
+			Motors.avocadoMotor.set(-1.0); // at full speed
+			avocadoTimer.reset();  // we won't test for ...
+			avocadoTimer.start();  // ... stopping for 1 second
+			isAvocadoTurning = true;
+			System.out.println("In avocado turning motor ON");
+			avocadoLimitReleased = false;
+		}
 
-	// 	if (!Sensors.avocadoLimit.get() && !avocadoLimitReleased) {
-	// 		avocadoLimitReleased = true;
-	// 		System.out.println("In avocado -- avocadoLimitReleased");
-	// 	}
+		if (!Sensors.avocadoLimit.get() && !avocadoLimitReleased) {
+			avocadoLimitReleased = true;
+			System.out.println("In avocado -- avocadoLimitReleased");
+		}
 
-	// 	if (isAvocadoTurning) {
-	// 		// is it time to stop yet? 
-	// 		// Wait a second before testing if the limit switch is closed
-	// 		// if (avocadoTimer.get() >= 1.0) {
-	// 			if (Sensors.avocadoLimit.get() && avocadoLimitReleased) {  //active when true
-	// 				Motors.avocadoMotor.set(0.0);
-	// 				System.out.println("In avocado turning motor OFF");
-	// 				// set new position
-	// 				avocadoPos = 180 - avocadoPos;
-	// 				avocadoTimer.reset();
-	// 				isAvocadoTurning = false;
-	// 			}
-	// 	//	}
-	// }
+		if (isAvocadoTurning) {
+			// is it time to stop yet? 
+			// Wait a second before testing if the limit switch is closed
+			// if (avocadoTimer.get() >= 1.0) {
+				if (Sensors.avocadoLimit.get() && avocadoLimitReleased) {  //active when true
+					Motors.avocadoMotor.set(0.0);
+					System.out.println("In avocado turning motor OFF");
+					// set new position
+					avocadoPos = 180 - avocadoPos;
+					avocadoTimer.reset();
+					isAvocadoTurning = false;
+				}
+			}
+	
 	}
 
 	private void avocadoControl(){
@@ -337,92 +296,128 @@ public class Robot extends TimedRobot {
 	}
 
 	private void landingGear(){
-		// if(!Motors.landingGear.get() && controllers[OPERATOR].getRawButton(0)){ // supposed to be start button
-		// 	Motors.landingGear.set(true);// extend
-		// }
+		if(!Motors.landingGear.get() && controllers[OPERATOR].getRawButton(ControllerMap.start)){ // supposed to be start button
+			Motors.landingGear.set(true);// extend
+		}
 
-		// if(Motors.landingGear.get() && controllers[OPERATOR].getRawButton(0)){ // supposed to be back button
-		// 	Motors.landingGear.set(false);// retract
-		// }
+		if(Motors.landingGear.get() && controllers[OPERATOR].getRawButton(ControllerMap.back)){ // supposed to be back button
+			Motors.landingGear.set(false);// retract
+		}
 	}
 
 	private void climbingArm(){
-		// double armMovement = controllers[OPERATOR].getRawAxis(0); // supposed to be right stick Y axis
-		// if(Math.abs(armMovement) > .3){
-		// 	Motors.armMotor.set(armMovement);
-		// }
+		double armMovement = controllers[OPERATOR].getRawAxis(0); // supposed to be right stick Y axis
+		if(Math.abs(armMovement) > .3){
+			Motors.armMotor.set(armMovement);
+		}
+	}
+
+	void beltGoingUp(){
+
+	}
+
+	void beltStopped(){
+
+	}
+	
+	void beltAtLimit(){
+
+	}
+
+	void beltEjecting(){
+
 	}
 
 	private void cargoIntake(){
-		// final double GOING_UP = -1.0;
-		// final double GOING_DOWN = 1.0;
+		final double GOING_UP = -1.0;
+		final double GOING_DOWN = 1.0;
 
-		// if (controllers[OPERATOR].getRawButton(0)) { // y button
-		// 	Motors.hippy.set(true);  // extended
-		// }
+		switch(beltState){
+			case MOVING_UP:
+				beltGoingUp();
+				break;
+			case STOPPED:
+				beltStopped();
+				break;
+			case LIMIT_HIT:
+				beltAtLimit();
+				break;
+			case EJECTING:
+				beltEject();
+				break;
 
-	    // if (controllers[OPERATOR].getRawButton(0)) { // a button
-		// 	Motors.hippy.set(false); // retracted
-		// }
+		}
+
+		if (beltState == beltStates.MOVING_UP) {
+			if (controllers[OPERATOR].getRawButton(xButton) && xButtonEnabled) {
+				// X button hit, stop the motor and change state
+				Motors.beltMotor.set(0.0);
+				beltState = beltStates.STOPPED;
+				System.out.println("beltState is " + beltState);
+				// prevent from going immediately backwards
+				xButtonEnabled = false; 
+			}
+			// change the line below when we hook up a real limit switch.
+			// Right now we get a true on the get, because no switch is there.
+			if (!Sensors.beltLimit.get()) {
+				// cargo is at the limit switch, stop the motor and change state
+				Motors.beltMotor.set(0.0);
+				beltState = beltStates.LIMIT_HIT;
+				System.out.println("beltState is " + beltState);
+			}
+		}
+		
+		if (beltState == beltStates.STOPPED) {	
+			if (controllers[OPERATOR].getRawButton(bButton) && bButtonEnabled) { 
+				// operator wants to run intake until X button or 
+				// the limit switch is active
+				Motors.beltMotor.set(GOING_UP);
+				beltState = beltStates.MOVING_UP;
+				System.out.println("beltState is " + beltState);
+				// prevent from going immediately backwards
+				bButtonEnabled = false;
+			}
+			else if (controllers[OPERATOR].getRawButton(xButton) && xButtonEnabled) {
+				// operator wants to run intake in reverse until the B is hit
+				Motors.beltMotor.set(GOING_DOWN);
+				beltState = beltStates.MOVING_DOWN;
+				System.out.println("beltState is " + beltState);
+			}
+		}
+		
+		if (beltState == beltStates.LIMIT_HIT) { 
+			// only X button can override the limit switch
+			if (controllers[OPERATOR].getRawButton(xButton)) {
+				Motors.beltMotor.set(GOING_UP);
+				beltState = beltStates.EJECTING;
+				System.out.println("beltState is " + beltState);
+			}
+		}
+		
+		if (beltState == beltStates.EJECTING  || beltState == beltStates.MOVING_DOWN) {
+			// only B button can stop the belt in these states
+			if (controllers[OPERATOR].getRawButton(bButton) && bButtonEnabled) {
+				Motors.beltMotor.set(0.0);
+				beltState = beltStates.STOPPED;
+				System.out.println("beltState is " + beltState);
+				// prevent from going immediately upwards
+				bButtonEnabled = false;
+			}
+		}
+		// re-enable button once it is released
+		if (! controllers[OPERATOR].getRawButton(xButton) ) xButtonEnabled = true;
+		if (! controllers[OPERATOR].getRawButton(bButton) ) bButtonEnabled = true;
 	
 	}
 
-	private void turnVacuumOn() {
-		if (controllers[OPERATOR].getRawButton(1) && vaccumTimer < 0) { //A button
-			vaccumTimer = 50;
-
-			if (!vacuumOn) {
-				vacuumOn = true;
-			} else {
-				vacuumOn = false;
-			}
+	private void hippyControl(){
+		if (controllers[OPERATOR].getRawButton(0)) { // y button
+			Motors.hippy.set(true);  // extended
 		}
 
-		if (vacuumOn) {
-			Motors.vacuumMotor.set(1);
-		} else {
-			Motors.vacuumMotor.set(0);
+	    if (controllers[OPERATOR].getRawButton(0)) { // a button
+			Motors.hippy.set(false); // retracted
 		}
-	}
-
-	private void cubeDispenser() {
-		if (controllers[OPERATOR].getRawButton(3)) { // X Button
-			// Intake cube
-			Motors.cubeMotorLeft.set(-0.7); // -0.7
-			Motors.cubeMotorRight.set(0.7); // 0.7
-			// t = new MovementController();
-		    // t.start();
-		} else if (controllers[OPERATOR].getRawButton(4)) {// Eject cube - Y Button
-			Motors.cubeMotorLeft.set(0.6); // 0.5
-			Motors.cubeMotorRight.set(-0.6); // -0.5
-		} else {
-			Motors.cubeMotorLeft.set(0);
-			Motors.cubeMotorRight.set(0);
-		}
-	}
-
-	private void scissorSpeed(double scissorSpeed) {
-		if ((Math.abs(scissorSpeed) > 0.2)) {
-			Motors.scissorMotorOne.set(scissorSpeed);
-			Motors.scissorMotorTwo.set(-scissorSpeed);
-		} else {
-			Motors.scissorMotorOne.set(0.0);
-			Motors.scissorMotorTwo.set(0.0);
-		}
-	}
-
-	private boolean vacuumPivot(double speedOfVacuumPivot) {
-		//System.out.println(Sensors.vacuumPivotSwitch.get());
-		// FALSE means the switch is being PRESSED
-		// TRUE means the switch is NOT being PRESSED
-		if (Math.abs(speedOfVacuumPivot) >= 0.2) { // Checking if speed of vacuum is above the dead zone
-			if (!Sensors.vacuumPivotSwitch.get() && speedOfVacuumPivot > 0) { // Checking if switch is pressed AND speed is negative
-				Motors.vacuumPivotMotor.set(0); // Setting speed to 0 so the arm won't move down anymore
-			} else Motors.vacuumPivotMotor.set(speedOfVacuumPivot); // If we are going the other way or switch isnt pressed, run as usual
-			return Sensors.vacuumPivotSwitch.get();
-		}
-		Motors.vacuumPivotMotor.set(0); // If speed is not above the dead zone, set the speed to 0
-		return true;
 	}
 
 	private void driveControl() {
