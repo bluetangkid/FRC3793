@@ -51,8 +51,12 @@ public class Robot extends TimedRobot {
 	static boolean avocadoLimitReleased = false;
 	static Timer avocadoTimer = new Timer();
 
+	static final int TIMER_DELAY = 5;
+
+	static int avocadoSlideTimer = 0;
 	static boolean isAvocadoOut = false;
 
+	static int hingeTimer = 0;
 	static boolean isHingeUp = false;
 
 	//beltstates
@@ -65,7 +69,9 @@ public class Robot extends TimedRobot {
 	static SmartDashboard dashboard;
 	//static PowerDistributionPanel pdp;
 	static double minVoltage = 30;
-	boolean compressorOn = false;
+
+	static int compressorTimer = 0;
+	static boolean compressorOn = true;
 
 	@Override
 	public void robotInit() {
@@ -146,7 +152,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		state = RoboState.TeleopInit;
-		Motors.compressor.setClosedLoopControl(compressorOn);
+		
 	}
 
 	@Override																																																																					
@@ -229,6 +235,7 @@ public class Robot extends TimedRobot {
 		climbingArm(); // work Driver
 		cargoIntake(); // work Driver
 		hingeControl();// work driver
+		compressorControl();
 
 		// ----------------------------------------------------------------------
 
@@ -245,29 +252,44 @@ public class Robot extends TimedRobot {
 		return Master == controllers[OPERATOR];
 			} 
 
-	
+	public void compressorControl(){
+		compressorTimer++;
+		if(compressorTimer >= TIMER_DELAY){
+			compressorTimer = TIMER_DELAY;
+		}
+
+		if(compressorTimer >= TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.rightClick)){
+			compressorTimer = 0;
+			if(compressorOn){
+				compressorOn = false;
+			}else{
+				compressorOn = true;
+			}
+		}
+		
+		Motors.compressor.setClosedLoopControl(compressorOn);
+	}
 
 	public void avocadoSlideControl(){
-		
-
-		if(controllers[DRIVER].getRawButton(ControllerMap.A) && isAvocadoOut){
-			isAvocadoOut = false;
-		} else if(controllers[DRIVER].getRawButton(ControllerMap.A)){
-			isAvocadoOut = true;
+		avocadoSlideTimer++;
+		if(avocadoSlideTimer >= TIMER_DELAY){
+			avocadoSlideTimer = TIMER_DELAY;
 		}
 
-
-		if(isAvocadoOut){
-			Motors.avocadoSlide.set(true);
+		if(avocadoSlideTimer == TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.A) ){
+			avocadoSlideTimer = 0;
+			if(isAvocadoOut){
+				isAvocadoOut = false;
+			}else{
+				isAvocadoOut = true;
+			}
 		}
-		else{
-			Motors.avocadoSlide.set(false);
-		}
 
-		 
+		Motors.avocadoSlide.set(isAvocadoOut);
 	}
 
 	public void avocadoTurningControl(){
+		//1.33 seconds
 		int povPos = controllers[OPERATOR].getPOV(0);
 
 		double left = controllers[OPERATOR].getRawAxis(ControllerMap.rightX);
@@ -413,18 +435,21 @@ public class Robot extends TimedRobot {
 
 	private void hingeControl(){
 		
-
-		if(controllers[DRIVER].getRawButton(ControllerMap.Y) && isHingeUp){
-			isHingeUp = false;
-		}else if(controllers[DRIVER].getRawButton(ControllerMap.Y)){
-			isHingeUp = true;
+		hingeTimer++;
+		if(hingeTimer >= TIMER_DELAY){
+			hingeTimer = TIMER_DELAY;
 		}
 
-		if(isHingeUp){
-			Motors.hinge.set(true);
-		}else{
-			Motors.hinge.set(false);
+		if(hingeTimer >= TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.Y)){
+			hingeTimer = 0;
+			if(isHingeUp){
+				isHingeUp = false;
+			}else{
+				isHingeUp = true;
+			}
 		}
+
+		Motors.hinge.set(isHingeUp);
 	}
 
 	private void driveControl() {
