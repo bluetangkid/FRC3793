@@ -71,7 +71,7 @@ public class Motors {
 
 		compressor = new Compressor(RobotMap.COMPRESSOR.getPin());
 		avocadoSlide = new Solenoid(RobotMap.AVACADO_SLIDE.getPin());
-		landingGear = new Solenoid(RobotMap.LANDING_GEAR.getPin());
+		//landingGear = new Solenoid(RobotMap.LANDING_GEAR.getPin());
 		hinge = new Solenoid(RobotMap.HINGE.getPin());
 		
 		Motors.victorRight.follow(Motors.talonRight);
