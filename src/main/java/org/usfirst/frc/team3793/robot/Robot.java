@@ -64,6 +64,8 @@ public class Robot extends TimedRobot {
 	static int hingeTimer = 0;
 	static boolean isHingeUp = false;
 
+	toggleSwitch hingeSwitch;
+
 	//beltstates
 	public enum beltStates {STOPPED, MOVING_UP, LIMIT_HIT, EJECTING, MOVING_DOWN}
 	beltStates beltState = beltStates.STOPPED;
@@ -160,6 +162,11 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
+		try{
+		hingeSwitch = new toggleSwitch(controllers[DRIVER], ControllerMap.A, Motors.hinge, Motors.hinge.getClass().getMethod("set", Boolean.class));
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		state = RoboState.TeleopInit;
 		
 	}
