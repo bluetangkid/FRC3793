@@ -19,14 +19,14 @@ public enum RobotMap {
 
 	//AVOCADO - avocado shaped object that rotates/ slides out to pick up a latch
 	AVACADO_MOTOR(1),
-	AVACADO_SLIDE(0),
+	AVACADO_SLIDE(2),
 	AVOCADO_LIMIT_SWITCH(8),
 
 	//BELT - succ up ball
 	BELT_MOTOR(0),
 	BELT_LIMIT(9),
 	//BLINKIN - lights
-	BLINKIN(6),
+	//BLINKIN(6),
 
 	//COMPRESSOR - pneumatics compressor
 	COMPRESSOR(0),
@@ -35,7 +35,7 @@ public enum RobotMap {
 	LANDING_GEAR(2),
 
 	//HIPPY - used to change the height of the output of ball.
-	HIPPY(1),
+	HINGE(1),
 
 	END(1);
 	
