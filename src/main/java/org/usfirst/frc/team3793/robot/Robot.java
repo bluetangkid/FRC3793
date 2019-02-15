@@ -28,6 +28,8 @@ public class Robot extends TimedRobot {
 	public int controllerSelector = 0;
 	public GenericHID Master = null;
 	
+	public float degToBall = 0;
+	public float degToTape = 0;
 	
 	static RoboState state = RoboState.RobotInit;
 	Thread t;
@@ -405,6 +407,19 @@ public class Robot extends TimedRobot {
 		if (Math.abs(turn) < 0.1) turn = 0.0;
 		
 		Motors.drive.arcadeDrive(dif, turn);
+	}
+
+	public void getBall(){
+		String[] info = Sensors.jeVoisTracking.readString().split(",");
+
+		for(int i = 0; i < info.length; i++){
+			String temp = info[i];
+			if(temp.startsWith("B")){
+				degToBall = Float.parseFloat(temp.substring(1));
+			} else {
+				degToTape = Float.parseFloat(temp.substring(1));
+			}
+		}
 	}
 
 	@Override
