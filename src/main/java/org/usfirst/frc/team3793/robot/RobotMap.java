@@ -37,7 +37,6 @@ public enum RobotMap {
 	//HIPPY - used to change the height of the output of ball.
 	HIPPY(1),
 
-	
 	END(1);
 	
 	private int pinNum;
