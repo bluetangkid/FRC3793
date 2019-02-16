@@ -1,4 +1,9 @@
 package movement;
+
+import org.usfirst.frc.team3793.robot.Sensors;
+import edu.wpi.first.wpilibj.PIDController;
+import org.usfirst.frc.team3793.robot.Robot;
+import org.usfirst.frc.team3793.robot.Motors;
 /**
  * abstract class that {@link Straight} and {@link Turn} implement
  * @author Warren Funk
@@ -8,6 +13,7 @@ public abstract class MovementAction {
 	protected boolean direction;
 	protected float maxSpeed;
 	protected Speed PID;
+	protected PIDController controller;
 	protected float degrees;
 	
 	public MovementAction(int direction, float maxSpeed) {
@@ -22,4 +28,6 @@ public abstract class MovementAction {
 	 */
 	public abstract Speed getSpeed();
 	public abstract boolean isComplete();
+	public void resetStartPos(){
+	}
 }

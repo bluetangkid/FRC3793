@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -20,8 +21,8 @@ import edu.wpi.first.wpilibj.Timer;
  * Main Robot class. Does networking and Teleop control by thinking very hard
  * and very carefully.
  * 
- * @author Faris for teleop control, Warren for networking, FIRST provided an
- *         empty class template
+ * @author Faris for teleop control, Warren for networking, Ethan for
+ *         Autonomous, FIRST provided an empty class template
  */
 public class Robot extends TimedRobot {
 
@@ -70,18 +71,13 @@ public class Robot extends TimedRobot {
 	static int hingeTimer = 0;
 	static boolean isHingeUp = false;
 
-<<<<<<< HEAD
+	toggleSwitch hingeSwitch;
+
 	// beltstates
 	public enum beltStates {
 		STOPPED, MOVING_UP, LIMIT_HIT, EJECTING, MOVING_DOWN
 	}
 
-=======
-	toggleSwitch hingeSwitch;
-
-	//beltstates
-	public enum beltStates {STOPPED, MOVING_UP, LIMIT_HIT, EJECTING, MOVING_DOWN}
->>>>>>> 7f5ee17c2a3692d483713885ad1053893066cf36
 	beltStates beltState = beltStates.STOPPED;
 	boolean xButtonEnabled = false;
 	boolean bButtonEnabled = false;
@@ -95,7 +91,7 @@ public class Robot extends TimedRobot {
 	static double minVoltage = 30;
 
 	static int compressorTimer = 0;
-	static boolean compressorOn = true;
+	static boolean compressorOn = false;
 	boolean hasDone = false;
 
 	@Override
@@ -109,7 +105,7 @@ public class Robot extends TimedRobot {
 			Master = controllers[DRIVER];
 			System.out.println("controller 0");
 		}
-		// Motors.compressor.setClosedLoopControl(false);
+		Motors.compressor.setClosedLoopControl(false);
 		// Motors.landingGear.set(false);
 		// Motors.avocadoSlide.set(false);
 
@@ -159,7 +155,7 @@ public class Robot extends TimedRobot {
 
 		t = new MovementController();
 		t.start();
-		// Motors.compressor.setClosedLoopControl(false);
+		Motors.compressor.setClosedLoopControl(compressorOn);
 		// Motors.avocadoSlide.set(false);
 	}
 
@@ -172,16 +168,18 @@ public class Robot extends TimedRobot {
 		Scheduler.getInstance().run();
 		// System.out.println(Sensors.navX.getYaw()+ "autoPeriodic");
 		if (!hasDone) {
-			moveToBall(90);
+			//moveToHatch(40);
 			hasDone = true;
 		}
+		//System.out.println(" " + Sensors.jeVoisTracking.readString());
 	}
 
 	@Override
 	public void teleopInit() {
-		try{
-		hingeSwitch = new toggleSwitch(controllers[DRIVER], ControllerMap.A, Motors.hinge, Motors.hinge.getClass().getMethod("set", Boolean.class));
-		}catch(Exception e){
+		try {
+			hingeSwitch = new toggleSwitch(controllers[DRIVER], ControllerMap.A, Motors.hinge,
+					Solenoid.class.getDeclaredMethod("set", boolean.class));
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		state = RoboState.TeleopInit;
@@ -507,8 +505,8 @@ public class Robot extends TimedRobot {
 				isHingeUp = true;
 			}
 		}
-
-		Motors.hinge.set(isHingeUp);
+		hingeSwitch.update();
+		// Motors.hinge.set(isHingeUp);
 	}
 
 	private void driveControl() {
@@ -543,6 +541,20 @@ public class Robot extends TimedRobot {
 		MovementController.addAction(new Turn(angle, .8f));
 		float distance = 1;// (float) Sensors.backDist.getRangeInches() * INCHES_TO_METERS;
 		MovementController.addAction(new Straight(distance, .8f));
+	}
+
+	public void moveToHatch(float a) {
+		float angle = a;
+		MovementController.addAction((new Turn(angle, .8f)));
+		double distance = 2;// (double) Sensors.backDist.getRangeInches() * INCHES_TO_METERS;
+		if (angle > 0) {
+			MovementController.addAction((new Turn(90 - angle, .8f)));
+			MovementController.addAction(new Straight((float) (Math.cos(Math.toRadians(90 - angle)) * distance), .8f));
+			MovementController.addAction((new Turn(-90, .8f)));
+			MovementController.addAction(new Straight((float) (Math.sin(Math.toRadians(90 - angle)) * distance), .8f));
+		} else {
+			MovementController.addAction((new Turn(-90 - angle, .8f)));
+		}
 
 	}
 

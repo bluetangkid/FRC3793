@@ -14,7 +14,7 @@ import org.usfirst.frc.team3793.robot.RoboState;
  * {@link MovementActions} is used along with {@code ArrayDeque.removeFirst();}
  * to act as a FIFO list
  * 
- * @author Warren Funk
+ * @author Warren Funk and Ethan Durham
  */
 
 public class MovementController extends Thread {
@@ -32,6 +32,7 @@ public class MovementController extends Thread {
 
 		action = null;
 		actions = new ArrayDeque<MovementAction>();
+		// actions.add(new Turn(45,.8f));
 		// Make speed for everything 0.8f(reccomended)
 		// actions.add(new Turn(90, 0.8f));
 		// Put actions here for autonomous like so: actions.add(new Turn(1, 90, 0.7));
@@ -45,8 +46,10 @@ public class MovementController extends Thread {
 			}
 			if (Robot.getState() == RoboState.Autonomous) {
 				if (!actions.isEmpty()) {
-					if (action == null && timer <= 0)
+					if (action == null && timer <= 0) {
 						action = actions.removeFirst();
+						action.resetStartPos();
+					}
 				}
 				if (action != null) {
 					Speed speed = action.getSpeed();

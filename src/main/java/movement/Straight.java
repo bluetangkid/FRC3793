@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.PIDOutput;
 public class Straight extends MovementAction implements PIDOutput {
 	float distance;
 	Point startPos;
-	PIDController straightPID;
 
 	final static float kP = .23f;
 	final static float kI = 0;
@@ -33,13 +32,13 @@ public class Straight extends MovementAction implements PIDOutput {
 		degrees = Sensors.navX.getYaw();
 		startPos = new Point(Motors.talonLeft.getSelectedSensorPosition(0),
 				Motors.talonRight.getSelectedSensorPosition(0));
-		straightPID = new PIDController(kP, kI, kD, kF, Sensors.navX, this, 0.005);
-		straightPID.setInputRange(-180.0f, 180.0f);
-		straightPID.setOutputRange(0.8f, 1.2f);
-		straightPID.setAbsoluteTolerance(kTolerance);
-		straightPID.setContinuous(true);
-		straightPID.setSetpoint(degrees);
-		straightPID.enable();
+		controller = new PIDController(kP, kI, kD, kF, Sensors.navX, this, 0.005);
+		controller.setInputRange(-180.0f, 180.0f);
+		controller.setOutputRange(0.8f, 1.2f);
+		controller.setAbsoluteTolerance(kTolerance);
+		controller.setContinuous(true);
+		controller.setSetpoint(degrees);
+		controller.enable();
 	}
 
 	/**
@@ -73,5 +72,13 @@ public class Straight extends MovementAction implements PIDOutput {
 	@Override
 	public void pidWrite(double output) {
 		PID = new Speed(maxSpeed * output, -maxSpeed);
+	}
+	public void resetStartPos(){
+		super.resetStartPos();
+		degrees = Sensors.navX.getYaw();
+		controller.setSetpoint(degrees);
+		startPos = new Point(Motors.talonLeft.getSelectedSensorPosition(0),
+				Motors.talonRight.getSelectedSensorPosition(0));
+				System.out.println("Reset Start Position");
 	}
 }
