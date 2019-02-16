@@ -23,17 +23,14 @@ public class Turn extends MovementAction implements PIDOutput {
 
 	public Turn(float degrees, float maxSpeed) {
 		super((int) Math.signum(degrees), maxSpeed);
-		System.out.println(Sensors.navX.getYaw() + " Start of turn");
-		
+		System.out.println(" Initializing Turn");
 		this.degrees = Sensors.navX.getYaw() + (degrees);
-		System.out.println(this.degrees + " setPoint Pre wrap");
 
 		if (this.degrees > 180) {
 			this.degrees = -180 + this.degrees % 180;
 		} else if (this.degrees < -180) {
 			this.degrees = 180 - this.degrees % 180;
 		}
-		System.out.println(this.degrees + " setPoint post wrap");
 
 		turnController = new PIDController(kP, kI, kD, kF, Sensors.navX, this, 0.005);
 		turnController.setInputRange(-180.0f, 180.0f);
@@ -42,7 +39,6 @@ public class Turn extends MovementAction implements PIDOutput {
 		turnController.setContinuous(true);
 		turnController.setSetpoint(this.degrees);
 		turnController.enable();
-		System.out.println(turnController.getSetpoint() + " setPoint");
 	}
 
 	/**
@@ -64,11 +60,10 @@ public class Turn extends MovementAction implements PIDOutput {
 		
 		if (onSetpoint()) {
 			framedoodad++;
-			System.out.println(framedoodad + " framedoodad");
 		} else framedoodad = 0;
 
 		if (framedoodad > 9) {
-			System.out.println(Sensors.navX.getYaw() + " end of turn");
+			System.out.println(" Turn is Complete");
 			return true;
 		}
 		return false;

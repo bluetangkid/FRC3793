@@ -18,34 +18,34 @@ import org.usfirst.frc.team3793.robot.RoboState;
  */
 
 public class MovementController extends Thread {
-	ArrayDeque<MovementAction> actions;
+	static ArrayDeque<MovementAction> actions;
 	MovementAction action;
 	boolean teleopEnabled = false;
+	int timer = 0;
 
-	public MovementController() {}
+	public MovementController() {
+	}
 
 	public void run() {
-		while (Sensors.navX.isCalibrating());
+		while (Sensors.navX.isCalibrating())
+			;
 
 		action = null;
 		actions = new ArrayDeque<MovementAction>();
 		// Make speed for everything 0.8f(reccomended)
-		actions.add(new Straight(3, 0.8f));
+		// actions.add(new Turn(90, 0.8f));
 		// Put actions here for autonomous like so: actions.add(new Turn(1, 90, 0.7));
-		// actions.add(new Turn (45,.8f));
-
-		action = actions.removeFirst();
 
 		while (!Thread.interrupted()) {
-			// System.out.println(System.currentTimeMillis());
+			timer--;
 			if (action != null && action.isComplete()) {
 				action = null;
 				Motors.drive.tankDrive(0, 0);
-				// System.out.println("The action is complete");
+				timer = 30;
 			}
 			if (Robot.getState() == RoboState.Autonomous) {
 				if (!actions.isEmpty()) {
-					if (action == null)
+					if (action == null && timer <= 0)
 						action = actions.removeFirst();
 				}
 				if (action != null) {
@@ -71,9 +71,10 @@ public class MovementController extends Thread {
 			}
 		}
 		this.interrupt();
+
 	}
 
-	public synchronized void addAction(MovementAction a) {
+	public static synchronized void addAction(MovementAction a) {
 		actions.add(a);
 	}
 
