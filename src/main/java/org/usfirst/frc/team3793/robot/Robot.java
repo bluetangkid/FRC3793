@@ -66,6 +66,7 @@ public class Robot extends TimedRobot {
 	static final int TIMER_DELAY = 15;
 
 	static int avocadoSlideTimer = 0;
+	//nice
 	static boolean isAvocadoOut = false;
 
 	static int hingeTimer = 0;

@@ -66,6 +66,7 @@ public class MovementController extends Thread {
 				action = null;
 				actions.clear();
 			}
+			// nice
 			try {
 				Thread.sleep(5);
 			} catch (InterruptedException e) {

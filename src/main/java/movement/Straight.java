@@ -66,6 +66,7 @@ public class Straight extends MovementAction implements PIDOutput {
 		if (distTraveled() >= distance) {
 		System.out.println(" Straight Complete");
 		}
+		//nice
 		return distTraveled() >= distance;
 	}
 

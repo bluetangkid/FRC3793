@@ -15,7 +15,7 @@ public class Turn extends MovementAction implements PIDOutput {
 	// 0.58s oscillaty
 	final static float kP = .05f;// .175
 	final static float kI = 0.00000f;// .000001
-	final static float kD = 1f;//1
+	final static float kD = 1f;// 1
 	final static float kF = 0f;
 	final static float kTolerance = 1;
 	public int framedoodad = 0;
@@ -53,21 +53,24 @@ public class Turn extends MovementAction implements PIDOutput {
 	 */
 	public boolean isComplete() {
 		// if(onSetpoint()){
-		// 	System.out.println(Sensors.navX.getYaw() + " End of turn");
+		// System.out.println(Sensors.navX.getYaw() + " End of turn");
 		// }
 		// return onSetpoint();
-		
+
 		if (onSetpoint()) {
 			framedoodad++;
-		} else framedoodad = 0;
+		} else
+			framedoodad = 0;
 
 		if (framedoodad > 9) {
 			System.out.println(" Turn is Complete");
 			return true;
 		}
+		// nice
 		return false;
 		// if(onSetpoint() && !Sensors.navX.isMoving()){
-			// System.out.println(" Baby girl what you doin' where's your man, I just popped a xan, 50,000 in Japan");
+		// System.out.println(" Baby girl what you doin' where's your man, I just popped
+		// a xan, 50,000 in Japan");
 		// }
 		// return onSetpoint() && !Sensors.navX.isMoving();
 	}
@@ -78,17 +81,20 @@ public class Turn extends MovementAction implements PIDOutput {
 	}
 
 	public boolean onSetpoint() {
-		
+
 		// if(timer > 0){
-		// 	timer--;
+		// timer--;
 		// }else{
-		// 	timer = 10;
-		// 	//System.out.println(Math.abs(controller.getSetpoint() - Sensors.navX.getYaw()) + " distance from target");
+		// timer = 10;
+		// //System.out.println(Math.abs(controller.getSetpoint() -
+		// Sensors.navX.getYaw()) + " distance from target");
 		// }
 
-		return Sensors.navX.getYaw() > controller.getSetpoint() - 3 && Sensors.navX.getYaw() < controller.getSetpoint() + 3;
+		return Sensors.navX.getYaw() > controller.getSetpoint() - 3
+				&& Sensors.navX.getYaw() < controller.getSetpoint() + 3;
 	}
-	public void resetStartPos(){
+
+	public void resetStartPos() {
 		this.degrees = Sensors.navX.getYaw() + (degrees);
 		if (this.degrees > 180) {
 			this.degrees = -180 + this.degrees % 180;
