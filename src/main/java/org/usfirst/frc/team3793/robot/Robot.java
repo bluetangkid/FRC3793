@@ -2,6 +2,8 @@ package org.usfirst.frc.team3793.robot;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -21,8 +23,8 @@ import edu.wpi.first.wpilibj.Timer;
  * Main Robot class. Does networking and Teleop control by thinking very hard
  * and very carefully.
  * 
- * @author Faris for teleop control, Warren for networking, Ethan for
- *         Autonomous, FIRST provided an empty class template
+ * @author Faris for teleop control, Warren for networking, FIRST provided an
+ *         empty class template
  */
 public class Robot extends TimedRobot {
 
@@ -59,41 +61,23 @@ public class Robot extends TimedRobot {
 
 	static int avocadoPos = 180;
 	static boolean isAvocadoTurning = false;
-	static boolean avocadoLimitReleased = false;
-
-	static Timer avocadoTimer = new Timer();
 
 	static final int TIMER_DELAY = 15;
 
-	static int avocadoSlideTimer = 0;
-	//nice
-	static boolean isAvocadoOut = false;
-
-	static int hingeTimer = 0;
-	static boolean isHingeUp = false;
+	toggleSwitch avocadoSlideSwitch;
 
 	toggleSwitch hingeSwitch;
 
 	// beltstates
-	public enum beltStates {
-		STOPPED, MOVING_UP, LIMIT_HIT, EJECTING, MOVING_DOWN
-	}
-
-	beltStates beltState = beltStates.STOPPED;
-	boolean xButtonEnabled = false;
-	boolean bButtonEnabled = false;
-
-	static int beltTimer = 0;
-
-	boolean beltMoving = false;
+	BeltController beltController;
 
 	static SmartDashboard dashboard;
 	// static PowerDistributionPanel pdp;
 	static double minVoltage = 30;
 
-	static int compressorTimer = 0;
-	static boolean compressorOn = false;
 	boolean hasDone = false;
+
+	toggleSwitch compressorSwitch;
 
 	@Override
 	public void robotInit() {
@@ -156,7 +140,7 @@ public class Robot extends TimedRobot {
 
 		t = new MovementController();
 		t.start();
-		Motors.compressor.setClosedLoopControl(compressorOn);
+		// Motors.compressor.setClosedLoopControl(false);
 		// Motors.avocadoSlide.set(false);
 	}
 
@@ -169,17 +153,23 @@ public class Robot extends TimedRobot {
 		Scheduler.getInstance().run();
 		// System.out.println(Sensors.navX.getYaw()+ "autoPeriodic");
 		if (!hasDone) {
-			//moveToHatch(40);
+			moveToBall(90);
 			hasDone = true;
 		}
-		//System.out.println(" " + Sensors.jeVoisTracking.readString());
 	}
 
 	@Override
 	public void teleopInit() {
+
+		beltController = new BeltController(controllers[DRIVER], Motors.beltMotor);
+
 		try {
 			hingeSwitch = new toggleSwitch(controllers[DRIVER], ControllerMap.A, Motors.hinge,
-					Solenoid.class.getDeclaredMethod("set", boolean.class));
+					Solenoid.class.getMethod("set", boolean.class));
+			avocadoSlideSwitch = new toggleSwitch(controllers[DRIVER], ControllerMap.B, Motors.avocadoSlide,
+					Solenoid.class.getMethod("set", boolean.class));
+			compressorSwitch = new toggleSwitch(controllers[DRIVER], ControllerMap.rightClick, Motors.compressor,
+					Compressor.class.getMethod("seClosedLoopControl", boolean.class));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -245,8 +235,9 @@ public class Robot extends TimedRobot {
 		// landingGear();
 		climbingArm(); // work Driver
 		cargoIntake(); //
-		hingeControl();// work driver
-		compressorControl(); // work
+		hingeSwitch.update();// work driver
+		compressorSwitch.update();
+		; // work
 
 		// ----------------------------------------------------------------------
 
@@ -263,109 +254,34 @@ public class Robot extends TimedRobot {
 		return Master == controllers[OPERATOR];
 	}
 
-	public void compressorControl() {
-		compressorTimer++;
-		if (compressorTimer >= TIMER_DELAY) {
-			compressorTimer = TIMER_DELAY;
-		}
-
-		if (compressorTimer >= TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.rightClick)) {
-			compressorTimer = 0;
-			if (compressorOn) {
-				compressorOn = false;
-			} else {
-				compressorOn = true;
-			}
-		}
-
-		Motors.compressor.setClosedLoopControl(compressorOn);
-
-	}
-
-	public void avocadoSlideControl() {
-		avocadoSlideTimer++;
-		if (avocadoSlideTimer >= TIMER_DELAY) {
-			avocadoSlideTimer = TIMER_DELAY;
-		}
-
-		if (avocadoSlideTimer >= TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.A)) {
-			avocadoSlideTimer = 0;
-			if (isAvocadoOut) {
-				isAvocadoOut = false;
-			} else {
-				isAvocadoOut = true;
-			}
-		}
-
-		Motors.avocadoSlide.set(isAvocadoOut);
-	}
-
 	public void avocadoTurningControl() {
 		// 1.33 seconds
 		int povPos = controllers[OPERATOR].getPOV(0);
 
 		avocadoRotationTimer++;
-		if (avocadoRotationTimer >= TIMER_DELAY) {
+		if (avocadoRotationTimer > TIMER_DELAY) {
 			avocadoRotationTimer = TIMER_DELAY;
 		}
 
-		if (avocadoRotationTimer >= TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.start)) {
+		if (avocadoRotationTimer == TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.start)) {
 			avocadoRotationTimer = 0;
 			isAvocadoTurning = true;
 		}
 
+		if (Sensors.avocadoLimit.get()) {
+			isAvocadoTurning = false;
+		}
+
 		if (isAvocadoTurning) {
 			Motors.avocadoMotor.set(-1);
-			if (Sensors.avocadoLimit.get()) {
-				isAvocadoTurning = false;
-			}
 		} else {
 			Motors.avocadoMotor.set(0);
 		}
 
-		// if(povPos >= 135 && povPos <225 && avocadoPos >= 180 && !isAvocadoTurning){
-		// // Up D-pad
-		// Motors.avocadoMotor.set(-1.0); // at full speed
-		// avocadoTimer.reset(); // we won't test for ...
-		// avocadoTimer.start(); // ... stopping for 1 second
-		// isAvocadoTurning = true;
-		// System.out.println("In avocado turning motor ON");
-		// avocadoLimitReleased = false;
-		// }
-
-		// if(povPos >= 315 && povPos < 45 && avocadoPos <= 0 && !isAvocadoTurning){ //
-		// Down D-pad
-		// Motors.avocadoMotor.set(-1.0); // at full speed
-		// avocadoTimer.reset(); // we won't test for ...
-		// avocadoTimer.start(); // ... stopping for 1 second
-		// isAvocadoTurning = true;
-		// System.out.println("In avocado turning motor ON");
-		// avocadoLimitReleased = false;
-		// }
-
-		// if (!Sensors.avocadoLimit.get() && !avocadoLimitReleased) {
-		// avocadoLimitReleased = true;
-		// System.out.println("In avocado -- avocadoLimitReleased");
-		// }
-
-		// if (isAvocadoTurning) {
-		// // is it time to stop yet?
-		// // Wait a second before testing if the limit switch is closed
-		// // if (avocadoTimer.get() >= 1.0) {
-		// if (Sensors.avocadoLimit.get() && avocadoLimitReleased) { //active when true
-		// Motors.avocadoMotor.set(0.0);
-		// System.out.println("In avocado turning motor OFF");
-		// // set new position
-		// avocadoPos = 180 - avocadoPos;
-		// avocadoTimer.reset();
-		// isAvocadoTurning = false;
-		// }
-		// }
-
 	}
 
 	private void avocadoControl() {
-		avocadoSlideControl();
+		avocadoSlideSwitch.update();
 		avocadoTurningControl();
 	}
 
@@ -401,113 +317,7 @@ public class Robot extends TimedRobot {
 
 		Motors.beltMotor.set(dif);
 
-		beltTimer++;
-		if (beltTimer >= TIMER_DELAY) {
-			beltTimer = TIMER_DELAY;
-		}
-
-		if (!beltMoving && beltTimer >= TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.X)) {
-			beltTimer = 0;
-			Motors.beltMotor.set(GOING_DOWN);
-			beltMoving = true;
-		}
-
-		if (!beltMoving && beltTimer >= TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.B)) {
-			beltTimer = 0;
-			Motors.beltMotor.set(GOING_DOWN);
-			beltMoving = true;
-		}
-
-		if (beltMoving && beltTimer >= TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.B)
-				|| controllers[DRIVER].getRawButton(ControllerMap.X)) {
-			beltTimer = 0;
-			Motors.beltMotor.set(0);
-			beltMoving = false;
-		}
-
-		// if (beltState == beltStates.MOVING_UP) {
-		// if (controllers[DRIVER].getRawButton(ControllerMap.X) && xButtonEnabled) {
-		// // X button hit, stop the motor and change state
-		// Motors.beltMotor.set(0.0);
-		// beltState = beltStates.STOPPED;
-		// System.out.println("beltState is " + beltState);
-		// // prevent from going immediately backwards
-		// xButtonEnabled = false;
-		// }
-		// // change the line below when we hook up a real limit switch.
-		// // Right now we get a true on the get, because no switch is there.
-		// if (!Sensors.beltLimit.get()) {
-		// // cargo is at the limit switch, stop the motor and change state
-		// Motors.beltMotor.set(0.0);
-		// beltState = beltStates.LIMIT_HIT;
-		// System.out.println("beltState is " + beltState);
-		// }
-		// }
-
-		// if (beltState == beltStates.STOPPED) {
-		// if (controllers[DRIVER].getRawButton(ControllerMap.B) && bButtonEnabled) {
-		// // operator wants to run intake until X button or
-		// // the limit switch is active
-		// Motors.beltMotor.set(GOING_UP);
-		// beltState = beltStates.MOVING_UP;
-		// System.out.println("beltState is " + beltState);
-		// // prevent from going immediately backwards
-		// bButtonEnabled = false;
-		// }
-		// else if (controllers[DRIVER].getRawButton(ControllerMap.X) && xButtonEnabled)
-		// {
-		// // operator wants to run intake in reverse until the B is hit
-		// Motors.beltMotor.set(GOING_DOWN);
-		// beltState = beltStates.MOVING_DOWN;
-		// System.out.println("beltState is " + beltState);
-		// }
-		// }
-
-		// if (beltState == beltStates.LIMIT_HIT) {
-		// // only X button can override the limit switch
-		// if (controllers[DRIVER].getRawButton(ControllerMap.X)) {
-		// Motors.beltMotor.set(GOING_UP);
-		// beltState = beltStates.EJECTING;
-		// System.out.println("beltState is " + beltState);
-		// }
-		// }
-
-		// if (beltState == beltStates.EJECTING || beltState == beltStates.MOVING_DOWN)
-		// {
-		// // only B button can stop the belt in these states
-		// if (controllers[OPERATOR].getRawButton(ControllerMap.B) && bButtonEnabled) {
-		// Motors.beltMotor.set(0.0);
-		// beltState = beltStates.STOPPED;
-		// System.out.println("beltState is " + beltState);
-		// // prevent from going immediately upwards
-		// bButtonEnabled = false;
-		// }
-		// }
-		// // re-enable button once it is released
-		// if (! controllers[OPERATOR].getRawButton(ControllerMap.X) ) xButtonEnabled =
-		// true;
-		// if (! controllers[OPERATOR].getRawButton(ControllerMap.B) ) bButtonEnabled =
-		// true;
-
-	}
-
-	private void hingeControl() {
-
-		hingeTimer++;
-		if (hingeTimer >= TIMER_DELAY) {
-			hingeTimer = TIMER_DELAY;
-		}
-
-		if (hingeTimer >= TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.Y)) {
-			hingeTimer = 0;
-			if (isHingeUp) {
-				isHingeUp = false;
-			} else {
-				isHingeUp = true;
-			}
-		}
-		hingeSwitch.update();
-		// Motors.hinge.set(isHingeUp);
+		beltController.update();
 	}
 
 	private void driveControl() {
@@ -542,20 +352,6 @@ public class Robot extends TimedRobot {
 		MovementController.addAction(new Turn(angle, .8f));
 		float distance = 1;// (float) Sensors.backDist.getRangeInches() * INCHES_TO_METERS;
 		MovementController.addAction(new Straight(distance, .8f));
-	}
-
-	public void moveToHatch(float a) {
-		float angle = a;
-		MovementController.addAction((new Turn(angle, .8f)));
-		double distance = 2;// (double) Sensors.backDist.getRangeInches() * INCHES_TO_METERS;
-		if (angle > 0) {
-			MovementController.addAction((new Turn(90 - angle, .8f)));
-			MovementController.addAction(new Straight((float) (Math.cos(Math.toRadians(90 - angle)) * distance), .8f));
-			MovementController.addAction((new Turn(-90, .8f)));
-			MovementController.addAction(new Straight((float) (Math.sin(Math.toRadians(90 - angle)) * distance), .8f));
-		} else {
-			MovementController.addAction((new Turn(-90 - angle, .8f)));
-		}
 
 	}
 
