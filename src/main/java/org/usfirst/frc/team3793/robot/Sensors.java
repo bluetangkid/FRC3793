@@ -25,6 +25,7 @@ public class Sensors {
 	
 	public static void initialize() {
 		vacuumPivotSwitch = new DigitalInput(4);
+		System.out.println(SerialPort.Port.values());
 		navX = new AHRS(SerialPort.Port.kUSB);
 		
 		//backDist = new Ultrasonic(1, 1);
@@ -32,6 +33,6 @@ public class Sensors {
 		beltLimit = new DigitalInput(RobotMap.BELT_LIMIT.getPin());
 		//jeVois1 = new SerialPort(921600, SerialPort.Port.kUSB1);
 		//jeVois2 = new SerialPort(921600, SerialPort.Port.kUSB2);
-		//jeVoisTracking = new SerialPort(921600, SerialPort.Port.kOnboard);
+		//jeVoisTracking = new SerialPort(921600, SerialPort.Port.kUSB1);
 	}
 }
