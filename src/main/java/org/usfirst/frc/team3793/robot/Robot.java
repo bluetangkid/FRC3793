@@ -367,6 +367,7 @@ public class Robot extends TimedRobot {
 		} else {
 			MovementController.addAction((new Turn(-90 - angle, .8f)));
 		}
+	}
 
 	@Override
 	public void testPeriodic() {
