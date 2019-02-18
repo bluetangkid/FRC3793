@@ -10,7 +10,9 @@ import java.lang.reflect.*;
 
 import edu.wpi.first.wpilibj.GenericHID;
 /**
- * Add your docs here.
+ * Gives Toggle Switch Functionality to controller buttons
+ * 
+ * @author Faris Prasetiawan
  */
 public class toggleSwitch {
 

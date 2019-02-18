@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.GenericHID;
 
 /**
  * Add your docs here.
+ * 
+ * @author Faris Prasetiawan
  */
 public class BeltController {
     GenericHID controller;
@@ -19,7 +21,7 @@ public class BeltController {
     final int TIMER_DELAY = 15;
 
     final int UP = 1;
-    final int DOWN = 1;
+    final int DOWN = -1;
 
     enum beltStates {GOING_UP, MIDPOINT, GOING_DOWN, STOPPED };
     beltStates beltState = beltStates.STOPPED;
@@ -39,18 +41,18 @@ public class BeltController {
             timer = 0;
            
             switch(beltState){
-            case STOPPED:
-                beltState = beltStates.GOING_UP;
-                break;
-            case GOING_UP:
-                beltState = beltStates.STOPPED;
-                break;
-            case MIDPOINT:
-                beltState = beltStates.GOING_UP;
-                break;
-            case GOING_DOWN:
-                beltState = beltStates.STOPPED;
-                break;
+                case STOPPED:
+                    beltState = beltStates.GOING_UP;
+                    break;
+                case GOING_UP:
+                    beltState = beltStates.STOPPED;
+                    break;
+                case MIDPOINT:
+                    beltState = beltStates.GOING_UP;
+                    break;
+                case GOING_DOWN:
+                    beltState = beltStates.STOPPED;
+                    break;
            }
         }
 
@@ -58,18 +60,18 @@ public class BeltController {
             timer = 0;
            
             switch(beltState){
-            case STOPPED:
-                beltState = beltStates.GOING_DOWN;
-                break;
-            case GOING_UP:
-                beltState = beltStates.STOPPED;
-                break;
-            case MIDPOINT:
-                beltState = beltStates.GOING_DOWN;
-                break;
-            case GOING_DOWN:
-                beltState = beltStates.STOPPED;
-                break;
+                case STOPPED:
+                    beltState = beltStates.GOING_DOWN;
+                    break;
+                case GOING_UP:
+                    beltState = beltStates.STOPPED;
+                    break;
+                case MIDPOINT:
+                    beltState = beltStates.GOING_DOWN;
+                    break;
+                case GOING_DOWN:
+                    beltState = beltStates.STOPPED;
+                    break;
             }
         }
 

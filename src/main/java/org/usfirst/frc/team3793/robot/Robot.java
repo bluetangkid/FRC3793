@@ -61,9 +61,6 @@ public class Robot extends TimedRobot {
 
 	static int avocadoPos = 180;
 	static boolean isAvocadoTurning = false;
-	static boolean avocadoLimitReleased = false;
-
-	static Timer avocadoTimer = new Timer();
 
 	static final int TIMER_DELAY = 15;
 
@@ -71,16 +68,13 @@ public class Robot extends TimedRobot {
 
 	toggleSwitch hingeSwitch;
 
-	//beltstates
-	
+	// beltstates
 	BeltController beltController;
 
 	static SmartDashboard dashboard;
 	// static PowerDistributionPanel pdp;
 	static double minVoltage = 30;
 
-	
-	
 	boolean hasDone = false;
 
 	toggleSwitch compressorSwitch;
@@ -96,7 +90,7 @@ public class Robot extends TimedRobot {
 			Master = controllers[DRIVER];
 			System.out.println("controller 0");
 		}
-		 Motors.compressor.setClosedLoopControl(false);
+		Motors.compressor.setClosedLoopControl(false);
 		// Motors.landingGear.set(false);
 		// Motors.avocadoSlide.set(false);
 
@@ -168,12 +162,15 @@ public class Robot extends TimedRobot {
 	public void teleopInit() {
 
 		beltController = new BeltController(controllers[DRIVER], Motors.beltMotor);
-		
-		try{
-		hingeSwitch = new toggleSwitch(controllers[DRIVER], ControllerMap.A, Motors.hinge, Solenoid.class.getMethod("set", boolean.class));
-		avocadoSlideSwitch = new toggleSwitch(controllers[DRIVER], ControllerMap.B, Motors.avocadoSlide, Solenoid.class.getMethod("set", boolean.class));
-		compressorSwitch = new toggleSwitch(controllers[DRIVER], ControllerMap.rightClick, Motors.compressor, Compressor.class.getMethod("seClosedLoopControl", boolean.class));
-		}catch(Exception e){
+
+		try {
+			hingeSwitch = new toggleSwitch(controllers[DRIVER], ControllerMap.A, Motors.hinge,
+					Solenoid.class.getMethod("set", boolean.class));
+			avocadoSlideSwitch = new toggleSwitch(controllers[DRIVER], ControllerMap.B, Motors.avocadoSlide,
+					Solenoid.class.getMethod("set", boolean.class));
+			compressorSwitch = new toggleSwitch(controllers[DRIVER], ControllerMap.rightClick, Motors.compressor,
+					Compressor.class.getMethod("seClosedLoopControl", boolean.class));
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		state = RoboState.TeleopInit;
@@ -239,7 +236,8 @@ public class Robot extends TimedRobot {
 		climbingArm(); // work Driver
 		cargoIntake(); //
 		hingeSwitch.update();// work driver
-		compressorSwitch.update();; // work
+		compressorSwitch.update();
+		; // work
 
 		// ----------------------------------------------------------------------
 
@@ -256,29 +254,26 @@ public class Robot extends TimedRobot {
 		return Master == controllers[OPERATOR];
 	}
 
-	
-
-	
-
 	public void avocadoTurningControl() {
 		// 1.33 seconds
 		int povPos = controllers[OPERATOR].getPOV(0);
 
 		avocadoRotationTimer++;
-		if (avocadoRotationTimer >= TIMER_DELAY) {
+		if (avocadoRotationTimer > TIMER_DELAY) {
 			avocadoRotationTimer = TIMER_DELAY;
 		}
 
-		if (avocadoRotationTimer >= TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.start)) {
+		if (avocadoRotationTimer == TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.start)) {
 			avocadoRotationTimer = 0;
 			isAvocadoTurning = true;
 		}
 
+		if (Sensors.avocadoLimit.get()) {
+			isAvocadoTurning = false;
+		}
+
 		if (isAvocadoTurning) {
 			Motors.avocadoMotor.set(-1);
-			if (Sensors.avocadoLimit.get()) {
-				isAvocadoTurning = false;
-			}
 		} else {
 			Motors.avocadoMotor.set(0);
 		}
@@ -322,11 +317,8 @@ public class Robot extends TimedRobot {
 
 		Motors.beltMotor.set(dif);
 
-		
 		beltController.update();
 	}
-
-	
 
 	private void driveControl() {
 		double leftY = controllers[DRIVER].getRawAxis(ControllerMap.leftY);
