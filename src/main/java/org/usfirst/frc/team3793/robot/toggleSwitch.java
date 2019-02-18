@@ -6,12 +6,15 @@
 /*----------------------------------------------------------------------------*/
 
 package org.usfirst.frc.team3793.robot;
+
 import java.lang.reflect.*;
 
 import edu.wpi.first.wpilibj.GenericHID;
-/**
+
+/*
  * Gives Toggle Switch Functionality to controller buttons
- * 
+ * ONLY FOR SOLENOIDS
+ *  
  * @author Faris Prasetiawan
  */
 public class toggleSwitch {
@@ -27,31 +30,31 @@ public class toggleSwitch {
 
     final int TIMER_DELAY = 15;
 
-    toggleSwitch(GenericHID controller, int buttonNum, Object obj, Method method){
+    toggleSwitch(GenericHID controller, int buttonNum, Object obj, Method method) {
         this.buttonNum = buttonNum;
         this.controller = controller;
         this.obj = obj;
         this.method = method;
     }
 
-    void update(){
+    void update() {
         timer++;
-        if(timer>TIMER_DELAY){
+        if (timer > TIMER_DELAY) {
             timer = TIMER_DELAY;
         }
 
-        if(timer == TIMER_DELAY && controller.getRawButton(buttonNum)){
-            timer =0;
-            if(b){
+        if (timer == TIMER_DELAY && controller.getRawButton(buttonNum)) {
+            timer = 0;
+            if (b) {
                 b = false;
-            }else{
+            } else {
                 b = true;
             }
         }
 
-        try{
-        method.invoke(obj,b);
-        }catch(Exception e){
+        try {
+            method.invoke(obj, b);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
