@@ -355,6 +355,19 @@ public class Robot extends TimedRobot {
 
 	}
 
+	public void moveToHatch(float a) {
+		float angle = a;
+		MovementController.addAction((new Turn(angle, .8f)));
+		double distance = 2;// (double) Sensors.backDist.getRangeInches() * INCHES_TO_METERS;
+		if (angle > 0) {
+			MovementController.addAction((new Turn(90 - angle, .8f)));
+			MovementController.addAction(new Straight((float) (Math.cos(Math.toRadians(90 - angle)) * distance), .8f));
+			MovementController.addAction((new Turn(-90, .8f)));
+			MovementController.addAction(new Straight((float) (Math.sin(Math.toRadians(90 - angle)) * distance), .8f));
+		} else {
+			MovementController.addAction((new Turn(-90 - angle, .8f)));
+		}
+
 	@Override
 	public void testPeriodic() {
 	}
