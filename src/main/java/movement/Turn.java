@@ -1,6 +1,5 @@
 package movement;
 
-import org.usfirst.frc.team3793.robot.Motors;
 import org.usfirst.frc.team3793.robot.Sensors;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;

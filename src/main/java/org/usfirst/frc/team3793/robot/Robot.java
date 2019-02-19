@@ -6,7 +6,6 @@ import java.net.InetAddress;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
@@ -15,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import movement.MovementController;
 import movement.Straight;
 import movement.Turn;
-import edu.wpi.first.wpilibj.Timer;
 
 //Equation for Drift on tile where y is drift in clicks and x is velocity in clicks/100 ms
 // Y=7.029608995X - 592.3469424, where domain is defined on (90,1700)
@@ -256,7 +254,6 @@ public class Robot extends TimedRobot {
 
 	public void avocadoTurningControl() {
 		// 1.33 seconds
-		int povPos = controllers[OPERATOR].getPOV(0);
 
 		avocadoRotationTimer++;
 		if (avocadoRotationTimer > TIMER_DELAY) {
