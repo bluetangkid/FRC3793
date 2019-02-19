@@ -77,6 +77,12 @@ public class Robot extends TimedRobot {
 
 	toggleSwitch compressorSwitch;
 
+	int rightBumperTimer = 0;
+	int leftBumperTimer = 0;
+
+	boolean rightBumperEngaged = false;
+	boolean leftBumperEngaged = false;
+
 	@Override
 	public void robotInit() {
 		Motors.initialize();
@@ -177,6 +183,9 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopPeriodic() {
+		try{
+		System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA: " + Sensors.jeVois1.readString());
+		}catch(Exception e){e.printStackTrace();}
 		if (singleControllerMode && Master.getRawButton(ControllerMap.leftClick)) {
 			controllerSelector++;
 			GenericHID c;
@@ -228,20 +237,58 @@ public class Robot extends TimedRobot {
 
 		// ---------------------------- ARCADE DRIVE ----------------------------
 
-		driveControl(); // work Driver
-		avocadoControl(); // both work Driver
-		// landingGear();
-		climbingArm(); // work Driver
-		cargoIntake(); //
-		hingeSwitch.update();// work driver
-		compressorSwitch.update();
-		; // work
+		try {
+			if(!rightBumperEngaged && !leftBumperEngaged){
+			driveControl(); // work Driver
+			}
+			avocadoControl(); // both work Driver
+			// landingGear();
+			climbingArm(); // work Driver
+			cargoIntake(); //
+			hingeSwitch.update();// work driver
+			compressorSwitch.update();
+			rightBumper();
+			leftBumper();
+
+			if(MovementController.actions.isEmpty(){
+				rightBumperEngaged = false;
+				leftBumperEngaged = false;
+			}
+		} catch(Exception e) { 
+			e.printStackTrace();
+		}
 
 		// ----------------------------------------------------------------------
 
 		// ----------------------------------------------------------------------
 		// Motors.blinkin.set(-0.01);
 
+	}
+
+	public void rightBumper(){
+		rightBumperTimer++;
+		if(rightBumperTimer>TIMER_DELAY){
+			rightBumperTimer = TIMER_DELAY;
+		}
+
+		if(!rightBumperEngaged &&  rightBumperTimer == TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.RB)){
+			rightBumperTimer = 0;
+			rightBumperEngaged = true;
+			moveToBall();
+		}
+	}
+
+	public void leftBumper(){
+		leftBumperTimer++;
+		if(leftBumperTimer>TIMER_DELAY){
+			leftBumperTimer = TIMER_DELAY;
+		}
+
+		if(!leftBumperEngaged && leftBumperTimer == TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.LB)){
+			leftBumperTimer = 0;
+			leftBumperEngaged = true;
+			moveToHatch();
+		}
 	}
 
 	public boolean masterIsDriver() {
@@ -344,16 +391,16 @@ public class Robot extends TimedRobot {
 		}
 	}
 
-	public void moveToBall(float a) {
-		float angle = a;
+	public void moveToBall() {
+		float angle = degToBall;
 		MovementController.addAction(new Turn(angle, .8f));
 		float distance = 1;// (float) Sensors.backDist.getRangeInches() * INCHES_TO_METERS;
 		MovementController.addAction(new Straight(distance, .8f));
 
 	}
 
-	public void moveToHatch(float a) {
-		float angle = a;
+	public void moveToHatch() {
+		float angle = degToTape;
 		MovementController.addAction((new Turn(angle, .8f)));
 		double distance = 2;// (double) Sensors.backDist.getRangeInches() * INCHES_TO_METERS;
 		if (angle > 0) {
