@@ -26,7 +26,7 @@ public class Sensors {
 	public static void initialize() {
 		vacuumPivotSwitch = new DigitalInput(4);
 		System.out.println(SerialPort.Port.values());
-		navX = new AHRS(SerialPort.Port.kUSB2);
+		navX = new AHRS(SerialPort.Port.kUSB);
 		
 		//backDist = new Ultrasonic(1, 1);
 		avocadoLimit = new DigitalInput(RobotMap.AVOCADO_LIMIT_SWITCH.getPin());

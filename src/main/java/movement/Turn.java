@@ -13,18 +13,19 @@ import edu.wpi.first.wpilibj.PIDOutput;
  */
 public class Turn extends MovementAction implements PIDOutput {
 	// 0.58s oscillaty
-	final static float kP = .05f;// .175
+	final static float kP = .1f;// .05
 	final static float kI = 0.00000f;// .000001
 	final static float kD = 1f;// 1
 	final static float kF = 0f;
 	final static float kTolerance = 1;
 	public int framedoodad = 0;
+	public float targetDegrees = 0;
 
 	public Turn(float degrees, float maxSpeed) {
 		super((int) Math.signum(degrees), maxSpeed);
 		System.out.println(" Initializing Turn");
 		this.degrees = Sensors.navX.getYaw() + (degrees);
-
+		targetDegrees = degrees;
 		if (this.degrees > 180) {
 			this.degrees = -180 + this.degrees % 180;
 		} else if (this.degrees < -180) {
@@ -95,12 +96,14 @@ public class Turn extends MovementAction implements PIDOutput {
 	}
 
 	public void resetStartPos() {
-		this.degrees = Sensors.navX.getYaw() + (degrees);
+		this.degrees = Sensors.navX.getYaw() + (targetDegrees);
 		if (this.degrees > 180) {
 			this.degrees = -180 + this.degrees % 180;
 		} else if (this.degrees < -180) {
 			this.degrees = 180 - this.degrees % 180;
 		}
+		System.out.println(controller.getSetpoint() + " Pre reset setpoint");
 		controller.setSetpoint(this.degrees);
+		System.out.println(controller.getSetpoint() + " Post reset setpoint");
 	}
 }
