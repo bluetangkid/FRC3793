@@ -1,9 +1,6 @@
 package movement;
 
-import org.usfirst.frc.team3793.robot.Sensors;
 import edu.wpi.first.wpilibj.PIDController;
-import org.usfirst.frc.team3793.robot.Robot;
-import org.usfirst.frc.team3793.robot.Motors;
 /**
  * abstract class that {@link Straight} and {@link Turn} implement
  * @author Warren Funk
