@@ -18,7 +18,7 @@ import org.usfirst.frc.team3793.robot.RoboState;
  */
 
 public class MovementController extends Thread {
-	static ArrayDeque<MovementAction> actions;
+	public static ArrayDeque<MovementAction> actions;
 	MovementAction action;
 	boolean teleopEnabled = false;
 	int timer = 0;
