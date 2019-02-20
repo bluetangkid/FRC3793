@@ -12,7 +12,8 @@ import edu.wpi.first.wpilibj.PIDOutput;
  */
 public class Straight extends MovementAction implements PIDOutput {
 	float distance;
-	Point startPos;
+	float xPos;
+	float yPos;
 
 	final static float kP = .23f;
 	final static float kI = 0;
@@ -30,8 +31,6 @@ public class Straight extends MovementAction implements PIDOutput {
 		this.distance = distance;
 		System.out.println(" straight trying to initialize");
 		degrees = Sensors.navX.getYaw();
-		startPos = new Point(Motors.talonLeft.getSelectedSensorPosition(0),
-				Motors.talonRight.getSelectedSensorPosition(0));
 		controller = new PIDController(kP, kI, kD, kF, Sensors.navX, this, 0.005);
 		controller.setInputRange(-180.0f, 180.0f);
 		controller.setOutputRange(0.8f, 1.2f);
@@ -55,8 +54,7 @@ public class Straight extends MovementAction implements PIDOutput {
 	 * @return the distance traveled so far by the robot
 	 */
 	private double distTraveled() {
-		return (startPos.getDist(new Point(Motors.talonLeft.getSelectedSensorPosition(0),
-				Motors.talonRight.getSelectedSensorPosition(0))) / 4096) * 0.15 * Math.PI;
+		return (Math.sqrt(xPos*xPos + yPos*yPos) / 4096) * 0.15 * Math.PI;
 	}
 
 	/**
@@ -66,20 +64,19 @@ public class Straight extends MovementAction implements PIDOutput {
 		if (distTraveled() >= distance) {
 		System.out.println(" Straight Complete");
 		}
-		//nice
 		return distTraveled() >= distance;
 	}
-
+	//nice
 	@Override
 	public void pidWrite(double output) {
+		xPos += Motors.talonRight.getSelectedSensorVelocity(0);
+		yPos += Motors.talonLeft.getSelectedSensorVelocity(0);
 		PID = new Speed(maxSpeed * output, -maxSpeed);
 	}
 	public void resetStartPos(){
 		super.resetStartPos();
 		degrees = Sensors.navX.getYaw();
 		controller.setSetpoint(degrees);
-		startPos = new Point(Motors.talonLeft.getSelectedSensorPosition(0),
-				Motors.talonRight.getSelectedSensorPosition(0));
-				System.out.println("Reset Start Position");
+		System.out.println("Reset Start Position");
 	}
 }
