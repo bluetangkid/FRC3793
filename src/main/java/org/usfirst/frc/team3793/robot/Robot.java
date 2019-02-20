@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import movement.MovementController;
 import movement.Straight;
 import movement.Turn;
+import movement.Point;
 
 //Equation for Drift on tile where y is drift in clicks and x is velocity in clicks/100 ms
 // Y=7.029608995X - 592.3469424, where domain is defined on (90,1700)
@@ -354,10 +355,18 @@ public class Robot extends TimedRobot {
 	}
 
 	private void driveControl() {
-		double leftY = controllers[DRIVER].getRawAxis(ControllerMap.leftY);
-		double dif = Math.signum(Math.pow(leftY, 3));
+		double leftY = controllers[DRIVER].getRawAxis(ControllerMap.leftTrigger) - controllers[DRIVER].getRawAxis(ControllerMap.rightTrigger);
+		double dif;
 		if (Math.abs(leftY) < 0.05)
 			dif = 0.0;
+		else dif = Math.signum(Math.pow(leftY, 3));
+
+		float deadzone = 0.15f;
+    	Point stickInput = new Point(controllers[DRIVER].getRawAxis(ControllerMap.leftX), controllers[DRIVER].getRawAxis(ControllerMap.leftY));
+    	if(stickInput.getDist(new Point(0, 0)) < deadzone)
+        	stickInput = new Point(0, 0);
+    	else
+			stickInput = stickInput.normalize().mul(((stickInput.getDist(new Point(0, 0)) - deadzone) / (1 - deadzone)));
 
 		double leftX = controllers[DRIVER].getRawAxis(ControllerMap.leftX);
 		double turn = Math.signum(Math.pow(leftX, 3));

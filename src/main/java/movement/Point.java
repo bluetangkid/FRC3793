@@ -9,7 +9,7 @@ public class Point {
 	private double x;
 	private double y;
 	
-	Point(double x, double y){
+	public Point(double x, double y){
 		this.x = x;
 		this.y = y;
 	}
@@ -19,6 +19,18 @@ public class Point {
 	 */
 	public double getDist(Point a) {
 		return Math.sqrt(Math.pow(a.x - x, 2) + Math.pow(a.y - y, 2));
+	}
+
+	public Point normalize(){
+		x /= getDist(new Point(0, 0));
+		y /= getDist(new Point(0, 0));
+		return this;
+	}
+
+	public Point mul(double factor) {
+		x *= factor;
+		y *= factor;
+		return this;
 	}
 	
 	/**
