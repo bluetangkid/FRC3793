@@ -368,12 +368,7 @@ public class Robot extends TimedRobot {
     	else
 			stickInput = stickInput.normalize().mul(((stickInput.getDist(new Point(0, 0)) - deadzone) / (1 - deadzone)));
 
-		double leftX = controllers[DRIVER].getRawAxis(ControllerMap.leftX);
-		double turn = Math.signum(Math.pow(leftX, 3));
-		if (Math.abs(leftX) < 0.05)
-			turn = 0.0;
-
-		Motors.drive.arcadeDrive(turn*Settings.TURN_MULT, -dif*Settings.SPEED_MULT);
+		Motors.drive.arcadeDrive(stickInput.getX()*Settings.TURN_MULT, -dif*Settings.SPEED_MULT);
 	}
 
 	public void degreeSync() {
