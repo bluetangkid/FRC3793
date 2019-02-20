@@ -29,7 +29,7 @@ public class Straight extends MovementAction implements PIDOutput {
 	public Straight(float distance, float maxSpeed) {
 		super((int) Math.signum(distance), maxSpeed);
 		this.distance = distance;
-		System.out.println(" straight trying to initialize");
+		System.out.println(" straight trying its hardest to initialize");
 		degrees = Sensors.navX.getYaw();
 		controller = new PIDController(kP, kI, kD, kF, Sensors.navX, this, 0.005);
 		controller.setInputRange(-180.0f, 180.0f);

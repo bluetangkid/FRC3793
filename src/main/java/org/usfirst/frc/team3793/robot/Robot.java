@@ -246,11 +246,6 @@ public class Robot extends TimedRobot {
 			compressorSwitch.update();
 			rightBumper();
 			leftBumper();
-
-			if(MovementController.actions.isEmpty()){
-				rightBumperEngaged = false;
-				leftBumperEngaged = false;
-			}
 		} catch(Exception e) { 
 			e.printStackTrace();
 		}
@@ -369,7 +364,7 @@ public class Robot extends TimedRobot {
 		if (Math.abs(leftX) < 0.05)
 			turn = 0.0;
 
-		Motors.drive.arcadeDrive(turn * .6, -dif);
+		Motors.drive.arcadeDrive(turn*Settings.TURN_MULT, -dif*Settings.SPEED_MULT);
 	}
 
 	public void degreeSync() {
@@ -390,7 +385,6 @@ public class Robot extends TimedRobot {
 		MovementController.addAction(new Turn(angle, .8f));
 		float distance = 1;// (float) Sensors.backDist.getRangeInches() * INCHES_TO_METERS;
 		MovementController.addAction(new Straight(distance, .8f));
-
 	}
 
 	public void moveToHatch() {
@@ -408,8 +402,7 @@ public class Robot extends TimedRobot {
 	}
 
 	@Override
-	public void testPeriodic() {
-	}
+	public void testPeriodic() {}
 
 	public static synchronized RoboState getState() {
 		return state;

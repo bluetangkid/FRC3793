@@ -7,5 +7,6 @@ package org.usfirst.frc.team3793.robot;
  *
  */
 public interface Settings {
-	public static final float ACCELERATION = 0.01f;// DOES NOTHING, JUST HERE AS A PLACEHOLDER
+	public static final float SPEED_MULT = 1.0f;
+	public static final float TURN_MULT = 0.8f;
 }
