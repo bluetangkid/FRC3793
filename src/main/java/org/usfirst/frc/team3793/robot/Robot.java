@@ -156,15 +156,10 @@ public class Robot extends TimedRobot {
 		state = RoboState.Autonomous;
 		Scheduler.getInstance().run();
 		// System.out.println(Sensors.navX.getYaw()+ "autoPeriodic");
-		if (!hasDone) {
-			moveToBall(90);
-			hasDone = true;
-		}
 	}
 
 	@Override
 	public void teleopInit() {
-
 		beltController = new BeltController(controllers[DRIVER], Motors.beltMotor);
 
 		try {
@@ -183,9 +178,11 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopPeriodic() {
-		try{
+		try {
 		System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA: " + Sensors.jeVois1.readString());
-		}catch(Exception e){e.printStackTrace();}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 		if (singleControllerMode && Master.getRawButton(ControllerMap.leftClick)) {
 			controllerSelector++;
 			GenericHID c;
@@ -239,7 +236,7 @@ public class Robot extends TimedRobot {
 
 		try {
 			if(!rightBumperEngaged && !leftBumperEngaged){
-			driveControl(); // work Driver
+				driveControl(); // work Driver
 			}
 			avocadoControl(); // both work Driver
 			// landingGear();
@@ -250,7 +247,7 @@ public class Robot extends TimedRobot {
 			rightBumper();
 			leftBumper();
 
-			if(MovementController.actions.isEmpty(){
+			if(MovementController.actions.isEmpty()){
 				rightBumperEngaged = false;
 				leftBumperEngaged = false;
 			}
@@ -262,32 +259,29 @@ public class Robot extends TimedRobot {
 
 		// ----------------------------------------------------------------------
 		// Motors.blinkin.set(-0.01);
-
 	}
 
 	public void rightBumper(){
-		rightBumperTimer++;
-		if(rightBumperTimer>TIMER_DELAY){
-			rightBumperTimer = TIMER_DELAY;
-		}
-
-		if(!rightBumperEngaged &&  rightBumperTimer == TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.RB)){
-			rightBumperTimer = 0;
+		if(controllers[DRIVER].getRawButton(ControllerMap.RB) && !rightBumperEngaged){
 			rightBumperEngaged = true;
 			moveToBall();
+		}
+
+		if(!controllers[DRIVER].getRawButton(ControllerMap.RB) && rightBumperEngaged){
+			rightBumperEngaged = false;
+			MovementController.clearActions();
 		}
 	}
 
 	public void leftBumper(){
-		leftBumperTimer++;
-		if(leftBumperTimer>TIMER_DELAY){
-			leftBumperTimer = TIMER_DELAY;
-		}
-
-		if(!leftBumperEngaged && leftBumperTimer == TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.LB)){
-			leftBumperTimer = 0;
+		if(controllers[DRIVER].getRawButton(ControllerMap.LB) && !leftBumperEngaged){
 			leftBumperEngaged = true;
 			moveToHatch();
+		}
+
+		if(!controllers[DRIVER].getRawButton(ControllerMap.LB) && leftBumperEngaged){
+			leftBumperEngaged = false;
+			MovementController.clearActions();
 		}
 	}
 

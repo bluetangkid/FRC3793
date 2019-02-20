@@ -27,8 +27,7 @@ public class MovementController extends Thread {
 	}
 
 	public void run() {
-		while (Sensors.navX.isCalibrating())
-			;
+		while (Sensors.navX.isCalibrating());
 
 		action = null;
 		actions = new ArrayDeque<MovementAction>();
@@ -44,7 +43,7 @@ public class MovementController extends Thread {
 				Motors.drive.tankDrive(0, 0);
 				timer = 30;
 			}
-			if (Robot.getState() == RoboState.Autonomous) {
+			if (Robot.getState() == RoboState.Autonomous || Robot.getState() == RoboState.Teleop) {
 				if (!actions.isEmpty()) {
 					if (action == null && timer <= 0) {
 						action = actions.removeFirst();
@@ -55,18 +54,11 @@ public class MovementController extends Thread {
 					Speed speed = action.getSpeed();
 					Motors.drive.tankDrive(speed.getL(), speed.getR());
 				}
-			} else if (Robot.getState() == RoboState.Teleop) {
-				if (teleopEnabled) {
-					if (action == null)
-						action = actions.removeFirst();
-					Speed speed = action.getSpeed();
-					Motors.drive.tankDrive(speed.getL(), speed.getR());
-				}
 			} else if (Robot.getState() == RoboState.TeleopInit) {
 				action = null;
 				actions.clear();
 			}
-			// nice
+			
 			try {
 				Thread.sleep(5);
 			} catch (InterruptedException e) {
@@ -74,15 +66,14 @@ public class MovementController extends Thread {
 				return;
 			}
 		}
-		this.interrupt();
-
+		this.interrupt(); // nice
 	}
 
 	public static synchronized void addAction(MovementAction a) {
 		actions.add(a);
 	}
 
-	public synchronized void setStatus(boolean status) {
-		teleopEnabled = status;
+	public static synchronized void clearActions(){
+		actions.clear();
 	}
 }
