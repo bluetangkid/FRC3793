@@ -347,18 +347,17 @@ public class Robot extends TimedRobot {
 	}
 
 	private void driveControl() {
-		double leftY = controllers[DRIVER].getRawAxis(ControllerMap.leftTrigger) - controllers[DRIVER].getRawAxis(ControllerMap.rightTrigger);
 		double dif;
-		if (Math.abs(leftY) < 0.05)
+		double leftY = controllers[DRIVER].getRawAxis(ControllerMap.leftTrigger) - controllers[DRIVER].getRawAxis(ControllerMap.rightTrigger);
+		if (Math.abs(leftY) < Settings.BUMPER_DEADZONE)
 			dif = 0.0;
 		else dif = Math.signum(Math.pow(leftY, 3));
 
-		float deadzone = 0.15f;
     	Point stickInput = new Point(controllers[DRIVER].getRawAxis(ControllerMap.leftX), controllers[DRIVER].getRawAxis(ControllerMap.leftY));
-    	if(stickInput.getDist(new Point(0, 0)) < deadzone)
+    	if(stickInput.getDist(new Point(0, 0)) < Settings.LSTICK_DEADZONE)
         	stickInput = new Point(0, 0);
     	else
-			stickInput = stickInput.normalize().mul(((stickInput.getDist(new Point(0, 0)) - deadzone) / (1 - deadzone)));
+			stickInput = stickInput.normalize().mul(((stickInput.getDist(new Point(0, 0)) - Settings.LSTICK_DEADZONE) / (1 - Settings.LSTICK_DEADZONE)));
 
 		Motors.drive.arcadeDrive(stickInput.getX()*Settings.TURN_MULT, -dif*Settings.SPEED_MULT, false);
 	}
