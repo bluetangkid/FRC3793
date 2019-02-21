@@ -174,7 +174,6 @@ public class Robot extends TimedRobot {
 			e.printStackTrace();
 		}
 		state = RoboState.TeleopInit;
-
 	}
 
 	@Override
@@ -252,8 +251,6 @@ public class Robot extends TimedRobot {
 		}
 
 		// ----------------------------------------------------------------------
-
-		// ----------------------------------------------------------------------
 		// Motors.blinkin.set(-0.01);
 	}
 
@@ -320,19 +317,17 @@ public class Robot extends TimedRobot {
 	}
 
 	private void landingGear() {
-		if (!Motors.landingGear.get() && controllers[OPERATOR].getRawButton(ControllerMap.start)) { // supposed to be
-																									// start button
+		if (!Motors.landingGear.get() && controllers[OPERATOR].getRawButton(ControllerMap.start)) {
 			Motors.landingGear.set(true);// extend
 		}
 
-		if (Motors.landingGear.get() && controllers[OPERATOR].getRawButton(ControllerMap.back)) { // supposed to be back
-																									// button
+		if (Motors.landingGear.get() && controllers[OPERATOR].getRawButton(ControllerMap.back)) {
 			Motors.landingGear.set(false);// retract
 		}
 	}
 
 	private void climbingArm() {
-		double armMovement = controllers[DRIVER].getRawAxis(ControllerMap.rightY); // supposed to be right stick Y axis
+		double armMovement = controllers[DRIVER].getRawAxis(ControllerMap.rightY);
 
 		if (Math.abs(armMovement) > .1) {
 			Motors.armMotor.set(armMovement * .6);
@@ -342,9 +337,6 @@ public class Robot extends TimedRobot {
 	}
 
 	private void cargoIntake() {
-		final double GOING_UP = -1.0;
-		final double GOING_DOWN = 1.0;
-
 		double dif = Math.signum(Math.pow(controllers[DRIVER].getRawAxis(ControllerMap.rightX), 3));
 		if (Math.abs(dif) < 0.1)
 			dif = 0.0;
