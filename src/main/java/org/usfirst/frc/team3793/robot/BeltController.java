@@ -20,66 +20,84 @@ public class BeltController {
     int timer = 0;
     final int TIMER_DELAY = 15;
 
+    int buttonNum;
+    int buttonNum2;
+
     final int UP = 1;
     final int DOWN = -1;
 
     enum beltStates {GOING_UP, MIDPOINT, GOING_DOWN, STOPPED };
     beltStates beltState = beltStates.STOPPED;
 
-    BeltController(GenericHID controller, Spark motor){
+    BeltController(GenericHID controller, Spark motor, int buttonNum, int buttonNum2){
         this.controller = controller;
         this.motor = motor;
+        this.buttonNum = buttonNum;
+        this.buttonNum2 = buttonNum2;
     }
 
     void update(){
-        timer ++;
-        if(timer> TIMER_DELAY){
-            timer = TIMER_DELAY;
+
+        if(controller.getRawButton(buttonNum)){
+            motor.set(UP);
+        }else{
+            motor.set(0);
         }
 
-        if(timer == TIMER_DELAY && controller.getRawButton(ControllerMap.X)){
-            timer = 0;
-           
-            switch(beltState){
-                case STOPPED:
-                    beltState = beltStates.GOING_UP;
-                    break;
-                case GOING_UP:
-                    beltState = beltStates.STOPPED;
-                    break;
-                case MIDPOINT:
-                    beltState = beltStates.GOING_UP;
-                    break;
-                case GOING_DOWN:
-                    beltState = beltStates.STOPPED;
-                    break;
-           }
+        if(controller.getRawButton(buttonNum2)){
+            motor.set(DOWN);
+        }else{
+            motor.set(0);
         }
 
-        if(timer == TIMER_DELAY && controller.getRawButton(ControllerMap.B)){
-            timer = 0;
+        // timer ++;
+        // if(timer> TIMER_DELAY){
+        //     timer = TIMER_DELAY;
+        // }
+
+        // if(timer == TIMER_DELAY && controller.getRawButton(ControllerMap.X)){
+        //     timer = 0;
            
-            switch(beltState){
-                case STOPPED:
-                    beltState = beltStates.GOING_DOWN;
-                    break;
-                case GOING_UP:
-                    beltState = beltStates.STOPPED;
-                    break;
-                case MIDPOINT:
-                    beltState = beltStates.GOING_DOWN;
-                    break;
-                case GOING_DOWN:
-                    beltState = beltStates.STOPPED;
-                    break;
-            }
-        }
+        //     switch(beltState){
+        //         case STOPPED:
+        //             beltState = beltStates.GOING_UP;
+        //             break;
+        //         case GOING_UP:
+        //             beltState = beltStates.STOPPED;
+        //             break;
+        //         case MIDPOINT:
+        //             beltState = beltStates.GOING_UP;
+        //             break;
+        //         case GOING_DOWN:
+        //             beltState = beltStates.STOPPED;
+        //             break;
+        //    }
+        // }
+
+        // if(timer == TIMER_DELAY && controller.getRawButton(ControllerMap.B)){
+        //     timer = 0;
+           
+        //     switch(beltState){
+        //         case STOPPED:
+        //             beltState = beltStates.GOING_DOWN;
+        //             break;
+        //         case GOING_UP:
+        //             beltState = beltStates.STOPPED;
+        //             break;
+        //         case MIDPOINT:
+        //             beltState = beltStates.GOING_DOWN;
+        //             break;
+        //         case GOING_DOWN:
+        //             beltState = beltStates.STOPPED;
+        //             break;
+        //     }
+        // }
 
         // if( beltState == beltStates.GOING_UP && Sensors.beltLimit.get()){
         //     beltState = beltStates.MIDPOINT;
         // }
 
-        setMotors();
+        //setMotors();
     }
 
 
