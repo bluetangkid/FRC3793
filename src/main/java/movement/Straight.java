@@ -71,7 +71,7 @@ public class Straight extends MovementAction implements PIDOutput {
 	public void pidWrite(double output) {
 		xPos += Motors.talonRight.getSelectedSensorVelocity(0);
 		yPos += Motors.talonLeft.getSelectedSensorVelocity(0);
-		PID = new Speed(maxSpeed * output, -maxSpeed);
+		PID = new Speed(maxSpeed * output, -maxSpeed * (1/output));
 	}
 	public void resetStartPos(){
 		super.resetStartPos();
