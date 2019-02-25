@@ -12,12 +12,13 @@ import edu.wpi.first.wpilibj.PIDOutput;
  */
 public class Straight extends MovementAction implements PIDOutput {
 	float distance;
-	float xPos;
-	float yPos;
+	double xPos;
+	double yPos;
+	double time;
 
-	final static float kP = .23f;
+	final static float kP = .3f;
 	final static float kI = 0;
-	final static float kD = 0;
+	final static float kD = 1.9f;
 	final static float kF = 0.0f;
 	final static float kTolerance = 0;
 	private double speedMult = 1;
@@ -44,8 +45,8 @@ public class Straight extends MovementAction implements PIDOutput {
 	 * @return {@link Speed} required to go in a straight line
 	 */
 	public Speed getSpeed() {
-		if (distTraveled() / distance > .8) {
-			speedMult -= .05;
+		if (distance - distTraveled() < 0.8) {
+			//speedMult -= .01;
 		}
 		return PID;
 	}
@@ -54,7 +55,9 @@ public class Straight extends MovementAction implements PIDOutput {
 	 * @return the distance traveled so far by the robot
 	 */
 	private double distTraveled() {
-		return (Math.sqrt(xPos*xPos + yPos*yPos) / 4096) * 0.15 * Math.PI;
+		double num = (Math.sqrt(xPos*xPos + yPos*yPos) / 4096d) * 1.5d * Math.PI;
+		System.out.println(num);
+		return num;
 	}
 
 	/**
@@ -62,16 +65,18 @@ public class Straight extends MovementAction implements PIDOutput {
 	 */
 	public boolean isComplete() {
 		if (distTraveled() >= distance) {
-		System.out.println(" Straight Complete");
+			System.out.println(" Straight Complete");
+			MovementController.addAction(new Turn(degrees - Sensors.navX.getYaw(), 0.8f));
 		}
 		return distTraveled() >= distance;
 	}
 	//nice
 	@Override
 	public void pidWrite(double output) {
-		xPos += Motors.talonRight.getSelectedSensorVelocity(0);
-		yPos += Motors.talonLeft.getSelectedSensorVelocity(0);
-		PID = new Speed(maxSpeed * output, -maxSpeed * (1/output));
+		xPos += Motors.talonRight.getSelectedSensorVelocity(0) * (System.currentTimeMillis() - time) * (1d/1000d);
+		yPos += Motors.talonLeft.getSelectedSensorVelocity(0) * (System.currentTimeMillis() - time) * (1d/1000d);
+		time = System.currentTimeMillis();
+		PID = new Speed(maxSpeed * output * speedMult, -maxSpeed * (1/output) * speedMult);
 	}
 	public void resetStartPos(){
 		super.resetStartPos();
