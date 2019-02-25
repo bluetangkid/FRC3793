@@ -67,6 +67,8 @@ public class Robot extends TimedRobot {
 
 	toggleSwitch hingeSwitch;
 
+	toggleSwitch landingGearSwitch;
+
 	// beltstates
 	BeltController beltController;
 
@@ -75,8 +77,6 @@ public class Robot extends TimedRobot {
 	static double minVoltage = 30;
 
 	boolean hasDone = false;
-
-	toggleSwitch compressorSwitch;
 
 	int rightBumperTimer = 0;
 	int leftBumperTimer = 0;
@@ -161,15 +161,16 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
-		beltController = new BeltController(controllers[DRIVER], Motors.beltMotor);
+		beltController = new BeltController(controllers[OPERATOR], Motors.beltMotor, ControllerMap.X, ControllerMap.B);
 
 		try {
-			hingeSwitch = new toggleSwitch(controllers[DRIVER], ControllerMap.A, Motors.hinge,
+			hingeSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.A, Motors.hinge,
 					Solenoid.class.getMethod("set", boolean.class));
-			avocadoSlideSwitch = new toggleSwitch(controllers[DRIVER], ControllerMap.B, Motors.avocadoSlide,
+			avocadoSlideSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.RB, Motors.avocadoSlide,
 					Solenoid.class.getMethod("set", boolean.class));
-			compressorSwitch = new toggleSwitch(controllers[DRIVER], ControllerMap.rightClick, Motors.compressor,
-					Compressor.class.getMethod("seClosedLoopControl", boolean.class));
+			landingGearSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.start, Motors.landingGear,
+					Solenoid.class.getMethod("set", boolean.class));
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -179,8 +180,8 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		try {
-		System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA: " + Sensors.jeVois1.readString());
-		} catch(Exception e) {
+			System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA: " + Sensors.jeVois1.readString());
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		if (singleControllerMode && Master.getRawButton(ControllerMap.leftClick)) {
@@ -235,18 +236,18 @@ public class Robot extends TimedRobot {
 		// ---------------------------- ARCADE DRIVE ----------------------------
 
 		try {
-			if(!rightBumperEngaged && !leftBumperEngaged){
+			if (!rightBumperEngaged && !leftBumperEngaged) {
 				driveControl(); // work Driver
 			}
-			avocadoControl(); // both work Driver
-			// landingGear();
-			climbingArm(); // work Driver
-			cargoIntake(); //
-			hingeSwitch.update();// work driver
-			compressorSwitch.update();
-			rightBumper();
-			leftBumper();
-		} catch(Exception e) { 
+			avocadoControl(); // both work operator
+			climbingArm(); // operator RIGHT STICK
+			// cargoIntake(); // operator
+			beltController.update(); // operator X - UP AND B - DOWN Button
+			hingeSwitch.update();// opperator A button
+			landingGearSwitch.update();
+			rightBumper(); // driver
+			leftBumper(); // driver
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -254,25 +255,25 @@ public class Robot extends TimedRobot {
 		// Motors.blinkin.set(-0.01);
 	}
 
-	public void rightBumper(){
-		if(controllers[DRIVER].getRawButton(ControllerMap.RB) && !rightBumperEngaged){
+	public void rightBumper() {
+		if (controllers[DRIVER].getRawButton(ControllerMap.RB) && !rightBumperEngaged) {
 			rightBumperEngaged = true;
 			moveToBall();
 		}
 
-		if(!controllers[DRIVER].getRawButton(ControllerMap.RB) && rightBumperEngaged){
+		if (!controllers[DRIVER].getRawButton(ControllerMap.RB) && rightBumperEngaged) {
 			rightBumperEngaged = false;
 			MovementController.clearActions();
 		}
 	}
 
-	public void leftBumper(){
-		if(controllers[DRIVER].getRawButton(ControllerMap.LB) && !leftBumperEngaged){
+	public void leftBumper() {
+		if (controllers[DRIVER].getRawButton(ControllerMap.LB) && !leftBumperEngaged) {
 			leftBumperEngaged = true;
 			moveToHatch();
 		}
 
-		if(!controllers[DRIVER].getRawButton(ControllerMap.LB) && leftBumperEngaged){
+		if (!controllers[DRIVER].getRawButton(ControllerMap.LB) && leftBumperEngaged) {
 			leftBumperEngaged = false;
 			MovementController.clearActions();
 		}
@@ -294,7 +295,7 @@ public class Robot extends TimedRobot {
 			avocadoRotationTimer = TIMER_DELAY;
 		}
 
-		if (avocadoRotationTimer == TIMER_DELAY && controllers[DRIVER].getRawButton(ControllerMap.start)) {
+		if (avocadoRotationTimer == TIMER_DELAY && controllers[OPERATOR].getRawButton(ControllerMap.LB)) {
 			avocadoRotationTimer = 0;
 			isAvocadoTurning = true;
 		}
@@ -312,8 +313,8 @@ public class Robot extends TimedRobot {
 	}
 
 	private void avocadoControl() {
-		avocadoSlideSwitch.update();
-		avocadoTurningControl();
+		avocadoSlideSwitch.update(); // Operator RB
+		avocadoTurningControl(); // operator LB
 	}
 
 	private void landingGear() {
@@ -327,7 +328,7 @@ public class Robot extends TimedRobot {
 	}
 
 	private void climbingArm() {
-		double armMovement = controllers[DRIVER].getRawAxis(ControllerMap.rightY);
+		double armMovement = controllers[OPERATOR].getRawAxis(ControllerMap.rightY);
 
 		if (Math.abs(armMovement) > .1) {
 			Motors.armMotor.set(armMovement * .6);
@@ -348,18 +349,22 @@ public class Robot extends TimedRobot {
 
 	private void driveControl() {
 		double dif;
-		double leftY = controllers[DRIVER].getRawAxis(ControllerMap.leftTrigger) - controllers[DRIVER].getRawAxis(ControllerMap.rightTrigger);
+		double leftY = controllers[DRIVER].getRawAxis(ControllerMap.leftTrigger)
+				- controllers[DRIVER].getRawAxis(ControllerMap.rightTrigger);
 		if (Math.abs(leftY) < Settings.BUMPER_DEADZONE)
 			dif = 0.0;
-		else dif = Math.signum(Math.pow(leftY, 3));
+		else
+			dif = Math.signum(Math.pow(leftY, 3));
 
-    	Point stickInput = new Point(controllers[DRIVER].getRawAxis(ControllerMap.leftX), controllers[DRIVER].getRawAxis(ControllerMap.leftY));
-    	if(stickInput.getDist(new Point(0, 0)) < Settings.LSTICK_DEADZONE)
-        	stickInput = new Point(0, 0);
-    	else
-			stickInput = stickInput.normalize().mul(((stickInput.getDist(new Point(0, 0)) - Settings.LSTICK_DEADZONE) / (1 - Settings.LSTICK_DEADZONE)));
+		Point stickInput = new Point(controllers[DRIVER].getRawAxis(ControllerMap.leftX),
+				controllers[DRIVER].getRawAxis(ControllerMap.leftY));
+		if (stickInput.getDist(new Point(0, 0)) < Settings.LSTICK_DEADZONE)
+			stickInput = new Point(0, 0);
+		else
+			stickInput = stickInput.normalize().mul(((stickInput.getDist(new Point(0, 0)) - Settings.LSTICK_DEADZONE)
+					/ (1 - Settings.LSTICK_DEADZONE)));
 
-		Motors.drive.arcadeDrive(stickInput.getX()*Settings.TURN_MULT, -dif*Settings.SPEED_MULT, false);
+		Motors.drive.arcadeDrive(stickInput.getX() * Settings.TURN_MULT, -dif * Settings.SPEED_MULT, false);
 	}
 
 	public void degreeSync() {
@@ -397,7 +402,8 @@ public class Robot extends TimedRobot {
 	}
 
 	@Override
-	public void testPeriodic() {}
+	public void testPeriodic() {
+	}
 
 	public static synchronized RoboState getState() {
 		return state;
