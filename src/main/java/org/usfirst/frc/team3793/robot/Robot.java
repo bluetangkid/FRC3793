@@ -57,6 +57,7 @@ public class Robot extends TimedRobot {
 
 	// avocado initialization
 	static int avocadoRotationTimer = 0;
+	static long timeAvocado = 0;
 
 	static int avocadoPos = 180;
 	static boolean isAvocadoTurning = false;
@@ -100,6 +101,8 @@ public class Robot extends TimedRobot {
 		// Motors.avocadoSlide.set(false);
 
 		state = RoboState.RobotInit;
+		t = new MovementController();
+		t.start();
 
 		// try {
 		// socket = new DatagramSocket(5808);
@@ -125,7 +128,7 @@ public class Robot extends TimedRobot {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// Motors.compressor.setClosedLoopControl(false);
+		 Motors.compressor.setClosedLoopControl(true);
 		// Motors.landingGear.set(false);
 		// Motors.avocadoSlide.set(false);
 	}
@@ -143,8 +146,8 @@ public class Robot extends TimedRobot {
 
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
 
-		t = new MovementController();
-		t.start();
+		// t = new MovementController();
+		// t.start();
 		// Motors.compressor.setClosedLoopControl(false);
 		// Motors.avocadoSlide.set(false);
 	}
@@ -164,12 +167,12 @@ public class Robot extends TimedRobot {
 		beltController = new BeltController(controllers[OPERATOR], Motors.beltMotor, ControllerMap.X, ControllerMap.B);
 
 		try {
-			hingeSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.A, Motors.hinge,
+			hingeSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.start, Motors.hinge,
 					Solenoid.class.getMethod("set", boolean.class));
-			avocadoSlideSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.RB, Motors.avocadoSlide,
+			avocadoSlideSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.A, Motors.avocadoSlide,
 					Solenoid.class.getMethod("set", boolean.class));
-			landingGearSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.start, Motors.landingGear,
-					Solenoid.class.getMethod("set", boolean.class));
+			//landingGearSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.back, Motors.landingGear,
+					//Solenoid.class.getMethod("set", boolean.class));
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -179,11 +182,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopPeriodic() {
-		try {
-			System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA: " + Sensors.jeVois1.readString());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		degreeSync();
 		if (singleControllerMode && Master.getRawButton(ControllerMap.leftClick)) {
 			controllerSelector++;
 			GenericHID c;
@@ -243,8 +242,8 @@ public class Robot extends TimedRobot {
 			climbingArm(); // operator RIGHT STICK
 			// cargoIntake(); // operator
 			beltController.update(); // operator X - UP AND B - DOWN Button
-			hingeSwitch.update();// opperator A button
-			landingGearSwitch.update();
+			hingeSwitch.update();// opperator Y button
+			//landingGearSwitch.update();
 			rightBumper(); // driver
 			leftBumper(); // driver
 		} catch (Exception e) {
@@ -288,15 +287,16 @@ public class Robot extends TimedRobot {
 	}
 
 	public void avocadoTurningControl() {
-		// 1.33 seconds
+		// 1330 miliseconds, doesn't work
 
 		avocadoRotationTimer++;
 		if (avocadoRotationTimer > TIMER_DELAY) {
 			avocadoRotationTimer = TIMER_DELAY;
 		}
 
-		if (avocadoRotationTimer == TIMER_DELAY && controllers[OPERATOR].getRawButton(ControllerMap.LB)) {
+		if (avocadoRotationTimer == TIMER_DELAY && controllers[OPERATOR].getRawButton(ControllerMap.Y)) {
 			avocadoRotationTimer = 0;
+			timeAvocado = System.currentTimeMillis();
 			isAvocadoTurning = true;
 		}
 
@@ -305,16 +305,18 @@ public class Robot extends TimedRobot {
 		}
 
 		if (isAvocadoTurning) {
+			if(System.currentTimeMillis() - timeAvocado > 1200) isAvocadoTurning = false;
 			Motors.avocadoMotor.set(-1);
 		} else {
+			timeAvocado = 0;
 			Motors.avocadoMotor.set(0);
 		}
 
 	}
 
 	private void avocadoControl() {
-		avocadoSlideSwitch.update(); // Operator RB
-		avocadoTurningControl(); // operator LB
+		avocadoSlideSwitch.update(); // Operator A
+		avocadoTurningControl(); // operator Y
 	}
 
 	private void landingGear() {
@@ -368,36 +370,46 @@ public class Robot extends TimedRobot {
 	}
 
 	public void degreeSync() {
-		String[] info = Sensors.jeVoisTracking.readString().split(",");
-
-		for (int i = 0; i < info.length; i++) {
-			String temp = info[i];
-			if (temp.startsWith("B")) {
-				degToBall = Float.parseFloat(temp.substring(1));
-			} else {
-				degToTape = Float.parseFloat(temp.substring(1));
+		String[] info = null;
+		try {
+			info = Sensors.jeVois1.readString().split(",");
+			for (int i = 0; i < info.length; i++) {
+				String temp = info[i];
+				if(temp.length() > 1) {
+					System.out.println(temp);
+					if (temp.startsWith("B")) {
+						degToBall = Float.parseFloat(temp.substring(1));
+					} else {
+						degToTape = Float.parseFloat(temp.substring(1));
+					}
+				}
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
 	public void moveToBall() {
 		float angle = degToBall;
-		MovementController.addAction(new Turn(angle, .8f));
+		MovementController.addAction(new Turn(180 - angle, .8f));
 		float distance = 1;// (float) Sensors.backDist.getRangeInches() * INCHES_TO_METERS;
-		MovementController.addAction(new Straight(distance, .8f));
+	//	MovementController.addAction(new Straight(distance, .8f));
 	}
 
 	public void moveToHatch() {
 		float angle = degToTape;
-		MovementController.addAction((new Turn(angle, .8f)));
+		MovementController.addAction((new Turn(180 - angle, .8f)));
 		double distance = 2;// (double) Sensors.backDist.getRangeInches() * INCHES_TO_METERS;
 		if (angle > 0) {
-			MovementController.addAction((new Turn(90 - angle, .8f)));
-			MovementController.addAction(new Straight((float) (Math.cos(Math.toRadians(90 - angle)) * distance), .8f));
-			MovementController.addAction((new Turn(-90, .8f)));
-			MovementController.addAction(new Straight((float) (Math.sin(Math.toRadians(90 - angle)) * distance), .8f));
+		//	MovementController.addAction((new Turn(90 - angle, .8f)));
+		//	MovementController.addAction(new Straight((float) (Math.cos(Math.toRadians(90 - angle)) * distance), .8f));
+		//	MovementController.addAction((new Turn(-90, .8f)));
+		//	MovementController.addAction(new Straight((float) (Math.sin(Math.toRadians(90 - angle)) * distance), .8f));
 		} else {
-			MovementController.addAction((new Turn(-90 - angle, .8f)));
+		//	MovementController.addAction((new Turn(-90 - angle, .8f)));
+		//	MovementController.addAction(new Straight((float) (Math.cos(Math.toRadians(-90 - angle)) * distance), .8f));
+		//	MovementController.addAction((new Turn(90, .8f)));
+		//	MovementController.addAction(new Straight((float) (Math.sin(Math.toRadians(-90 - angle)) * distance), .8f));		}
 		}
 	}
 
