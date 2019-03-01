@@ -305,13 +305,12 @@ public class Robot extends TimedRobot {
 		}
 
 		if (isAvocadoTurning) {
-			if(System.currentTimeMillis() - timeAvocado > 1200) isAvocadoTurning = false;
+			if(System.currentTimeMillis() - timeAvocado > 1600) isAvocadoTurning = false;
 			Motors.avocadoMotor.set(-1);
 		} else {
 			timeAvocado = 0;
 			Motors.avocadoMotor.set(0);
 		}
-
 	}
 
 	private void avocadoControl() {
