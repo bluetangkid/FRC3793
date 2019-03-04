@@ -370,7 +370,10 @@ public class Robot extends TimedRobot {
 		if(Math.abs(lx) > Settings.LSTICK_DEADZONE)
 			lNum = Math.pow(controllers[DRIVER].getRawAxis(ControllerMap.leftX), 3);
 		else lNum = 0;
-		Motors.drive.arcadeDrive(lNum * Settings.TURN_MULT, -dif * Settings.SPEED_MULT, false);
+		
+		if(lNum == 0 && dif == 0 && Motors.talonLeft.getSelectedSensorVelocity(0) > 100)
+			Motors.drive.arcadeDrive(0, 0);
+		else Motors.drive.arcadeDrive(lNum * Settings.TURN_MULT, -dif * Settings.SPEED_MULT, false);
 	}
 
 	public void degreeSync() {
@@ -396,8 +399,6 @@ public class Robot extends TimedRobot {
 	public void moveToBall() {
 		float angle = degToBall;
 		MovementController.addAction(new Turn(180 - angle, .8f));
-		float distance = 1;// (float) Sensors.backDist.getRangeInches() * INCHES_TO_METERS;
-	//	MovementController.addAction(new Straight(distance, .8f));
 	}
 
 	public void moveToHatch() {
