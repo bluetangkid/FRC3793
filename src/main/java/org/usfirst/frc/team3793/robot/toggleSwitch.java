@@ -38,24 +38,50 @@ public class toggleSwitch {
     }
 
     void update() {
-        timer++;
-        if (timer > TIMER_DELAY) {
-            timer = TIMER_DELAY;
+        
+        if (timer < TIMER_DELAY) {
+            timer++;
         }
 
-        if (timer == TIMER_DELAY && controller.getRawButton(buttonNum)) {
-            timer = 0;
-            if (b) {
-                b = false;
-            } else {
-                b = true;
+
+        if(timer == TIMER_DELAY){
+            
+            if(isTrigger() && controller.getRawAxis(buttonNum) < .1){
+                timer = 0;
+                if(controller.getRawAxis(buttonNum) < .1){
+                setTrue();
+                }
+            }else{
+                if(controller.getRawButton(buttonNum)){
+                    timer = 0;
+                setTrue();
+                }
             }
+
+            
+
         }
+
+        
+
+        
 
         try {
             method.invoke(obj, b);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    void setTrue(){
+        if(b){
+            b = false;
+        }else{
+            b = true;
+        }
+    }
+
+    boolean isTrigger(){
+        return buttonNum == ControllerMap.leftTrigger || buttonNum == ControllerMap.rightTrigger;
     }
 }

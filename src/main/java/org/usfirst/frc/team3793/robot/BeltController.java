@@ -20,11 +20,11 @@ public class BeltController {
     int timer = 0;
     final int TIMER_DELAY = 15;
 
-    int buttonNum;
-    int buttonNum2;
+    int buttonUp;
+    int buttonDown;
 
-    final int UP = 1;
-    final int DOWN = -1;
+    final float UP = 1;
+    final float DOWN = -1;
 
     enum beltStates {GOING_UP, MIDPOINT, GOING_DOWN, STOPPED };
     beltStates beltState = beltStates.STOPPED;
@@ -32,19 +32,15 @@ public class BeltController {
     BeltController(GenericHID controller, Spark motor, int buttonNum, int buttonNum2){
         this.controller = controller;
         this.motor = motor;
-        this.buttonNum = buttonNum;
-        this.buttonNum2 = buttonNum2;
+        this.buttonUp = buttonNum;
+        this.buttonDown = buttonNum2;
     }
 
     void update(){
 
-        if(controller.getRawButton(buttonNum)){
+        if(controller.getRawButton(buttonUp)){
             motor.set(UP);
-        }else{
-            motor.set(0);
-        }
-
-        if(controller.getRawButton(buttonNum2)){
+        }else if(controller.getRawButton(buttonDown)){
             motor.set(DOWN);
         }else{
             motor.set(0);
@@ -102,16 +98,16 @@ public class BeltController {
 
 
     void setMotors(){
-        if(beltState == beltStates.STOPPED || beltState == beltStates.MIDPOINT){
-            motor.set(0);
-        }
+        // if(beltState == beltStates.STOPPED || beltState == beltStates.MIDPOINT){
+        //     motor.set(0);
+        // }
 
-        if(beltState == beltStates.GOING_UP){
-            motor.set(UP);
-        }
+        // if(beltState == beltStates.GOING_UP){
+        //     motor.set(UP);
+        // }
 
-        if(beltState == beltStates.GOING_DOWN){
-            motor.set(DOWN);
-        }
+        // if(beltState == beltStates.GOING_DOWN){
+        //     motor.set(DOWN);
+        // }
     }
 }
