@@ -14,6 +14,9 @@ public enum RobotMap {
 	VICTOR_LEFT(43), 
 	VICTOR_RIGHT(44), 
 
+	// end of arm motor
+	END_ARM_MOTOR(45),
+
 	//ARM MOTOR - flip down to push front end of robot up to climb up platform
 	ARM_MOTOR(8),
 

@@ -25,6 +25,7 @@ public class Motors {
 	public static WPI_TalonSRX talonRight;
 	public static WPI_VictorSPX victorLeft;
 	public static WPI_VictorSPX victorRight;
+	public static WPI_VictorSPX armEndMotor;
 	private static SpeedControllerGroup left;
 	private static SpeedControllerGroup right;
 	public static DifferentialDrive drive;
@@ -58,6 +59,8 @@ public class Motors {
 		drive = new DifferentialDrive(left, right);
 		drive.setSafetyEnabled(false);
 
+		//armEndMotor = new WPI_VictorSPX(RobotMap.END_ARM_MOTOR.getPin());
+		
 		// ------------------------------ Other Motors ------------------------------
 
 		// blinkin = new Spark(RobotMap.BLINKIN.getPin());
