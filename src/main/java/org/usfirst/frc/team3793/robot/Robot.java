@@ -167,7 +167,7 @@ public class Robot extends TimedRobot {
 		beltController = new BeltController(controllers[OPERATOR], Motors.beltMotor, ControllerMap.X, ControllerMap.B);
 
 		try {
-			hingeSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.start, Motors.hinge,
+			hingeSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.RB, Motors.hinge,
 					Solenoid.class.getMethod("set", boolean.class));
 			avocadoSlideSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.A, Motors.avocadoSlide,
 					Solenoid.class.getMethod("set", boolean.class));
@@ -300,7 +300,7 @@ public class Robot extends TimedRobot {
 			isAvocadoTurning = true;
 		}
 
-		if (Sensors.avocadoLimit.get()) {
+		if (Sensors.avocadoLimit.get() && avocadoRotationTimer == TIMER_DELAY) {
 			isAvocadoTurning = false;
 		}
 
@@ -356,16 +356,21 @@ public class Robot extends TimedRobot {
 			dif = 0.0;
 		else
 			dif = Math.signum(Math.pow(leftY, 3));
+		System.out.println(leftY + " " + dif);
 
-		Point stickInput = new Point(controllers[DRIVER].getRawAxis(ControllerMap.leftX),
-				controllers[DRIVER].getRawAxis(ControllerMap.leftY));
-		if (stickInput.getDist(new Point(0, 0)) < Settings.LSTICK_DEADZONE)
-			stickInput = new Point(0, 0);
-		else
-			stickInput = stickInput.normalize().mul(((stickInput.getDist(new Point(0, 0)) - Settings.LSTICK_DEADZONE)
-					/ (1 - Settings.LSTICK_DEADZONE)));
-
-		Motors.drive.arcadeDrive(stickInput.getX() * Settings.TURN_MULT, -dif * Settings.SPEED_MULT, false);
+		// Point stickInput = new Point(controllers[DRIVER].getRawAxis(ControllerMap.leftX),
+		// 		controllers[DRIVER].getRawAxis(ControllerMap.leftY));
+		// if (stickInput.getDist(new Point(0, 0)) < Settings.LSTICK_DEADZONE)
+		// 	stickInput = new Point(0, 0);
+		// else
+		// 	stickInput = stickInput.normalize().mul(((stickInput.getDist(new Point(0, 0)) - Settings.LSTICK_DEADZONE)
+		// 			/ (1 - Settings.LSTICK_DEADZONE)));
+		double lx = controllers[DRIVER].getRawAxis(ControllerMap.leftX);
+		double lNum;
+		if(Math.abs(lx) > Settings.LSTICK_DEADZONE)
+			lNum = Math.pow(controllers[DRIVER].getRawAxis(ControllerMap.leftX), 3);
+		else lNum = 0;
+		Motors.drive.arcadeDrive(lNum * Settings.TURN_MULT, -dif * Settings.SPEED_MULT, false);
 	}
 
 	public void degreeSync() {

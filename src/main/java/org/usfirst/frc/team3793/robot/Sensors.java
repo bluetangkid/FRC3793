@@ -43,7 +43,7 @@ public class Sensors {
 		visionCam = new UsbCamera("VisionProcCam", 0);
 		System.out.println(UsbCamera.enumerateUsbCameras());
 		visionCam.setPixelFormat(PixelFormat.kYUYV);		
-		camServer = new MjpegServer("VisionCamServer", "10.37.93.13", 80);
+		camServer = new MjpegServer("VisionCamServer", "10.37.93.0", 5801);
 		camServer.setSource(visionCam);
 
 		navX = new AHRS(SPI.Port.kMXP);
