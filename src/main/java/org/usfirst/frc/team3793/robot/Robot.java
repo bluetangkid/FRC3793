@@ -15,6 +15,8 @@ import movement.MovementController;
 import movement.Straight;
 import movement.Turn;
 import movement.Point;
+import movement.AvocadoSlide;
+import movement.AvocadoTurn;
 
 //Equation for Drift on tile where y is drift in clicks and x is velocity in clicks/100 ms
 // Y=7.029608995X - 592.3469424, where domain is defined on (90,1700)
@@ -421,7 +423,9 @@ public class Robot extends TimedRobot {
 	}
 
 	public void grabHatch(){
-		
+		MovementController.addAction(new AvocadoSlide(0,0,this));
+		MovementController.addAction(new AvocadoTurn(0,0,this));
+		MovementController.addAction(new AvocadoSlide(0,0,this));
 	}
 
 	@Override

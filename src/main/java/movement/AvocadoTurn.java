@@ -10,7 +10,7 @@ public class AvocadoTurn extends MovementAction {
     boolean isAvocadoTurning = true;
     int delayTimer = 0;
 
-    AvocadoTurn(int direction, float maxSpeed, Robot robot) {
+    public AvocadoTurn(int direction, float maxSpeed, Robot robot) {
         super(0, 0);
         this.robot = robot;
         isAvocadoTurning = true;
