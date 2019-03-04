@@ -21,7 +21,6 @@ public class Sensors {
 	public static AHRS navX;
 	public static SerialPort jeVois1;
 	public static SerialPort jeVois2;
-	//public static SerialPort jeVoisTracking;
 
 	public static Ultrasonic backDist;
 
@@ -35,19 +34,10 @@ public class Sensors {
 		vacuumPivotSwitch = new DigitalInput(4);
 		System.out.println(SerialPort.Port.values());
 		
-		//backDist = new Ultrasonic(1, 1);
 		avocadoLimit = new DigitalInput(RobotMap.AVOCADO_LIMIT_SWITCH.getPin());
 		beltLimit = new DigitalInput(RobotMap.BELT_LIMIT.getPin());
 		jeVois1 = new SerialPort(115200, SerialPort.Port.kUSB);
 
-		visionCam = new UsbCamera("VisionProcCam", 0);
-		System.out.println(UsbCamera.enumerateUsbCameras());
-		visionCam.setPixelFormat(PixelFormat.kYUYV);		
-		camServer = new MjpegServer("VisionCamServer", "10.37.93.13", 80);
-		camServer.setSource(visionCam);
-
 		navX = new AHRS(SPI.Port.kMXP);
-		//jeVois2 = new SerialPort(921600, SerialPort.Port.kUSB2);
-		//jeVoisTracking = new SerialPort(921600, SerialPort.Port.kUSB);
 	}
 }
