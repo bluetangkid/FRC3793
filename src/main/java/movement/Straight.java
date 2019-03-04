@@ -45,8 +45,8 @@ public class Straight extends MovementAction implements PIDOutput {
 	 * @return {@link Speed} required to go in a straight line
 	 */
 	public Speed getSpeed() {
-		if (distance - distTraveled() < 0.8) {
-			//speedMult -= .01;
+		if (distance - distTraveled() < 0.8 && speedMult >.5) {
+			speedMult -= .05;
 		}
 		return PID;
 	}

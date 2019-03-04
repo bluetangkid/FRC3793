@@ -58,4 +58,16 @@ public class toggleSwitch {
             e.printStackTrace();
         }
     }
+    public void reflect(){
+        if (b) {
+            b = false;
+        } else {
+            b = true;
+        }
+        try {
+            method.invoke(obj, b);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

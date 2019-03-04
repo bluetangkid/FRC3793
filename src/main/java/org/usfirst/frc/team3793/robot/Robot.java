@@ -52,8 +52,8 @@ public class Robot extends TimedRobot {
 	static DatagramSocket socket;
 	static InetAddress pi;
 
-	static final int DRIVER = 0;
-	static final int OPERATOR = 1;
+	public static final int DRIVER = 0;
+	public static final int OPERATOR = 1;
 
 	// avocado initialization
 	static int avocadoRotationTimer = 0;
@@ -62,9 +62,11 @@ public class Robot extends TimedRobot {
 	static int avocadoPos = 180;
 	static boolean isAvocadoTurning = false;
 
+	boolean avocadoLimitFunctions = true;
+
 	static final int TIMER_DELAY = 15;
 
-	toggleSwitch avocadoSlideSwitch;
+	public toggleSwitch avocadoSlideSwitch;
 
 	toggleSwitch hingeSwitch;
 
@@ -410,6 +412,10 @@ public class Robot extends TimedRobot {
 		//	MovementController.addAction((new Turn(90, .8f)));
 		//	MovementController.addAction(new Straight((float) (Math.sin(Math.toRadians(-90 - angle)) * distance), .8f));		}
 		}
+	}
+
+	public void grabHatch(){
+		
 	}
 
 	@Override
