@@ -11,6 +11,7 @@ public class AvocadoSlide extends MovementAction {
     public AvocadoSlide(int direction, float maxSpeed, Robot robot) {
         super(0, 0);
         this.robot = robot;
+        System.out.println("I want to die");
     }
 
     public Speed getSpeed() {
@@ -18,6 +19,7 @@ public class AvocadoSlide extends MovementAction {
     }
 
     public boolean isComplete(){
+        System.out.println("calling is complete");
         robot.avocadoSlideSwitch.reflect();
         return true;
     }

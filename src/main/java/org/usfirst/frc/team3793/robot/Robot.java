@@ -37,7 +37,7 @@ public class Robot extends TimedRobot {
 	private boolean singleControllerMode = true;
 	public int controllerSelector = 0;
 	public GenericHID Master = null;
-
+	boolean happenOnce = true;
 	public float degToBall = 0;
 	public float degToTape = 0;
 
@@ -105,7 +105,7 @@ public class Robot extends TimedRobot {
 		// Motors.avocadoSlide.set(false);
 
 		state = RoboState.RobotInit;
-		t = new MovementController();
+		t = new MovementController(this);
 		t.start();
 
 		// try {
@@ -128,11 +128,11 @@ public class Robot extends TimedRobot {
 		state = RoboState.Disabled;
 		// Motors.blinkin.set(-0.59);
 		try {
-			t.interrupt();
+			//t.interrupt();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		 Motors.compressor.setClosedLoopControl(true);
+		Motors.compressor.setClosedLoopControl(true);
 		// Motors.landingGear.set(false);
 		// Motors.avocadoSlide.set(false);
 	}
@@ -175,8 +175,9 @@ public class Robot extends TimedRobot {
 					Solenoid.class.getMethod("set", boolean.class));
 			avocadoSlideSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.A, Motors.avocadoSlide,
 					Solenoid.class.getMethod("set", boolean.class));
-			//landingGearSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.back, Motors.landingGear,
-					//Solenoid.class.getMethod("set", boolean.class));
+			// landingGearSwitch = new toggleSwitch(controllers[OPERATOR],
+			// ControllerMap.back, Motors.landingGear,
+			// Solenoid.class.getMethod("set", boolean.class));
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -240,14 +241,14 @@ public class Robot extends TimedRobot {
 
 		try {
 			if (!rightBumperEngaged && !leftBumperEngaged) {
-				driveControl(); // work Driver
+				// driveControl(); // work Driver
 			}
 			avocadoControl(); // both work operator
 			climbingArm(); // operator RIGHT STICK
 			// cargoIntake(); // operator
 			beltController.update(); // operator X - UP AND B - DOWN Button
 			hingeSwitch.update();// opperator Y button
-			//landingGearSwitch.update();
+			// landingGearSwitch.update();
 			rightBumper(); // driver
 			leftBumper(); // driver
 		} catch (Exception e) {
@@ -256,6 +257,10 @@ public class Robot extends TimedRobot {
 
 		// ----------------------------------------------------------------------
 		// Motors.blinkin.set(-0.01);
+		if (happenOnce) {
+			grabHatch();
+			happenOnce = false;
+		}
 	}
 
 	public void rightBumper() {
@@ -309,7 +314,8 @@ public class Robot extends TimedRobot {
 		}
 
 		if (isAvocadoTurning) {
-			if(System.currentTimeMillis() - timeAvocado > 1600) isAvocadoTurning = false;
+			if (System.currentTimeMillis() - timeAvocado > 1600)
+				isAvocadoTurning = false;
 			Motors.avocadoMotor.set(-1);
 		} else {
 			timeAvocado = 0;
@@ -360,44 +366,48 @@ public class Robot extends TimedRobot {
 			dif = 0.0;
 		else
 			dif = Math.signum(Math.pow(leftY, 3));
-		System.out.println(leftY + " " + dif);
+		// System.out.println(leftY + " " + dif);
 
-		// Point stickInput = new Point(controllers[DRIVER].getRawAxis(ControllerMap.leftX),
-		// 		controllers[DRIVER].getRawAxis(ControllerMap.leftY));
+		// Point stickInput = new
+		// Point(controllers[DRIVER].getRawAxis(ControllerMap.leftX),
+		// controllers[DRIVER].getRawAxis(ControllerMap.leftY));
 		// if (stickInput.getDist(new Point(0, 0)) < Settings.LSTICK_DEADZONE)
-		// 	stickInput = new Point(0, 0);
+		// stickInput = new Point(0, 0);
 		// else
-		// 	stickInput = stickInput.normalize().mul(((stickInput.getDist(new Point(0, 0)) - Settings.LSTICK_DEADZONE)
-		// 			/ (1 - Settings.LSTICK_DEADZONE)));
+		// stickInput = stickInput.normalize().mul(((stickInput.getDist(new Point(0, 0))
+		// - Settings.LSTICK_DEADZONE)
+		// / (1 - Settings.LSTICK_DEADZONE)));
 		double lx = controllers[DRIVER].getRawAxis(ControllerMap.leftX);
 		double lNum;
-		if(Math.abs(lx) > Settings.LSTICK_DEADZONE)
+		if (Math.abs(lx) > Settings.LSTICK_DEADZONE)
 			lNum = Math.pow(controllers[DRIVER].getRawAxis(ControllerMap.leftX), 3);
-		else lNum = 0;
-		
-		if(lNum == 0 && dif == 0 && Motors.talonLeft.getSelectedSensorVelocity(0) > 100)
+		else
+			lNum = 0;
+
+		if (lNum == 0 && dif == 0 && Motors.talonLeft.getSelectedSensorVelocity(0) > 100)
 			Motors.drive.arcadeDrive(0, 0);
-		else Motors.drive.arcadeDrive(lNum * Settings.TURN_MULT, -dif * Settings.SPEED_MULT, false);
+		else
+			Motors.drive.arcadeDrive(lNum * Settings.TURN_MULT, -dif * Settings.SPEED_MULT, false);
 	}
 
 	public void degreeSync() {
-		String[] info = null;
-		try {
-			info = Sensors.jeVois1.readString().split(",");
-			for (int i = 0; i < info.length; i++) {
-				String temp = info[i];
-				if(temp.length() > 1) {
-					System.out.println(temp);
-					if (temp.startsWith("B")) {
-						degToBall = Float.parseFloat(temp.substring(1));
-					} else {
-						degToTape = Float.parseFloat(temp.substring(1));
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		// String[] info = null;
+		// try {
+		// info = Sensors.jeVois1.readString().split(",");
+		// for (int i = 0; i < info.length; i++) {
+		// String temp = info[i];
+		// if(temp.length() > 1) {
+		// System.out.println(temp);
+		// if (temp.startsWith("B")) {
+		// degToBall = Float.parseFloat(temp.substring(1));
+		// } else {
+		// degToTape = Float.parseFloat(temp.substring(1));
+		// }
+		// }
+		// }
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
 	}
 
 	public void moveToBall() {
@@ -410,22 +420,27 @@ public class Robot extends TimedRobot {
 		MovementController.addAction((new Turn(180 - angle, .8f)));
 		double distance = 2;// (double) Sensors.backDist.getRangeInches() * INCHES_TO_METERS;
 		if (angle > 0) {
-		//	MovementController.addAction((new Turn(90 - angle, .8f)));
-		//	MovementController.addAction(new Straight((float) (Math.cos(Math.toRadians(90 - angle)) * distance), .8f));
-		//	MovementController.addAction((new Turn(-90, .8f)));
-		//	MovementController.addAction(new Straight((float) (Math.sin(Math.toRadians(90 - angle)) * distance), .8f));
+			// MovementController.addAction((new Turn(90 - angle, .8f)));
+			// MovementController.addAction(new Straight((float) (Math.cos(Math.toRadians(90
+			// - angle)) * distance), .8f));
+			// MovementController.addAction((new Turn(-90, .8f)));
+			// MovementController.addAction(new Straight((float) (Math.sin(Math.toRadians(90
+			// - angle)) * distance), .8f));
 		} else {
-		//	MovementController.addAction((new Turn(-90 - angle, .8f)));
-		//	MovementController.addAction(new Straight((float) (Math.cos(Math.toRadians(-90 - angle)) * distance), .8f));
-		//	MovementController.addAction((new Turn(90, .8f)));
-		//	MovementController.addAction(new Straight((float) (Math.sin(Math.toRadians(-90 - angle)) * distance), .8f));		}
+			// MovementController.addAction((new Turn(-90 - angle, .8f)));
+			// MovementController.addAction(new Straight((float)
+			// (Math.cos(Math.toRadians(-90 - angle)) * distance), .8f));
+			// MovementController.addAction((new Turn(90, .8f)));
+			// MovementController.addAction(new Straight((float)
+			// (Math.sin(Math.toRadians(-90 - angle)) * distance), .8f)); }
 		}
 	}
 
-	public void grabHatch(){
-		MovementController.addAction(new AvocadoSlide(0,0,this));
-		MovementController.addAction(new AvocadoTurn(0,0,this));
-		MovementController.addAction(new AvocadoSlide(0,0,this));
+	public void grabHatch() {
+		System.out.println("grabbing hatch");
+		MovementController.addAction(new AvocadoSlide(0, 0, this));
+		MovementController.addAction(new AvocadoTurn(0, 0, this));
+		MovementController.addAction(new AvocadoSlide(0, 0, this));
 	}
 
 	@Override
