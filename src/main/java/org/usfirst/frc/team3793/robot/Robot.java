@@ -333,12 +333,18 @@ public class Robot extends TimedRobot {
 	}
 
 	private void climbingArm() {
-		double armMovement = controllers[OPERATOR].getRawAxis(ControllerMap.rightY);
+		double armPivot = controllers[OPERATOR].getRawAxis(ControllerMap.leftY);
+		double armSpin = controllers[OPERATOR].getRawAxis(ControllerMap.rightY)
 
-		if (Math.abs(armMovement) > .1) {
-			Motors.armMotor.set(armMovement * .6);
+		if (Math.abs(armPivot) > .1) {
+			Motors.armMotor.set(armPivot * .6);
 		} else {
 			Motors.armMotor.set(0);
+		}
+		if (Math.abs(armSpin) > .1) {
+			Motors.armEndMotor.set(armSpin * .6);
+		} else {
+			Motors.armEndMotor.set(0);
 		}
 	}
 
