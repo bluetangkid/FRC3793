@@ -12,4 +12,5 @@ public interface Settings {
 	public static final float LSTICK_DEADZONE = 0.3f;
 	public static final float BUMPER_DEADZONE = 0.05f;
 	public static final int TIMER_DELAY = 15;
+	public static final float INCHES_TO_METERS = .0254f;
 }

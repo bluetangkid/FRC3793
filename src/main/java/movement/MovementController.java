@@ -32,28 +32,19 @@ public class MovementController extends Thread {
 		while (Sensors.navX.isCalibrating());
 		action = null;
 		actions = new ArrayDeque<MovementAction>();
-		// actions.add(new Turn(45,.8f));
 		// Make speed for everything 0.8f(reccomended)
 		//actions.add(new Straight(3, 0.8f));
-		// addAction(new AvocadoSlide(0,0,r));
-		// addAction(new AvocadoTurn(0,0,r));
-		// addAction(new AvocadoSlide(0,0,r));
-		//addAction(new Turn(90,.8f));
 		// Put actions here for autonomous like so: actions.add(new Turn(1, 90, 0.7));
 
 		while (!Thread.interrupted()) {
-			System.out.println("run is running");
-
 			timer--;
 			if (action != null && action.isComplete()) {
-				System.out.println("OH NO GMAER");
 				action = null;
 				Motors.drive.tankDrive(0, 0);
 				timer = 30;
 			}
 			if (Robot.getState() == RoboState.Autonomous || Robot.getState() == RoboState.Teleop) {
 				if (!actions.isEmpty()) {
-					System.out.println("Death is a blessing");
 					if (action == null && timer <= 0) {
 						action = actions.removeFirst();
 						action.resetStartPos();
@@ -63,11 +54,7 @@ public class MovementController extends Thread {
 					Speed speed = action.getSpeed();
 					Motors.drive.tankDrive(speed.getL(), speed.getR());
 				}
-			} else if (Robot.getState() == RoboState.TeleopInit) {
-				//action = null;
-				//actions.clear();
 			}
-			
 			try {
 				Thread.sleep(5);
 			} catch (InterruptedException e) {

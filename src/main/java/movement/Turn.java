@@ -52,10 +52,6 @@ public class Turn extends MovementAction implements PIDOutput {
 	 *         controller
 	 */
 	public boolean isComplete() {
-		// if(onSetpoint()){
-		// System.out.println(Sensors.navX.getYaw() + " End of turn");
-		// }
-		// return onSetpoint();
 
 		if (onSetpoint()) {
 			framedoodad++;
@@ -63,33 +59,18 @@ public class Turn extends MovementAction implements PIDOutput {
 			framedoodad = 0;
 
 		if (framedoodad > 9) {
-			System.out.println(" Turn is Complete");
+			System.out.println("Turn is Complete");
 			return true;
 		}
-		// nice
 		return false;
-		// if(onSetpoint() && !Sensors.navX.isMoving()){
-		// System.out.println(" Baby girl what you doin' where's your man, I just popped
-		// a xan, 50,000 in Japan");
-		// }
-		// return onSetpoint() && !Sensors.navX.isMoving();
 	}
 
 	@Override
-	public void pidWrite(double output) {
+	public void pidWrite(double output) { //nice
 		PID = new Speed(maxSpeed * output, maxSpeed * output);
 	}
 
 	public boolean onSetpoint() {
-
-		// if(timer > 0){
-		// timer--;
-		// }else{
-		// timer = 10;
-		// //System.out.println(Math.abs(controller.getSetpoint() -
-		// Sensors.navX.getYaw()) + " distance from target");
-		// }
-
 		return Sensors.navX.getYaw() > controller.getSetpoint() - 3
 				&& Sensors.navX.getYaw() < controller.getSetpoint() + 3;
 	}

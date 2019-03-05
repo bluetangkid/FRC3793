@@ -12,9 +12,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import movement.MovementController;
-import movement.Straight;
 import movement.Turn;
-import movement.Point;
 import movement.AvocadoSlide;
 import movement.AvocadoTurn;
 
@@ -32,17 +30,15 @@ public class Robot extends TimedRobot {
 	// Controller initialization
 	static GenericHID driverController = new XboxController(0);
 	static GenericHID operatorController = new XboxController(1);
-	public static final float INCHES_TO_METERS = .0254f;
 	public GenericHID[] controllers = new GenericHID[2];
 	private boolean singleControllerMode = true;
 	public int controllerSelector = 0;
 	public GenericHID Master = null;
-	boolean happenOnce = true;
 	public float degToBall = 0;
 	public float degToTape = 0;
 
 	static RoboState state = RoboState.RobotInit;
-	Thread t;
+	static Thread t;
 
 	public static float targetDegrees;
 	public static float targetDistance;
@@ -64,30 +60,30 @@ public class Robot extends TimedRobot {
 	static int avocadoPos = 180;
 	static boolean isAvocadoTurning = false;
 
-	boolean avocadoLimitFunctions = true;
+	static boolean avocadoLimitFunctions = true;
 
-	static final int TIMER_DELAY = 15;
+	static final int TIMER_DELAY = 15; // nice
 
-	public toggleSwitch avocadoSlideSwitch;
+	public static toggleSwitch avocadoSlideSwitch;
 
-	toggleSwitch hingeSwitch;
+	static toggleSwitch hingeSwitch;
 
-	toggleSwitch landingGearSwitch;
+	static toggleSwitch landingGearSwitch;
 
 	// beltstates
-	BeltController beltController;
+	static BeltController beltController;
 
 	static SmartDashboard dashboard;
 	// static PowerDistributionPanel pdp;
 	static double minVoltage = 30;
 
-	boolean hasDone = false;
+	static boolean hasDone = false;
 
-	int rightBumperTimer = 0;
-	int leftBumperTimer = 0;
+	static int rightBumperTimer = 0;
+	static int leftBumperTimer = 0;
 
-	boolean rightBumperEngaged = false;
-	boolean leftBumperEngaged = false;
+	static boolean rightBumperEngaged = false;
+	static boolean leftBumperEngaged = false;
 
 	@Override
 	public void robotInit() {
@@ -107,31 +103,12 @@ public class Robot extends TimedRobot {
 		state = RoboState.RobotInit;
 		t = new MovementController(this);
 		t.start();
-
-		// try {
-		// socket = new DatagramSocket(5808);
-		// socket.setSoTimeout(3);
-		// } catch (SocketException e) {
-		// e.printStackTrace();
-		// }
-
-		// try {
-		// pi = InetAddress.getByName("10.37.93.50");
-		// } catch (UnknownHostException e) {
-		// e.printStackTrace();
-		// }
-		// pdp = new PowerDistributionPanel();
 	}
 
 	@Override
 	public void disabledInit() {
 		state = RoboState.Disabled;
 		// Motors.blinkin.set(-0.59);
-		try {
-			//t.interrupt();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		Motors.compressor.setClosedLoopControl(true);
 		// Motors.landingGear.set(false);
 		// Motors.avocadoSlide.set(false);
@@ -148,19 +125,16 @@ public class Robot extends TimedRobot {
 		state = RoboState.AutonomousInit;
 		// Motors.blinkin.set(-0.43);
 
+		grabHatch();
+
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
 
-		// t = new MovementController();
-		// t.start();
 		// Motors.compressor.setClosedLoopControl(false);
 		// Motors.avocadoSlide.set(false);
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		SmartDashboard.putString("State", Robot.getState().name());
-		SmartDashboard.putNumber("Angle", Sensors.navX.getYaw());
-
 		state = RoboState.Autonomous;
 		Scheduler.getInstance().run();
 		// System.out.println(Sensors.navX.getYaw()+ "autoPeriodic");
@@ -211,37 +185,11 @@ public class Robot extends TimedRobot {
 
 		Scheduler.getInstance().run();
 
-		// if(pdp.getVoltage() < minVoltage) minVoltage = pdp.getVoltage();
-		// SmartDashboard.putNumber("Min Voltage", minVoltage);
-
-		/*
-		 * if(controllers[DRIVER].getBumper(Hand.kRight)) { byte[] data = new byte[1];
-		 * data[0] = 1; DatagramPacket p = new DatagramPacket(data, 1, pi, 5808); try
-		 * {socket.send(p);} catch (IOException e) {e.printStackTrace();} } byte[] data
-		 * = new byte[8]; DatagramPacket p = new DatagramPacket(data, data.length, pi,
-		 * 5808); try { socket.receive(p);
-		 * 
-		 * if(data[0] != 0) { byte[] a = new byte[4]; byte[] b = new byte[4];
-		 * 
-		 * a[0] = data[0]; a[1] = data[1]; a[2] = data[2]; a[3] = data[3];
-		 * 
-		 * b[0] = data[4]; b[1] = data[5]; b[2] = data[6]; b[3] = data[7];
-		 * 
-		 * float floatA = ByteBuffer.wrap(a).order(ByteOrder.LITTLE_ENDIAN).getFloat();
-		 * float floatB = ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getFloat();
-		 * if(floatA - Math.floor(floatA) == 0.151) { targetDegrees =
-		 * (float)Math.floor(floatA); targetDistance = floatB; } else { targetDegrees =
-		 * (float)Math.floor(floatB); targetDistance = floatA; }
-		 * MovementController.addAction(new Turn(targetDegrees, 0.5f));
-		 * MovementController.addAction(new Straight(targetDistance*0.8f, 0.5f)); } }
-		 * catch (Exception e) { e.printStackTrace(); }
-		 */
-
 		// ---------------------------- ARCADE DRIVE ----------------------------
 
 		try {
 			if (!rightBumperEngaged && !leftBumperEngaged) {
-				// driveControl(); // work Driver
+				driveControl(); // work Driver
 			}
 			avocadoControl(); // both work operator
 			climbingArm(); // operator RIGHT STICK
@@ -257,10 +205,6 @@ public class Robot extends TimedRobot {
 
 		// ----------------------------------------------------------------------
 		// Motors.blinkin.set(-0.01);
-		if (happenOnce) {
-			grabHatch();
-			happenOnce = false;
-		}
 	}
 
 	public void rightBumper() {
@@ -365,18 +309,9 @@ public class Robot extends TimedRobot {
 		if (Math.abs(leftY) < Settings.BUMPER_DEADZONE)
 			dif = 0.0;
 		else
-			dif = Math.signum(Math.pow(leftY, 3));
-		// System.out.println(leftY + " " + dif);
+			dif = Math.signum(Math.pow(leftY, 7));
+		System.out.println(leftY + " " + dif);
 
-		// Point stickInput = new
-		// Point(controllers[DRIVER].getRawAxis(ControllerMap.leftX),
-		// controllers[DRIVER].getRawAxis(ControllerMap.leftY));
-		// if (stickInput.getDist(new Point(0, 0)) < Settings.LSTICK_DEADZONE)
-		// stickInput = new Point(0, 0);
-		// else
-		// stickInput = stickInput.normalize().mul(((stickInput.getDist(new Point(0, 0))
-		// - Settings.LSTICK_DEADZONE)
-		// / (1 - Settings.LSTICK_DEADZONE)));
 		double lx = controllers[DRIVER].getRawAxis(ControllerMap.leftX);
 		double lNum;
 		if (Math.abs(lx) > Settings.LSTICK_DEADZONE)
@@ -388,26 +323,27 @@ public class Robot extends TimedRobot {
 			Motors.drive.arcadeDrive(0, 0);
 		else
 			Motors.drive.arcadeDrive(lNum * Settings.TURN_MULT, -dif * Settings.SPEED_MULT, false);
+		// Try curvature with fast turn
 	}
 
 	public void degreeSync() {
-		// String[] info = null;
-		// try {
-		// info = Sensors.jeVois1.readString().split(",");
-		// for (int i = 0; i < info.length; i++) {
-		// String temp = info[i];
-		// if(temp.length() > 1) {
-		// System.out.println(temp);
-		// if (temp.startsWith("B")) {
-		// degToBall = Float.parseFloat(temp.substring(1));
-		// } else {
-		// degToTape = Float.parseFloat(temp.substring(1));
-		// }
-		// }
-		// }
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
+		String[] info = null;
+		try {
+			info = Sensors.jeVois1.readString().split(",");
+			for (int i = 0; i < info.length; i++) {
+				String temp = info[i];
+				if(temp.length() > 1) {
+					System.out.println(temp);
+					if (temp.startsWith("B")) {
+						degToBall = Float.parseFloat(temp.substring(1));
+					} else {
+						degToTape = Float.parseFloat(temp.substring(1));
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void moveToBall() {

@@ -58,6 +58,7 @@ public class Motors {
 		right = new SpeedControllerGroup(talonRight, victorRight);
 		drive = new DifferentialDrive(left, right);
 		drive.setSafetyEnabled(false);
+		drive.setDeadband(0);
 
 		//armEndMotor = new WPI_VictorSPX(RobotMap.END_ARM_MOTOR.getPin());
 		
@@ -66,10 +67,9 @@ public class Motors {
 		// blinkin = new Spark(RobotMap.BLINKIN.getPin());
 
 		armMotor = new Spark(RobotMap.ARM_MOTOR.getPin());
-
+		// nice
 		avocadoMotor = new Talon(RobotMap.AVACADO_MOTOR.getPin());
 
-		// nice
 		beltMotor = new Spark(RobotMap.BELT_MOTOR.getPin());
 		// blinkin2019 = new Spark(RobotMap.BLINKIN.getPin());
 
