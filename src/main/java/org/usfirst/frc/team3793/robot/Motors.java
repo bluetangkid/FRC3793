@@ -60,7 +60,7 @@ public class Motors {
 		drive.setSafetyEnabled(false);
 		drive.setDeadband(0);
 
-		//armEndMotor = new WPI_VictorSPX(RobotMap.END_ARM_MOTOR.getPin());
+		armEndMotor = new WPI_VictorSPX(RobotMap.END_ARM_MOTOR.getPin());
 		
 		// ------------------------------ Other Motors ------------------------------
 
@@ -71,11 +71,11 @@ public class Motors {
 		avocadoMotor = new Talon(RobotMap.AVACADO_MOTOR.getPin());
 
 		beltMotor = new Spark(RobotMap.BELT_MOTOR.getPin());
-		// blinkin2019 = new Spark(RobotMap.BLINKIN.getPin());
+		blinkin2019 = new Spark(RobotMap.BLINKIN.getPin());
 
 		compressor = new Compressor(RobotMap.COMPRESSOR.getPin());
 		avocadoSlide = new Solenoid(RobotMap.AVACADO_SLIDE.getPin());
-		// landingGear = new Solenoid(RobotMap.LANDING_GEAR.getPin());
+		landingGear = new Solenoid(RobotMap.LANDING_GEAR.getPin());
 		hinge = new Solenoid(RobotMap.HINGE.getPin());
 
 		Motors.victorRight.follow(Motors.talonRight);

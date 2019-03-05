@@ -77,4 +77,7 @@ public class toggleSwitch {
             e.printStackTrace();
         }
     }
+    public boolean getB(){
+        return b;
+    }
 }

@@ -25,6 +25,8 @@ import movement.AvocadoTurn;
  * @author Faris for teleop control, Warren for networking, FIRST provided an
  *         empty class template
  */
+
+// default green, avocado down, avocado up, ball going up, ball going down
 public class Robot extends TimedRobot {
 
 	// Controller initialization
@@ -85,6 +87,10 @@ public class Robot extends TimedRobot {
 	static boolean rightBumperEngaged = false;
 	static boolean leftBumperEngaged = false;
 
+	public static boolean avocadoUp = true;
+	public static boolean beltMovingUp = false;
+	public static boolean beltMovingDown = false;
+
 	@Override
 	public void robotInit() {
 		Motors.initialize();
@@ -138,6 +144,11 @@ public class Robot extends TimedRobot {
 		state = RoboState.Autonomous;
 		Scheduler.getInstance().run();
 		// System.out.println(Sensors.navX.getYaw()+ "autoPeriodic");
+		try {
+			Motors.blinkin2019.set(setColors());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -149,9 +160,8 @@ public class Robot extends TimedRobot {
 					Solenoid.class.getMethod("set", boolean.class));
 			avocadoSlideSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.A, Motors.avocadoSlide,
 					Solenoid.class.getMethod("set", boolean.class));
-			// landingGearSwitch = new toggleSwitch(controllers[OPERATOR],
-			// ControllerMap.back, Motors.landingGear,
-			// Solenoid.class.getMethod("set", boolean.class));
+			landingGearSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.back, Motors.landingGear,
+					Solenoid.class.getMethod("set", boolean.class));
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -196,7 +206,7 @@ public class Robot extends TimedRobot {
 			// cargoIntake(); // operator
 			beltController.update(); // operator X - UP AND B - DOWN Button
 			hingeSwitch.update();// opperator Y button
-			// landingGearSwitch.update();
+			landingGearSwitch.update();
 			rightBumper(); // driver
 			leftBumper(); // driver
 		} catch (Exception e) {
@@ -205,6 +215,11 @@ public class Robot extends TimedRobot {
 
 		// ----------------------------------------------------------------------
 		// Motors.blinkin.set(-0.01);
+		try {
+			Motors.blinkin2019.set(setColors());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void rightBumper() {
@@ -241,7 +256,9 @@ public class Robot extends TimedRobot {
 
 	public void avocadoTurningControl() {
 		// 1330 miliseconds, doesn't work
-
+		if (isAvocadoTurning = true) {
+			// Motors.blinkin2019.set();
+		}
 		avocadoRotationTimer++;
 		if (avocadoRotationTimer > TIMER_DELAY) {
 			avocadoRotationTimer = TIMER_DELAY;
@@ -254,6 +271,11 @@ public class Robot extends TimedRobot {
 		}
 
 		if (Sensors.avocadoLimit.get() && avocadoRotationTimer == TIMER_DELAY) {
+			if (avocadoUp) {
+				avocadoUp = false;
+			} else {
+				avocadoUp = true;
+			}
 			isAvocadoTurning = false;
 		}
 
@@ -284,7 +306,7 @@ public class Robot extends TimedRobot {
 
 	private void climbingArm() {
 		double armPivot = controllers[OPERATOR].getRawAxis(ControllerMap.leftY);
-		double armSpin = controllers[OPERATOR].getRawAxis(ControllerMap.rightY)
+		double armSpin = controllers[OPERATOR].getRawAxis(ControllerMap.rightY);
 
 		if (Math.abs(armPivot) > .1) {
 			Motors.armMotor.set(armPivot * .6);
@@ -292,7 +314,7 @@ public class Robot extends TimedRobot {
 			Motors.armMotor.set(0);
 		}
 		if (Math.abs(armSpin) > .1) {
-			Motors.armEndMotor.set(armSpin * .6);
+			Motors.armEndMotor.set(armSpin * .9);
 		} else {
 			Motors.armEndMotor.set(0);
 		}
@@ -338,7 +360,7 @@ public class Robot extends TimedRobot {
 			info = Sensors.jeVois1.readString().split(",");
 			for (int i = 0; i < info.length; i++) {
 				String temp = info[i];
-				if(temp.length() > 1) {
+				if (temp.length() > 1) {
 					System.out.println(temp);
 					if (temp.startsWith("B")) {
 						degToBall = Float.parseFloat(temp.substring(1));
@@ -383,6 +405,34 @@ public class Robot extends TimedRobot {
 		MovementController.addAction(new AvocadoSlide(0, 0, this));
 		MovementController.addAction(new AvocadoTurn(0, 0, this));
 		MovementController.addAction(new AvocadoSlide(0, 0, this));
+	}
+
+	public double setColors() {
+		double color = Settings.HOT_PINK;
+
+		// if (avocadoUp && !isAvocadoTurning) {
+		// 	color = Settings.LIME;
+		// }
+		// if (!avocadoUp && !isAvocadoTurning) {
+		// 	color = Settings.GREEN;
+		// }
+		// if (isAvocadoTurning) {
+		// 	color = Settings.WAVE_FOREST;
+		// } else 
+		if (beltMovingUp()) {
+			color = Settings.BLUE;
+		} else if (beltMovingDown()) {
+			color = Settings.RED;
+		}
+		return color;
+	}
+
+	public boolean beltMovingUp() {
+		return controllers[OPERATOR].getRawButton(ControllerMap.X);
+	}
+
+	public boolean beltMovingDown() {
+		return controllers[OPERATOR].getRawButton(ControllerMap.B);
 	}
 
 	@Override

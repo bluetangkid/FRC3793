@@ -21,15 +21,15 @@ public enum RobotMap {
 	ARM_MOTOR(8),
 
 	//AVOCADO - avocado shaped object that rotates/ slides out to pick up a latch
-	AVACADO_MOTOR(6),
+	AVACADO_MOTOR(7),//6
 	AVACADO_SLIDE(0),
 	AVOCADO_LIMIT_SWITCH(8),
 
 	//BELT - succ up ball
-	BELT_MOTOR(7),
-	BELT_LIMIT(9),
+	BELT_MOTOR(9),//7
+	//BELT_LIMIT(9),
 	//BLINKIN - lights
-	//BLINKIN(6), // 9
+	BLINKIN(6), // 9
 
 	//COMPRESSOR - pneumatics compressor
 	COMPRESSOR(0),
