@@ -40,9 +40,9 @@ public class BeltController {
 
         if(controller.getRawButton(buttonUp)){
             motor.set(UP);
-        }else if(controller.getRawButton(buttonDown)){
+        } else if(controller.getRawButton(buttonDown)){
             motor.set(DOWN);
-        }else{
+        } else{
             motor.set(0);
         }
 

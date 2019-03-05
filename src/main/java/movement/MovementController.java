@@ -21,17 +21,17 @@ public class MovementController extends Thread {
 	public static ArrayDeque<MovementAction> actions;
 	MovementAction action;
 	boolean teleopEnabled = false;
+	Robot r;
 	int timer = 0;
 
-	public MovementController() {
+	public MovementController(Robot r) {
+		this.r = r;
 	}
 
 	public void run() {
 		while (Sensors.navX.isCalibrating());
-
 		action = null;
 		actions = new ArrayDeque<MovementAction>();
-		// actions.add(new Turn(45,.8f));
 		// Make speed for everything 0.8f(reccomended)
 		//actions.add(new Straight(3, 0.8f));
 		// Put actions here for autonomous like so: actions.add(new Turn(1, 90, 0.7));
@@ -54,11 +54,7 @@ public class MovementController extends Thread {
 					Speed speed = action.getSpeed();
 					Motors.drive.tankDrive(speed.getL(), speed.getR());
 				}
-			} else if (Robot.getState() == RoboState.TeleopInit) {
-				action = null;
-				actions.clear();
 			}
-			
 			try {
 				Thread.sleep(5);
 			} catch (InterruptedException e) {

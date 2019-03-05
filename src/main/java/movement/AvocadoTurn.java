@@ -11,7 +11,7 @@ public class AvocadoTurn extends MovementAction {
     int delayTimer = 0;
 
     public AvocadoTurn(int direction, float maxSpeed, Robot robot) {
-        super(0, 0);
+        super();
         this.robot = robot;
         isAvocadoTurning = true;
     }
@@ -20,7 +20,7 @@ public class AvocadoTurn extends MovementAction {
         return !isAvocadoTurning;
     }
 
-    public void turnBoi() {
+    public void spin() {
         // 1330 miliseconds, doesn't work
         delayTimer++;
         if (Sensors.avocadoLimit.get() && delayTimer > Settings.TIMER_DELAY) {
@@ -35,7 +35,7 @@ public class AvocadoTurn extends MovementAction {
     }
 
     public Speed getSpeed() {
-        turnBoi();
+        spin();
         return new Speed(0, 0);
     }
 }

@@ -9,7 +9,7 @@ public class AvocadoSlide extends MovementAction {
     Robot robot;
 
     public AvocadoSlide(int direction, float maxSpeed, Robot robot) {
-        super(0, 0);
+        super();
         this.robot = robot;
     }
 
