@@ -13,13 +13,13 @@ public interface Settings {
 	public static final float BUMPER_DEADZONE = 0.05f;
 	public static final int TIMER_DELAY = 15;
 	public static final float INCHES_TO_METERS = .0254f;
-	public static final double BLUE = .87;
-	public static final double RED = .61;
-	public static final double YELLOW = .69;
-	public static final double GREEN = .77;
-	public static final double WHITE = .93;
-	public static final double PURPLE = .91;
-	public static final double HOT_PINK = .57;
-	public static final double WAVE_FOREST = -.37;
-	public static final double LIME = .73;
+	public static final float BLUE = .87f;
+	public static final float RED = .61f;
+	public static final float YELLOW = .69f; //nice
+	public static final float GREEN = .77f;
+	public static final float WHITE = .93f;
+	public static final float PURPLE = .91f;
+	public static final float HOT_PINK = .57f;
+	public static final float WAVE_FOREST = -.37f;
+	public static final float LIME = .73f;
 }

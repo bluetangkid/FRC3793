@@ -3,6 +3,7 @@ package org.usfirst.frc.team3793.robot;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -10,11 +11,13 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import movement.MovementController;
 import movement.Turn;
 import movement.AvocadoSlide;
 import movement.AvocadoTurn;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 //Equation for Drift on tile where y is drift in clicks and x is velocity in clicks/100 ms
 // Y=7.029608995X - 592.3469424, where domain is defined on (90,1700)
@@ -38,6 +41,7 @@ public class Robot extends TimedRobot {
 	public GenericHID Master = null;
 	public float degToBall = 0;
 	public float degToTape = 0;
+	
 
 	static RoboState state = RoboState.RobotInit;
 	static Thread t;
@@ -68,6 +72,11 @@ public class Robot extends TimedRobot {
 
 	public static toggleSwitch avocadoSlideSwitch;
 
+	public static ShuffleboardTab main;
+	public static NetworkTableEntry avocadoState;
+	public static NetworkTableEntry hippieState;
+	public static NetworkTableEntry avoSlideState;
+
 	static toggleSwitch hingeSwitch;
 
 	static toggleSwitch landingGearSwitch;
@@ -93,6 +102,10 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void robotInit() {
+		main = Shuffleboard.getTab("main");
+		avocadoState = main.add("Avocado", "Up").getEntry();
+		hippieState = main.add("Hippie", "Down").getEntry();
+
 		Motors.initialize();
 		Sensors.initialize();
 
@@ -408,17 +421,23 @@ public class Robot extends TimedRobot {
 	}
 
 	public double setColors() {
-		double color = Settings.HOT_PINK;
+		float color = Settings.HOT_PINK;
 
-		// if (avocadoUp && !isAvocadoTurning) {
-		// 	color = Settings.LIME;
-		// }
-		// if (!avocadoUp && !isAvocadoTurning) {
-		// 	color = Settings.GREEN;
-		// }
-		// if (isAvocadoTurning) {
-		// 	color = Settings.WAVE_FOREST;
-		// } else 
+		if(avocadoSlideSwitch.getB())
+			avoSlideState.setString("Up");
+		else avoSlideState.setString("Down");
+
+		if(hingeSwitch.getB())
+			hippieState.setString("Up");
+		else hippieState.setString("Down");
+
+		if (avocadoUp && !isAvocadoTurning)
+			avocadoState.setString("Up");
+		else if (!avocadoUp && !isAvocadoTurning)
+			avocadoState.setString("Down");
+		else if (isAvocadoTurning)
+			avocadoState.setString("Turning");
+		
 		if (beltMovingUp()) {
 			color = Settings.BLUE;
 		} else if (beltMovingDown()) {
