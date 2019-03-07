@@ -42,7 +42,6 @@ public class Robot extends TimedRobot {
 	public float degToBall = 0;
 	public float degToTape = 0;
 	
-
 	static RoboState state = RoboState.RobotInit;
 	static Thread t;
 
