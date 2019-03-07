@@ -56,7 +56,6 @@ public class Straight extends MovementAction implements PIDOutput {
 	 */
 	private double distTraveled() {
 		double num = (Math.sqrt(xPos*xPos + yPos*yPos) / 4096d) * 1.5d * Math.PI;
-		System.out.println(num);
 		return num;
 	}
 

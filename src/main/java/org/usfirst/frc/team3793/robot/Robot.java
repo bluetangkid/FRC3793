@@ -67,7 +67,7 @@ public class Robot extends TimedRobot {
 
 	static boolean avocadoLimitFunctions = true;
 
-	static final int TIMER_DELAY = 15; // nice
+	static final int TIMER_DELAY = 3; // nice
 
 	public static toggleSwitch avocadoSlideSwitch;
 
@@ -153,9 +153,9 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
+		//Scheduler.getInstance().run();
+		teleopPeriodic();
 		state = RoboState.Autonomous;
-		Scheduler.getInstance().run();
-		// System.out.println(Sensors.navX.getYaw()+ "autoPeriodic");
 		try {
 			Motors.blinkin2019.set(setColors());
 		} catch (Exception e) {
@@ -283,11 +283,7 @@ public class Robot extends TimedRobot {
 		}
 
 		if (Sensors.avocadoLimit.get() && avocadoRotationTimer == TIMER_DELAY) {
-			if (avocadoUp) {
-				avocadoUp = false;
-			} else {
-				avocadoUp = true;
-			}
+			avocadoUp = !avocadoUp;
 			isAvocadoTurning = false;
 		}
 
@@ -349,8 +345,7 @@ public class Robot extends TimedRobot {
 		if (Math.abs(leftY) < Settings.BUMPER_DEADZONE)
 			dif = 0.0;
 		else
-			dif = Math.signum(Math.pow(leftY, 7));
-		System.out.println(leftY + " " + dif);
+			dif = Math.pow(leftY, 5);
 
 		double lx = controllers[DRIVER].getRawAxis(ControllerMap.leftX);
 		double lNum;
@@ -362,8 +357,7 @@ public class Robot extends TimedRobot {
 		if (lNum == 0 && dif == 0 && Motors.talonLeft.getSelectedSensorVelocity(0) > 100)
 			Motors.drive.arcadeDrive(0, 0);
 		else
-			Motors.drive.arcadeDrive(lNum * Settings.TURN_MULT, -dif * Settings.SPEED_MULT, false);
-		// Try curvature with fast turn
+			Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum * Settings.TURN_MULT, false);
 	}
 
 	public void degreeSync() {
