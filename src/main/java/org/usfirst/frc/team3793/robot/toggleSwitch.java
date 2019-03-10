@@ -65,7 +65,6 @@ public class toggleSwitch {
         }
     }
     public void reflect(){
-        System.out.println("AAAEEEE");
         if (b) {
             b = false;
         } else {

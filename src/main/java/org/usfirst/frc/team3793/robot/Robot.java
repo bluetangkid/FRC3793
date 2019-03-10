@@ -95,7 +95,7 @@ public class Robot extends TimedRobot {
 
 	static boolean rightBumperEngaged = false;
 	static boolean leftBumperEngaged = false;
-
+	static int invincibilityTimer = 0;
 	public static boolean avocadoUp = true;
 	public static boolean beltMovingUp = false;
 	public static boolean beltMovingDown = false;
@@ -126,10 +126,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void disabledInit() {
 		state = RoboState.Disabled;
-		// Motors.blinkin.set(-0.59);
 		Motors.compressor.setClosedLoopControl(true);
-		// Motors.landingGear.set(false);
-		// Motors.avocadoSlide.set(false);
 	}
 
 	@Override
@@ -148,13 +145,10 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		state = RoboState.AutonomousInit;
 		teleopInit();
-		// Motors.blinkin.set(-0.43);
 
 		// grabHatch();
 
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
-		// Motors.compressor.setClosedLoopControl(false);
-		// Motors.avocadoSlide.set(false);
 	}
 
 	@Override
@@ -282,10 +276,15 @@ public class Robot extends TimedRobot {
 
 	public void avocadoTurningControl() {
 		// 1330 miliseconds, doesn't work
-
+		if (invincibilityTimer > 0) {
+			invincibilityTimer--;
+		}
 		if (Sensors.avocadoLimit.get() && controllers[OPERATOR].getRawButton(ControllerMap.Y)) {
 			isAvocadoTurning = true;
 			startTurn = true;
+		}
+		if (controllers[OPERATOR].getRawButton(ControllerMap.Y)) {
+			invincibilityTimer = 2;
 		}
 		if (startTurn && !Sensors.avocadoLimit.get())
 			startTurn = false;
@@ -293,7 +292,7 @@ public class Robot extends TimedRobot {
 			avocadoUp = !avocadoUp;
 			isAvocadoTurning = false;
 		}
-		if (isAvocadoTurning)
+		if (isAvocadoTurning || invincibilityTimer != 0)
 			Motors.avocadoMotor.set(-1);
 		else
 			Motors.avocadoMotor.set(0);
@@ -309,12 +308,12 @@ public class Robot extends TimedRobot {
 		double armSpin = controllers[OPERATOR].getRawAxis(ControllerMap.rightY);
 
 		if (Math.abs(armPivot) > .1) {
-			Motors.armMotor.set(armPivot * .6);
+			Motors.armMotor.set(armPivot * Settings.PIVOTSPEED);
 		} else {
 			Motors.armMotor.set(0);
 		}
 		if (Math.abs(armSpin) > .1) {
-			Motors.armEndMotor.set(armSpin * .9);
+			Motors.armEndMotor.set(armSpin);
 		} else {
 			Motors.armEndMotor.set(0);
 		}
@@ -426,11 +425,13 @@ public class Robot extends TimedRobot {
 			avocadoState.setString("Turning");
 			color = Settings.HOT_PINK;
 		}
-		if (controllers[DRIVER].getRawButton(ControllerMap.back)){
-			if(colorState) color = Settings.CONFETTI;
-			else color = Settings.PARTY;
+		if (controllers[DRIVER].getRawButton(ControllerMap.back)) {
+			if (colorState)
+				color = Settings.CONFETTI;
+			else
+				color = Settings.PARTY;
 		}
-		if(System.currentTimeMillis() - lastLightSwitch > 300) {
+		if (System.currentTimeMillis() - lastLightSwitch > 300) {
 			lastLightSwitch = System.currentTimeMillis();
 			colorState = !colorState;
 		}

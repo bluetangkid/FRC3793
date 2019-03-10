@@ -27,5 +27,5 @@ public interface Settings {
 	public static final float SINELON = -0.77f;
 	public static final float CONFETTI = -0.87f;
 	public static final float BLACK = .99f;
-
+	public static final float PIVOTSPEED = 0.6f;
 }
