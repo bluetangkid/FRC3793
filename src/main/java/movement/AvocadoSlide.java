@@ -1,9 +1,6 @@
 package movement;
 
-import org.usfirst.frc.team3793.robot.Settings;
 import org.usfirst.frc.team3793.robot.Robot;
-import org.usfirst.frc.team3793.robot.Motors;
-import org.usfirst.frc.team3793.robot.Sensors;
 
 public class AvocadoSlide extends MovementAction {
     Robot robot;

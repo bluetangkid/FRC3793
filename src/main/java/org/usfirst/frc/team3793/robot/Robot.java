@@ -4,7 +4,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -14,9 +13,6 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import movement.MovementController;
-import movement.Turn;
-import movement.AvocadoSlide;
-import movement.AvocadoTurn;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
 //Equation for Drift on tile where y is drift in clicks and x is velocity in clicks/100 ms
@@ -41,7 +37,10 @@ public class Robot extends TimedRobot {
 	public GenericHID Master = null;
 	public float degToBall = 0;
 	public float degToTape = 0;
-	
+
+	public long lastLightSwitch;
+	public boolean colorState;
+
 	static RoboState state = RoboState.RobotInit;
 	static Thread t;
 
@@ -64,6 +63,7 @@ public class Robot extends TimedRobot {
 
 	static int avocadoPos = 180;
 	static boolean isAvocadoTurning = false;
+	static boolean startTurn = false;
 
 	static boolean avocadoLimitFunctions = true;
 
@@ -78,7 +78,8 @@ public class Robot extends TimedRobot {
 
 	static toggleSwitch hingeSwitch;
 
-	static toggleSwitch landingGearSwitch;
+	static toggleSwitch landingGearSwitch2;
+	static toggleSwitch landingGearSwitch3;
 
 	// beltstates
 	static BeltController beltController;
@@ -104,6 +105,7 @@ public class Robot extends TimedRobot {
 		main = Shuffleboard.getTab("main");
 		avocadoState = main.add("Avocado", "Up").getEntry();
 		hippieState = main.add("Hippie", "Down").getEntry();
+		avoSlideState = main.add("Avo Slide", "In").getEntry();
 
 		Motors.initialize();
 		Sensors.initialize();
@@ -115,8 +117,6 @@ public class Robot extends TimedRobot {
 			System.out.println("controller 0");
 		}
 		Motors.compressor.setClosedLoopControl(false);
-		// Motors.landingGear.set(false);
-		// Motors.avocadoSlide.set(false);
 
 		state = RoboState.RobotInit;
 		t = new MovementController(this);
@@ -136,24 +136,29 @@ public class Robot extends TimedRobot {
 	public void disabledPeriodic() {
 		state = RoboState.Disabled;
 		Scheduler.getInstance().run();
+		// if(!avocadoUp){
+		// isAvocadoTurning = true;
+		// startTurn = true;
+
+		// }
+
 	}
 
 	@Override
 	public void autonomousInit() {
 		state = RoboState.AutonomousInit;
+		teleopInit();
 		// Motors.blinkin.set(-0.43);
 
-		grabHatch();
+		// grabHatch();
 
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
-
 		// Motors.compressor.setClosedLoopControl(false);
 		// Motors.avocadoSlide.set(false);
 	}
 
 	@Override
 	public void autonomousPeriodic() {
-		//Scheduler.getInstance().run();
 		teleopPeriodic();
 		state = RoboState.Autonomous;
 		try {
@@ -172,12 +177,16 @@ public class Robot extends TimedRobot {
 					Solenoid.class.getMethod("set", boolean.class));
 			avocadoSlideSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.A, Motors.avocadoSlide,
 					Solenoid.class.getMethod("set", boolean.class));
-			landingGearSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.back, Motors.landingGear,
+			landingGearSwitch2 = new toggleSwitch(controllers[OPERATOR], ControllerMap.back, Motors.landingGear2,
+					Solenoid.class.getMethod("set", boolean.class));
+			landingGearSwitch3 = new toggleSwitch(controllers[OPERATOR], ControllerMap.start, Motors.landingGear3,
 					Solenoid.class.getMethod("set", boolean.class));
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		landingGearSwitch2.b = false;
+		landingGearSwitch3.b = true;
 		state = RoboState.TeleopInit;
 	}
 
@@ -210,23 +219,28 @@ public class Robot extends TimedRobot {
 		// ---------------------------- ARCADE DRIVE ----------------------------
 
 		try {
-			if (!rightBumperEngaged && !leftBumperEngaged) {
-				driveControl(); // work Driver
-			}
+			// if (!rightBumperEngaged && !leftBumperEngaged) {
+			driveControl(); // work Driver
+			// }
 			avocadoControl(); // both work operator
 			climbingArm(); // operator RIGHT STICK
-			// cargoIntake(); // operator
 			beltController.update(); // operator X - UP AND B - DOWN Button
 			hingeSwitch.update();// opperator Y button
-			landingGearSwitch.update();
-			rightBumper(); // driver
-			leftBumper(); // driver
+			if (controllers[OPERATOR].getRawButton(ControllerMap.start)) {
+				landingGearSwitch2.b = false;
+			}
+			if (controllers[OPERATOR].getRawButton(ControllerMap.back)) {
+				landingGearSwitch3.b = false;
+			}
+			landingGearSwitch2.update();
+			landingGearSwitch3.update();
+			// rightBumper(); // driver
+			// leftBumper(); // driver
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		// ----------------------------------------------------------------------
-		// Motors.blinkin.set(-0.01);
 		try {
 			Motors.blinkin2019.set(setColors());
 		} catch (Exception e) {
@@ -268,48 +282,26 @@ public class Robot extends TimedRobot {
 
 	public void avocadoTurningControl() {
 		// 1330 miliseconds, doesn't work
-		if (isAvocadoTurning = true) {
-			// Motors.blinkin2019.set();
-		}
-		avocadoRotationTimer++;
-		if (avocadoRotationTimer > TIMER_DELAY) {
-			avocadoRotationTimer = TIMER_DELAY;
-		}
 
-		if (avocadoRotationTimer == TIMER_DELAY && controllers[OPERATOR].getRawButton(ControllerMap.Y)) {
-			avocadoRotationTimer = 0;
-			timeAvocado = System.currentTimeMillis();
+		if (Sensors.avocadoLimit.get() && controllers[OPERATOR].getRawButton(ControllerMap.Y)) {
 			isAvocadoTurning = true;
+			startTurn = true;
 		}
-
-		if (Sensors.avocadoLimit.get() && avocadoRotationTimer == TIMER_DELAY) {
+		if (startTurn && !Sensors.avocadoLimit.get())
+			startTurn = false;
+		if (Sensors.avocadoLimit.get() && !startTurn && isAvocadoTurning) {
 			avocadoUp = !avocadoUp;
 			isAvocadoTurning = false;
 		}
-
-		if (isAvocadoTurning) {
-			if (System.currentTimeMillis() - timeAvocado > 1600)
-				isAvocadoTurning = false;
+		if (isAvocadoTurning)
 			Motors.avocadoMotor.set(-1);
-		} else {
-			timeAvocado = 0;
+		else
 			Motors.avocadoMotor.set(0);
-		}
 	}
 
 	private void avocadoControl() {
 		avocadoSlideSwitch.update(); // Operator A
 		avocadoTurningControl(); // operator Y
-	}
-
-	private void landingGear() {
-		if (!Motors.landingGear.get() && controllers[OPERATOR].getRawButton(ControllerMap.start)) {
-			Motors.landingGear.set(true);// extend
-		}
-
-		if (Motors.landingGear.get() && controllers[OPERATOR].getRawButton(ControllerMap.back)) {
-			Motors.landingGear.set(false);// retract
-		}
 	}
 
 	private void climbingArm() {
@@ -328,16 +320,6 @@ public class Robot extends TimedRobot {
 		}
 	}
 
-	private void cargoIntake() {
-		double dif = Math.signum(Math.pow(controllers[DRIVER].getRawAxis(ControllerMap.rightX), 3));
-		if (Math.abs(dif) < 0.1)
-			dif = 0.0;
-
-		Motors.beltMotor.set(dif);
-
-		beltController.update();
-	}
-
 	private void driveControl() {
 		double dif;
 		double leftY = controllers[DRIVER].getRawAxis(ControllerMap.leftTrigger)
@@ -345,96 +327,112 @@ public class Robot extends TimedRobot {
 		if (Math.abs(leftY) < Settings.BUMPER_DEADZONE)
 			dif = 0.0;
 		else
-			dif = Math.pow(leftY, 5);
+			dif = leftY;
 
 		double lx = controllers[DRIVER].getRawAxis(ControllerMap.leftX);
 		double lNum;
 		if (Math.abs(lx) > Settings.LSTICK_DEADZONE)
-			lNum = Math.pow(controllers[DRIVER].getRawAxis(ControllerMap.leftX), 3);
+			lNum = controllers[DRIVER].getRawAxis(ControllerMap.leftX);
 		else
 			lNum = 0;
 
 		if (lNum == 0 && dif == 0 && Motors.talonLeft.getSelectedSensorVelocity(0) > 100)
 			Motors.drive.arcadeDrive(0, 0);
 		else
-			Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum * Settings.TURN_MULT, false);
+			Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum * Settings.TURN_MULT);
 	}
 
 	public void degreeSync() {
-		String[] info = null;
-		try {
-			info = Sensors.jeVois1.readString().split(",");
-			for (int i = 0; i < info.length; i++) {
-				String temp = info[i];
-				if (temp.length() > 1) {
-					System.out.println(temp);
-					if (temp.startsWith("B")) {
-						degToBall = Float.parseFloat(temp.substring(1));
-					} else {
-						degToTape = Float.parseFloat(temp.substring(1));
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		// String[] info = null;
+		// try {
+		// info = Sensors.jeVois1.readString().split(",");
+		// for (int i = 0; i < info.length; i++) {
+		// String temp = info[i];
+		// if (temp.length() > 1) {
+		// System.out.println(temp);
+		// if (temp.startsWith("B")) {
+		// degToBall = Float.parseFloat(temp.substring(1));
+		// } else {
+		// degToTape = Float.parseFloat(temp.substring(1));
+		// }
+		// }
+		// }
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
 	}
 
 	public void moveToBall() {
-		float angle = degToBall;
-		MovementController.addAction(new Turn(180 - angle, .8f));
+		// float angle = degToBall;
+		// MovementController.addAction(new Turn(180 - angle, .8f));
 	}
 
 	public void moveToHatch() {
-		float angle = degToTape;
-		MovementController.addAction((new Turn(180 - angle, .8f)));
-		double distance = 2;// (double) Sensors.backDist.getRangeInches() * INCHES_TO_METERS;
-		if (angle > 0) {
-			// MovementController.addAction((new Turn(90 - angle, .8f)));
-			// MovementController.addAction(new Straight((float) (Math.cos(Math.toRadians(90
-			// - angle)) * distance), .8f));
-			// MovementController.addAction((new Turn(-90, .8f)));
-			// MovementController.addAction(new Straight((float) (Math.sin(Math.toRadians(90
-			// - angle)) * distance), .8f));
-		} else {
-			// MovementController.addAction((new Turn(-90 - angle, .8f)));
-			// MovementController.addAction(new Straight((float)
-			// (Math.cos(Math.toRadians(-90 - angle)) * distance), .8f));
-			// MovementController.addAction((new Turn(90, .8f)));
-			// MovementController.addAction(new Straight((float)
-			// (Math.sin(Math.toRadians(-90 - angle)) * distance), .8f)); }
-		}
+		// float angle = degToTape;
+		// MovementController.addAction((new Turn(180 - angle, .8f)));
+		// double distance = 2;// (double) Sensors.backDist.getRangeInches() *
+		// INCHES_TO_METERS;
+		// if (angle > 0) {
+		// MovementController.addAction((new Turn(90 - angle, .8f)));
+		// MovementController.addAction(new Straight((float) (Math.cos(Math.toRadians(90
+		// - angle)) * distance), .8f));
+		// MovementController.addAction((new Turn(-90, .8f)));
+		// MovementController.addAction(new Straight((float) (Math.sin(Math.toRadians(90
+		// - angle)) * distance), .8f));
+		// } else {
+		// MovementController.addAction((new Turn(-90 - angle, .8f)));
+		// MovementController.addAction(new Straight((float)
+		// (Math.cos(Math.toRadians(-90 - angle)) * distance), .8f));
+		// MovementController.addAction((new Turn(90, .8f)));
+		// MovementController.addAction(new Straight((float)
+		// (Math.sin(Math.toRadians(-90 - angle)) * distance), .8f)); }
+		// }
 	}
 
 	public void grabHatch() {
-		System.out.println("grabbing hatch");
-		MovementController.addAction(new AvocadoSlide(0, 0, this));
-		MovementController.addAction(new AvocadoTurn(0, 0, this));
-		MovementController.addAction(new AvocadoSlide(0, 0, this));
+		// System.out.println("grabbing hatch");
+		// MovementController.addAction(new AvocadoSlide(0, 0, this));
+		// MovementController.addAction(new AvocadoTurn(0, 0, this));
+		// MovementController.addAction(new AvocadoSlide(0, 0, this));
 	}
 
-	public double setColors() {
-		float color = Settings.HOT_PINK;
+	public float setColors() {
+		float color = Settings.PARTY;
 
-		if(avocadoSlideSwitch.getB())
-			avoSlideState.setString("Up");
-		else avoSlideState.setString("Down");
+		// if (avocadoSlideSwitch.getB())
+		// avoSlideState.setString("Up");
+		// else
+		// avoSlideState.setString("Down");
 
-		if(hingeSwitch.getB())
-			hippieState.setString("Up");
-		else hippieState.setString("Down");
+		// if (hingeSwitch.getB())
+		// hippieState.setString("Up");
+		// else
+		// hippieState.setString("Down");
 
-		if (avocadoUp && !isAvocadoTurning)
+		if (avocadoUp && !isAvocadoTurning) {
 			avocadoState.setString("Up");
-		else if (!avocadoUp && !isAvocadoTurning)
+			color = Settings.GREEN;
+		} else if (!avocadoUp && !isAvocadoTurning) {
 			avocadoState.setString("Down");
-		else if (isAvocadoTurning)
-			avocadoState.setString("Turning");
-		
+			color = Settings.YELLOW;
+		}
+
 		if (beltMovingUp()) {
 			color = Settings.BLUE;
 		} else if (beltMovingDown()) {
 			color = Settings.RED;
+		}
+		if (isAvocadoTurning) {
+			avocadoState.setString("Turning");
+			color = Settings.HOT_PINK;
+		}
+		if (controllers[DRIVER].getRawButton(ControllerMap.back)){
+			if(colorState) color = Settings.CONFETTI;
+			else color = Settings.PARTY;
+		}
+		if(System.currentTimeMillis() - lastLightSwitch > 300) {
+			lastLightSwitch = System.currentTimeMillis();
+			colorState = !colorState;
 		}
 		return color;
 	}

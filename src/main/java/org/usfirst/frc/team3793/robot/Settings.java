@@ -8,7 +8,7 @@ package org.usfirst.frc.team3793.robot;
  */
 public interface Settings {
 	public static final double SPEED_MULT = 1.0f;
-	public static final double TURN_MULT = 0.9f;
+	public static final double TURN_MULT = 0.5f;
 	public static final float LSTICK_DEADZONE = 0.25f;
 	public static final float BUMPER_DEADZONE = 0.05f;
 	public static final int TIMER_DELAY = 15;
@@ -22,4 +22,10 @@ public interface Settings {
 	public static final float HOT_PINK = .57f;
 	public static final float WAVE_FOREST = -.37f;
 	public static final float LIME = .73f;
+	public static final float LARSON = -.35f;
+	public static final float PARTY = -.43f;
+	public static final float SINELON = -0.77f;
+	public static final float CONFETTI = -0.87f;
+	public static final float BLACK = .99f;
+
 }

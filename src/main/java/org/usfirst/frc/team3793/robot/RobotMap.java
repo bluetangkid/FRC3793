@@ -35,7 +35,9 @@ public enum RobotMap {
 	COMPRESSOR(0),
 	
 	//LANDING GEAR - used to lift up back end of robot to climb
-	LANDING_GEAR(2),
+	LANDING_GEAR2(2),
+	LANDING_GEAR3(3),
+
 
 	//HIPPY - used to change the height of the output of ball.
 	HINGE(1),
