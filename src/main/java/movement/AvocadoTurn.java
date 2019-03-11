@@ -23,15 +23,11 @@ public class AvocadoTurn extends MovementAction {
     public void spin() {
         // 1330 miliseconds, doesn't work
         delayTimer++;
-        if (Sensors.avocadoLimit.get() && delayTimer > Settings.TIMER_DELAY) {
+        if (Sensors.avocadoLimit.get() && delayTimer > Settings.TIMER_DELAY)
             isAvocadoTurning = false;
-        }
 
-        if (isAvocadoTurning) {
-            Motors.avocadoMotor.set(-1);
-        } else {
-            Motors.avocadoMotor.set(0);
-        }
+        if (isAvocadoTurning) Motors.avocadoMotor.set(-1);
+        else Motors.avocadoMotor.set(0);
     }
 
     public Speed getSpeed() {

@@ -62,11 +62,11 @@ public class MovementController extends Thread {
 				return;
 			}
 		}
-		this.interrupt(); // nice
+		this.interrupt();
 	}
 
 	public static synchronized void addAction(MovementAction a) {
-		actions.add(a);
+		actions.add(a); // nice
 	}
 
 	public static synchronized void clearActions(){

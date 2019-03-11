@@ -15,7 +15,7 @@ public class AvocadoSlide extends MovementAction {
     }
 
     public boolean isComplete(){
-        robot.avocadoSlideSwitch.reflect();
+        robot.avocadoSlideSwitch.reflect(); // This is fine, checked by Warren
         return true;
     }
 }

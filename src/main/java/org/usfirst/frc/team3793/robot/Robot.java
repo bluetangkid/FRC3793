@@ -2,7 +2,6 @@ package org.usfirst.frc.team3793.robot;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -14,6 +13,8 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import movement.MovementController;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import movement.*;
 
 //Equation for Drift on tile where y is drift in clicks and x is velocity in clicks/100 ms
 // Y=7.029608995X - 592.3469424, where domain is defined on (90,1700)
@@ -21,7 +22,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
  * Main Robot class. Does networking and Teleop control by thinking very hard
  * and very carefully.
  * 
- * @author Faris for teleop control, Warren for networking, FIRST provided an
+ * @author Faris for teleop control, Warren for networking & drive control, FIRST provided an
  *         empty class template
  */
 
@@ -59,16 +60,10 @@ public class Robot extends TimedRobot {
 
 	// avocado initialization
 	static int avocadoRotationTimer = 0;
-	static long timeAvocado = 0;
-
-	static int avocadoPos = 180;
 	static boolean isAvocadoTurning = false;
 	static boolean startTurn = false;
 
-	static boolean avocadoLimitFunctions = true;
-
-	static final int TIMER_DELAY = 3; // nice
-
+	// nice
 	public static toggleSwitch avocadoSlideSwitch;
 
 	public static ShuffleboardTab main;
@@ -85,7 +80,7 @@ public class Robot extends TimedRobot {
 	static BeltController beltController;
 
 	static SmartDashboard dashboard;
-	// static PowerDistributionPanel pdp;
+	public static PowerDistributionPanel pdp;
 	static double minVoltage = 30;
 
 	static boolean hasDone = false;
@@ -106,6 +101,7 @@ public class Robot extends TimedRobot {
 		avocadoState = main.add("Avocado", "Up").getEntry();
 		hippieState = main.add("Hippie", "Down").getEntry();
 		avoSlideState = main.add("Avo Slide", "In").getEntry();
+		pdp = new PowerDistributionPanel();
 
 		Motors.initialize();
 		Sensors.initialize();
@@ -138,15 +134,14 @@ public class Robot extends TimedRobot {
 		// startTurn = true;
 
 		// }
-
 	}
 
 	@Override
 	public void autonomousInit() {
-		state = RoboState.AutonomousInit;
 		teleopInit();
+		state = RoboState.AutonomousInit;
 
-		// grabHatch();
+		PowerMonitor.init();
 
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
 	}
@@ -155,11 +150,6 @@ public class Robot extends TimedRobot {
 	public void autonomousPeriodic() {
 		teleopPeriodic();
 		state = RoboState.Autonomous;
-		try {
-			Motors.blinkin2019.set(setColors());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -186,7 +176,9 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopPeriodic() {
-		degreeSync();
+		PowerMonitor.evaluate();
+		//degreeSync();
+		// -------------------------- CONTROLLER GARBO --------------------------
 		if (singleControllerMode && Master.getRawButton(ControllerMap.leftClick)) {
 			controllerSelector++;
 			GenericHID c;
@@ -211,7 +203,6 @@ public class Robot extends TimedRobot {
 		Scheduler.getInstance().run();
 
 		// ---------------------------- ARCADE DRIVE ----------------------------
-
 		try {
 			// if (!rightBumperEngaged && !leftBumperEngaged) {
 			driveControl(); // work Driver
@@ -233,24 +224,10 @@ public class Robot extends TimedRobot {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		// ----------------------------------------------------------------------
 		try {
 			Motors.blinkin2019.set(setColors());
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-	}
-
-	public void rightBumper() {
-		if (controllers[DRIVER].getRawButton(ControllerMap.RB) && !rightBumperEngaged) {
-			rightBumperEngaged = true;
-			moveToBall();
-		}
-
-		if (!controllers[DRIVER].getRawButton(ControllerMap.RB) && rightBumperEngaged) {
-			rightBumperEngaged = false;
-			MovementController.clearActions();
 		}
 	}
 
@@ -275,7 +252,6 @@ public class Robot extends TimedRobot {
 	}
 
 	public void avocadoTurningControl() {
-		// 1330 miliseconds, doesn't work
 		if (invincibilityTimer > 0) {
 			invincibilityTimer--;
 		}
@@ -320,7 +296,7 @@ public class Robot extends TimedRobot {
 	}
 
 	private void driveControl() {
-		double dif;
+		double dif; // THESE GO FROM -1 to 1 SO IT NEEDS TO BE FIXED, TRIGGERS ONLY ENGAGE HALF WAY IN(I THONK)
 		double leftY = controllers[DRIVER].getRawAxis(ControllerMap.leftTrigger)
 				- controllers[DRIVER].getRawAxis(ControllerMap.rightTrigger);
 		if (Math.abs(leftY) < Settings.BUMPER_DEADZONE)
@@ -337,33 +313,30 @@ public class Robot extends TimedRobot {
 
 		if (lNum == 0 && dif == 0 && Motors.talonLeft.getSelectedSensorVelocity(0) > 100)
 			Motors.drive.arcadeDrive(0, 0);
-		else
-			Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum * Settings.TURN_MULT);
+		else {
+			if(controllers[DRIVER].getRawButton(ControllerMap.rightClick)) Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum);
+			else Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum * Settings.TURN_MULT);
+		}
 	}
 
 	public void degreeSync() {
-		// String[] info = null;
-		// try {
-		// info = Sensors.jeVois1.readString().split(",");
-		// for (int i = 0; i < info.length; i++) {
-		// String temp = info[i];
-		// if (temp.length() > 1) {
-		// System.out.println(temp);
-		// if (temp.startsWith("B")) {
-		// degToBall = Float.parseFloat(temp.substring(1));
-		// } else {
-		// degToTape = Float.parseFloat(temp.substring(1));
-		// }
-		// }
-		// }
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
-	}
-
-	public void moveToBall() {
-		// float angle = degToBall;
-		// MovementController.addAction(new Turn(180 - angle, .8f));
+		String[] info = null;
+		try {
+			info = Sensors.jeVois1.readString().split(",");
+			for (int i = 0; i < info.length; i++) {
+				String temp = info[i];
+				if (temp.length() > 1) {
+					System.out.println(temp);
+					if (temp.startsWith("B")) {
+						degToBall = Float.parseFloat(temp.substring(1));
+					} else {
+						degToTape = Float.parseFloat(temp.substring(1));
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void moveToHatch() {
@@ -389,24 +362,27 @@ public class Robot extends TimedRobot {
 	}
 
 	public void grabHatch() {
-		// System.out.println("grabbing hatch");
-		// MovementController.addAction(new AvocadoSlide(0, 0, this));
-		// MovementController.addAction(new AvocadoTurn(0, 0, this));
-		// MovementController.addAction(new AvocadoSlide(0, 0, this));
+		MovementController.addAction(new AvocadoSlide(0, 0, this));
+		MovementController.addAction(new AvocadoTurn(0, 0, this));
+		MovementController.addAction(new AvocadoSlide(0, 0, this));
 	}
 
 	public float setColors() {
 		float color = Settings.PARTY;
 
-		// if (avocadoSlideSwitch.getB())
-		// avoSlideState.setString("Up");
-		// else
-		// avoSlideState.setString("Down");
+		try{
+			if (avocadoSlideSwitch.getB())
+				avoSlideState.setString("Up");
+			else
+				avoSlideState.setString("Down");
 
-		// if (hingeSwitch.getB())
-		// hippieState.setString("Up");
-		// else
-		// hippieState.setString("Down");
+			if (hingeSwitch.getB())
+				hippieState.setString("Up");
+			else
+				hippieState.setString("Down");
+		} catch(Exception e){
+			e.printStackTrace();
+		}
 
 		if (avocadoUp && !isAvocadoTurning) {
 			avocadoState.setString("Up");
@@ -447,8 +423,7 @@ public class Robot extends TimedRobot {
 	}
 
 	@Override
-	public void testPeriodic() {
-	}
+	public void testPeriodic() {}
 
 	public static synchronized RoboState getState() {
 		return state;

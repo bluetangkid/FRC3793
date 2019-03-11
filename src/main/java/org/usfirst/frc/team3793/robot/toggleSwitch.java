@@ -38,26 +38,12 @@ public class toggleSwitch {
     }
 
     void update() {
-        
-        if (timer < TIMER_DELAY) {
-            timer++;
-        }
+        timer++;
 
-
-        if(timer == TIMER_DELAY && controller.getRawButton(buttonNum)){
+        if(timer >= TIMER_DELAY && controller.getRawButton(buttonNum)){
             timer = 0;
-            if (b) {
-                b = false;
-            } else {
-                b = true;
-            } 
-
+            b = !b;
         }
-
-        
-
-        
-
         try {
             method.invoke(obj, b);
         } catch (Exception e) {
@@ -65,11 +51,7 @@ public class toggleSwitch {
         }
     }
     public void reflect(){
-        if (b) {
-            b = false;
-        } else {
-            b = true;
-        }
+        b = !b;
         try {
             method.invoke(obj, b);
         } catch (Exception e) {
