@@ -23,7 +23,7 @@ import movement.*;
  * and very carefully.
  * 
  * @author Faris for teleop control, Warren for networking & drive control, FIRST provided an
- *         empty class template
+ * empty class template
  */
 
 // default green, avocado down, avocado up, ball going up, ball going down
@@ -32,15 +32,14 @@ public class Robot extends TimedRobot {
 	// Controller initialization
 	static GenericHID driverController = new XboxController(0);
 	static GenericHID operatorController = new XboxController(1);
-	public GenericHID[] controllers = new GenericHID[2];
-	private boolean singleControllerMode = true;
-	public int controllerSelector = 0;
-	public GenericHID Master = null;
-	public float degToBall = 0;
-	public float degToTape = 0;
+	public static GenericHID[] controllers = new GenericHID[2];
+	private static boolean singleControllerMode = true;
+	public static int controllerSelector = 0;
+	private static GenericHID Master = null;
+	public static float degToTape = 0;
 
-	public long lastLightSwitch;
-	public boolean colorState;
+	public static long lastLightSwitch;
+	public static boolean colorState;
 
 	static RoboState state = RoboState.RobotInit;
 	static Thread t;
@@ -327,11 +326,7 @@ public class Robot extends TimedRobot {
 				String temp = info[i];
 				if (temp.length() > 1) {
 					System.out.println(temp);
-					if (temp.startsWith("B")) {
-						degToBall = Float.parseFloat(temp.substring(1));
-					} else {
-						degToTape = Float.parseFloat(temp.substring(1));
-					}
+					degToTape = Float.parseFloat(temp);
 				}
 			}
 		} catch (Exception e) {
