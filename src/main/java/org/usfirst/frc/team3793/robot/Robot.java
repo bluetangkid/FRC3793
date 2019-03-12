@@ -15,6 +15,7 @@ import movement.MovementController;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import movement.*;
+import org.usfirst.frc.team3793.robot.PowerMonitor;
 
 //Equation for Drift on tile where y is drift in clicks and x is velocity in clicks/100 ms
 // Y=7.029608995X - 592.3469424, where domain is defined on (90,1700)

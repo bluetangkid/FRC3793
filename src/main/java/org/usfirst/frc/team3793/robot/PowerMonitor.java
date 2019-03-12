@@ -1,4 +1,5 @@
 package org.usfirst.frc.team3793.robot;
+import java.util.ArrayList;
 public class PowerMonitor {
     static double maxDriveCurrent;
     static double lowestVoltage;
@@ -7,6 +8,8 @@ public class PowerMonitor {
     static double maxArmCurr;
     static double maxAvocadoCurr;
     static double maxCurr;
+    static double resistance;
+    static ArrayList<Double> resistances;
 
     static void init() {
         lowestVoltage = 50;
@@ -16,6 +19,8 @@ public class PowerMonitor {
         maxCurr = 0;
         maxAvocadoCurr = 0;
         maxCompressorCurr = 0;
+        resistance = 0;
+        resistances = new ArrayList<Double>();
     }
 
     static void evaluate() {
@@ -28,6 +33,13 @@ public class PowerMonitor {
         if(Robot.pdp.getTotalCurrent() > maxCurr) maxCurr = Robot.pdp.getTotalCurrent();
         if(Robot.pdp.getCurrent(8) > maxCompressorCurr) maxCompressorCurr = Robot.pdp.getCurrent(8);
         if(Robot.pdp.getVoltage() < lowestVoltage) lowestVoltage = Robot.pdp.getVoltage();
+        resistances.add(Robot.pdp.getVoltage()/Robot.pdp.getTotalCurrent());
+        if(resistances.size() > 5) resistances.remove(0);
+        resistance = 0;
+        for(int i = 0; i < resistances.size(); i++){
+            resistance += resistances.get(i);
+        }
+        resistance /= 5;
         if(System.currentTimeMillis() % 1500 == 0) {
             System.out.println("Max Currents");
             System.out.println("Drive: " + maxDriveCurrent);
@@ -36,6 +48,7 @@ public class PowerMonitor {
             System.out.println("Arm Pivot: " + maxArmPivotCurr);
             System.out.println("Avocado: " + maxAvocadoCurr);
             System.out.println("Total: " + maxCurr);
+            System.out.println("Resistance" + resistance);
         }
     }
 }
