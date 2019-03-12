@@ -1,4 +1,6 @@
 package org.usfirst.frc.team3793.robot;
+
+import java.util.ArrayList;
 public class PowerMonitor {
     static double maxDriveCurrent;
     static double lowestVoltage;
@@ -7,6 +9,8 @@ public class PowerMonitor {
     static double maxArmCurr;
     static double maxAvocadoCurr;
     static double maxCurr;
+    static double impedance;
+    static ArrayList<Double> impedi;
 
     static void init() {
         lowestVoltage = 50;
@@ -28,7 +32,14 @@ public class PowerMonitor {
         if(Robot.pdp.getTotalCurrent() > maxCurr) maxCurr = Robot.pdp.getTotalCurrent();
         if(Robot.pdp.getCurrent(8) > maxCompressorCurr) maxCompressorCurr = Robot.pdp.getCurrent(8);
         if(Robot.pdp.getVoltage() < lowestVoltage) lowestVoltage = Robot.pdp.getVoltage();
-        if(System.currentTimeMillis() % 1500 == 0) {
+        impedi.add(Robot.pdp.getVoltage()/Robot.pdp.getTotalCurrent());
+        if(impedi.size() > 6) impedi.remove(0);
+        impedance = 0;
+        for(int i = 0; i < impedi.size(); i++){
+            impedance += impedi.get(i);
+        }
+        impedance /= 5;
+        if((int)(System.currentTimeMillis()/100) % 15 == 0) {
             System.out.println("Max Currents");
             System.out.println("Drive: " + maxDriveCurrent);
             System.out.println("Compressor: " + maxCompressorCurr);
