@@ -1,5 +1,4 @@
 package org.usfirst.frc.team3793.robot;
-
 import java.util.ArrayList;
 public class PowerMonitor {
     static double maxDriveCurrent;
@@ -9,8 +8,9 @@ public class PowerMonitor {
     static double maxArmCurr;
     static double maxAvocadoCurr;
     static double maxCurr;
-    static double impedance;
-    static ArrayList<Double> impedi;
+    static double maxBeltCurr;
+    static double resistance;
+    static ArrayList<Double> resistances;
 
     static void init() {
         lowestVoltage = 50;
@@ -19,27 +19,32 @@ public class PowerMonitor {
         maxArmPivotCurr = 0;
         maxCurr = 0;
         maxAvocadoCurr = 0;
-        maxCompressorCurr = 0;
-    }
+        maxCompressorCurr = 10;
+        maxBeltCurr = 0;
+        // belt is 12 talon srx right is 2 victor srx right 3 arm is 1 talonSRX left is 14 VictorSrx left 13 Arm spin 0 Avocado is 15 for sure
+        resistance = 0;
+        resistances = new ArrayList<Double>();
+    }//Use current spike to increase power to arm pivot motor, NOT IMPLEMENTED
 
     static void evaluate() {
-        double driveCurrent = Robot.pdp.getCurrent(0) + Robot.pdp.getCurrent(1) + Robot.pdp.getCurrent(2) + Robot.pdp.getCurrent(3);
+        double driveCurrent = Robot.pdp.getCurrent(2) + Robot.pdp.getCurrent(3) + Robot.pdp.getCurrent(14) + Robot.pdp.getCurrent(13);
         if(driveCurrent > maxDriveCurrent) maxDriveCurrent = driveCurrent;
-        if(Robot.pdp.getCurrent(4) > maxCompressorCurr) maxCompressorCurr = Robot.pdp.getCurrent(4);
-        if(Robot.pdp.getCurrent(5) > maxArmPivotCurr) maxArmPivotCurr = Robot.pdp.getCurrent(5);
-        if(Robot.pdp.getCurrent(6) > maxArmCurr) maxArmCurr = Robot.pdp.getCurrent(6);
-        if(Robot.pdp.getCurrent(7) > maxAvocadoCurr) maxAvocadoCurr = Robot.pdp.getCurrent(7);
+        //if(Robot.pdp.getCurrent(4) > maxCompressorCurr) maxCompressorCurr = Robot.pdp.getCurrent(4); //10 Amps
+        if(Robot.pdp.getCurrent(1) > maxArmPivotCurr) maxArmPivotCurr = Robot.pdp.getCurrent(1);
+        if(Robot.pdp.getCurrent(0) > maxArmCurr) maxArmCurr = Robot.pdp.getCurrent(0);
+        if(Robot.pdp.getCurrent(15) > maxAvocadoCurr) maxAvocadoCurr = Robot.pdp.getCurrent(15);
+        //if(Robot.pdp.getCurrent(8) > maxCompressorCurr) maxCompressorCurr = Robot.pdp.getCurrent(8);
+        if(Robot.pdp.getCurrent(12) > maxBeltCurr) maxBeltCurr = Robot.pdp.getCurrent(12);
         if(Robot.pdp.getTotalCurrent() > maxCurr) maxCurr = Robot.pdp.getTotalCurrent();
-        if(Robot.pdp.getCurrent(8) > maxCompressorCurr) maxCompressorCurr = Robot.pdp.getCurrent(8);
         if(Robot.pdp.getVoltage() < lowestVoltage) lowestVoltage = Robot.pdp.getVoltage();
-        impedi.add(Robot.pdp.getVoltage()/Robot.pdp.getTotalCurrent());
-        if(impedi.size() > 6) impedi.remove(0);
-        impedance = 0;
-        for(int i = 0; i < impedi.size(); i++){
-            impedance += impedi.get(i);
+        resistances.add(Robot.pdp.getVoltage()/Robot.pdp.getTotalCurrent());
+        if(resistances.size() > 5) resistances.remove(0);
+        resistance = 0;
+        for(int i = 0; i < resistances.size(); i++){
+            resistance += resistances.get(i);
         }
-        impedance /= 5;
-        if((int)(System.currentTimeMillis()/100) % 15 == 0) {
+        resistance /= 5;
+        if(System.currentTimeMillis() % 1500 == 0) {
             System.out.println("Max Currents");
             System.out.println("Drive: " + maxDriveCurrent);
             System.out.println("Compressor: " + maxCompressorCurr);
@@ -47,6 +52,7 @@ public class PowerMonitor {
             System.out.println("Arm Pivot: " + maxArmPivotCurr);
             System.out.println("Avocado: " + maxAvocadoCurr);
             System.out.println("Total: " + maxCurr);
+            System.out.println("Resistance " + resistance);
         }
     }
 }
