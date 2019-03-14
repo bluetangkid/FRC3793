@@ -76,6 +76,9 @@ public class Robot extends TimedRobot {
 	static toggleSwitch landingGearSwitch2;
 	static toggleSwitch landingGearSwitch3;
 
+	static int stabilizeTimer = 0;
+	static boolean isOscillating = false;
+
 	// beltstates
 	static BeltController beltController;
 
@@ -219,8 +222,9 @@ public class Robot extends TimedRobot {
 			}
 			landingGearSwitch2.update();
 			landingGearSwitch3.update();
+			stabilizeLandingGear();
 			// rightBumper(); // driver
-			// leftBumper(); // driver
+			//leftBumper(); // driver
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -231,6 +235,20 @@ public class Robot extends TimedRobot {
 		}
 	}
 
+	void stabilizeLandingGear(){
+		if(stabilizeTimer < Settings.TIMER_DELAY){ 
+			stabilizeTimer ++;
+		}
+		if(controllers[OPERATOR].getRawButton(ControllerMap.LB) && stabilizeTimer == Settings.TIMER_DELAY){
+			stabilizeTimer = 0;
+		isOscillating = !isOscillating;
+		}
+
+		if(isOscillating){
+			landingGearSwitch2.b = !landingGearSwitch2.b;
+			landingGearSwitch3.b = !landingGearSwitch3.b;
+		}
+	}
 	public void leftBumper() {
 		if (controllers[DRIVER].getRawButton(ControllerMap.LB) && !leftBumperEngaged) {
 			leftBumperEngaged = true;
