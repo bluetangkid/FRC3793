@@ -23,8 +23,8 @@ import org.usfirst.frc.team3793.robot.PowerMonitor;
  * Main Robot class. Does networking and Teleop control by thinking very hard
  * and very carefully.
  * 
- * @author Faris for teleop control, Warren for networking & drive control, FIRST provided an
- * empty class template
+ * @author Faris for teleop control, Warren for networking & drive control,
+ *         FIRST provided an empty class template
  */
 
 // default green, avocado down, avocado up, ball going up, ball going down
@@ -97,6 +97,7 @@ public class Robot extends TimedRobot {
 	public static boolean avocadoUp = true;
 	public static boolean beltMovingUp = false;
 	public static boolean beltMovingDown = false;
+	public static double currentDrawn = 0;
 
 	@Override
 	public void robotInit() {
@@ -105,7 +106,6 @@ public class Robot extends TimedRobot {
 		hippieState = main.add("Hippie", "Down").getEntry();
 		avoSlideState = main.add("Avo Slide", "In").getEntry();
 		pdp = new PowerDistributionPanel();
-
 		Motors.initialize();
 		Sensors.initialize();
 
@@ -180,7 +180,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		PowerMonitor.evaluate();
-		//degreeSync();
+		// degreeSync();
 		// -------------------------- CONTROLLER GARBO --------------------------
 		if (singleControllerMode && Master.getRawButton(ControllerMap.leftClick)) {
 			controllerSelector++;
@@ -207,9 +207,6 @@ public class Robot extends TimedRobot {
 
 		// ---------------------------- ARCADE DRIVE ----------------------------
 		try {
-			// if (!rightBumperEngaged && !leftBumperEngaged) {
-			driveControl(); // work Driver
-			// }
 			avocadoControl(); // both work operator
 			climbingArm(); // operator RIGHT STICK
 			beltController.update(); // operator X - UP AND B - DOWN Button
@@ -224,7 +221,14 @@ public class Robot extends TimedRobot {
 			landingGearSwitch3.update();
 			stabilizeLandingGear();
 			// rightBumper(); // driver
+<<<<<<< HEAD
 			//leftBumper(); // driver
+=======
+			// leftBumper(); // driver
+			// if (!rightBumperEngaged && !leftBumperEngaged) {
+			driveControl(); // work Driver
+			// }
+>>>>>>> 2e8757eea7a8b1d1f813a5a68597fbcf3bb48a4f
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -296,13 +300,16 @@ public class Robot extends TimedRobot {
 		avocadoSlideSwitch.update(); // Operator A
 		avocadoTurningControl(); // operator Y
 	}
+	// public boolean avocadoUp(){
+	// 	return false;
+	// }
 
 	private void climbingArm() {
 		double armPivot = controllers[OPERATOR].getRawAxis(ControllerMap.leftY);
 		double armSpin = controllers[OPERATOR].getRawAxis(ControllerMap.rightY);
 
 		if (Math.abs(armPivot) > .1) {
-			Motors.armMotor.set(armPivot * Settings.PIVOTSPEED);
+			Motors.armMotor.set(armPivot * Settings.PIVOT_SPEED);
 		} else {
 			Motors.armMotor.set(0);
 		}
@@ -314,14 +321,17 @@ public class Robot extends TimedRobot {
 	}
 
 	private void driveControl() {
-		double dif; // THESE GO FROM -1 to 1 SO IT NEEDS TO BE FIXED, TRIGGERS ONLY ENGAGE HALF WAY IN(I THONK)
+
+		double dif; // THESE GO FROM -1 to 1 SO IT NEEDS TO BE FIXED, TRIGGERS ONLY ENGAGE HALF WAY
+					// IN(I THONK)
+
 		double leftY = controllers[DRIVER].getRawAxis(ControllerMap.leftTrigger)
 				- controllers[DRIVER].getRawAxis(ControllerMap.rightTrigger);
 		if (Math.abs(leftY) < Settings.BUMPER_DEADZONE)
 			dif = 0.0;
-		else
+		else {
 			dif = leftY;
-
+		}
 		double lx = controllers[DRIVER].getRawAxis(ControllerMap.leftX);
 		double lNum;
 		if (Math.abs(lx) > Settings.LSTICK_DEADZONE)
@@ -332,8 +342,10 @@ public class Robot extends TimedRobot {
 		if (lNum == 0 && dif == 0 && Motors.talonLeft.getSelectedSensorVelocity(0) > 100)
 			Motors.drive.arcadeDrive(0, 0);
 		else {
-			if(controllers[DRIVER].getRawButton(ControllerMap.rightClick)) Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum);
-			else Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum * Settings.TURN_MULT);
+			if (controllers[DRIVER].getRawButton(ControllerMap.Y))
+				Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum);
+			else
+				Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT * Math.max(Math.sqrt(pdp.getVoltage()) - 2.162, 1), lNum * Settings.TURN_MULT);
 		}
 	}
 
@@ -384,7 +396,7 @@ public class Robot extends TimedRobot {
 	public float setColors() {
 		float color = Settings.PARTY;
 
-		try{
+		try {
 			if (avocadoSlideSwitch.getB())
 				avoSlideState.setString("Up");
 			else
@@ -394,7 +406,7 @@ public class Robot extends TimedRobot {
 				hippieState.setString("Up");
 			else
 				hippieState.setString("Down");
-		} catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -437,7 +449,8 @@ public class Robot extends TimedRobot {
 	}
 
 	@Override
-	public void testPeriodic() {}
+	public void testPeriodic() {
+	}
 
 	public static synchronized RoboState getState() {
 		return state;
