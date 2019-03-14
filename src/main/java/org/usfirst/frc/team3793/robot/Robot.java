@@ -103,7 +103,6 @@ public class Robot extends TimedRobot {
 		hippieState = main.add("Hippie", "Down").getEntry();
 		avoSlideState = main.add("Avo Slide", "In").getEntry();
 		pdp = new PowerDistributionPanel();
-
 		Motors.initialize();
 		Sensors.initialize();
 
@@ -279,6 +278,9 @@ public class Robot extends TimedRobot {
 		avocadoSlideSwitch.update(); // Operator A
 		avocadoTurningControl(); // operator Y
 	}
+	// public boolean avocadoUp(){
+	// 	return false;
+	// }
 
 	private void climbingArm() {
 		double armPivot = controllers[OPERATOR].getRawAxis(ControllerMap.leftY);
