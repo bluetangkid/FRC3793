@@ -335,13 +335,19 @@ public class Robot extends TimedRobot {
 		else
 			lNum = 0;
 
-		if (lNum == 0 && dif == 0 && Motors.talonLeft.getSelectedSensorVelocity(0) > 100)
+		if (lNum == 0 && dif == 0)
 			Motors.drive.arcadeDrive(0, 0);
 		else {
-			if (controllers[DRIVER].getRawButton(ControllerMap.Y))
+			if (controllers[DRIVER].getRawButton(ControllerMap.A))
 				Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum);
-			else
-				Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT * Math.max(Math.sqrt(pdp.getVoltage()) - 2.162, 1), lNum * Settings.TURN_MULT);
+			else if(controllers[DRIVER].getRawButton(ControllerMap.B)) { // Sicko mode button
+				Motors.talonLeft.enableCurrentLimit(false);
+				Motors.talonRight.enableCurrentLimit(false);
+			} else {
+				Motors.talonLeft.enableCurrentLimit(true);
+				Motors.talonRight.enableCurrentLimit(true);
+				Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum * Settings.TURN_MULT);
+			}
 		}
 	}
 
