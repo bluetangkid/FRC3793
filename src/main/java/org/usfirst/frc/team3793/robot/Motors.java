@@ -53,6 +53,10 @@ public class Motors {
 
 		talonLeft = new WPI_TalonSRX(RobotMap.TALON_LEFT.getPin());
 		talonRight = new WPI_TalonSRX(RobotMap.TALON_RIGHT.getPin());
+		talonLeft.configPeakCurrentLimit(0);
+		talonRight.configPeakCurrentLimit(0);
+		Motors.talonLeft.enableCurrentLimit(true);
+		Motors.talonRight.enableCurrentLimit(true);
 		victorLeft = new WPI_VictorSPX(RobotMap.VICTOR_LEFT.getPin());
 		victorRight = new WPI_VictorSPX(RobotMap.VICTOR_RIGHT.getPin());
 		left = new SpeedControllerGroup(talonLeft, victorLeft);

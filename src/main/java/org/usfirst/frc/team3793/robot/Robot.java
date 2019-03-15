@@ -76,6 +76,9 @@ public class Robot extends TimedRobot {
 	static toggleSwitch landingGearSwitch2;
 	static toggleSwitch landingGearSwitch3;
 
+	static int stabilizeTimer = 0;
+	static boolean isOscillating = false;
+
 	// beltstates
 	static BeltController beltController;
 
@@ -103,7 +106,6 @@ public class Robot extends TimedRobot {
 		hippieState = main.add("Hippie", "Down").getEntry();
 		avoSlideState = main.add("Avo Slide", "In").getEntry();
 		pdp = new PowerDistributionPanel();
-
 		Motors.initialize();
 		Sensors.initialize();
 
@@ -217,6 +219,7 @@ public class Robot extends TimedRobot {
 			}
 			landingGearSwitch2.update();
 			landingGearSwitch3.update();
+			stabilizeLandingGear();
 			// rightBumper(); // driver
 			// leftBumper(); // driver
 			// if (!rightBumperEngaged && !leftBumperEngaged) {
@@ -232,6 +235,20 @@ public class Robot extends TimedRobot {
 		}
 	}
 
+	void stabilizeLandingGear(){
+		if(stabilizeTimer < Settings.TIMER_DELAY){ 
+			stabilizeTimer ++;
+		}
+		if(controllers[OPERATOR].getRawButton(ControllerMap.LB) && stabilizeTimer == Settings.TIMER_DELAY){
+			stabilizeTimer = 0;
+		isOscillating = !isOscillating;
+		}
+
+		if(isOscillating){
+			landingGearSwitch2.b = !landingGearSwitch2.b;
+			landingGearSwitch3.b = !landingGearSwitch3.b;
+		}
+	}
 	public void leftBumper() {
 		if (controllers[DRIVER].getRawButton(ControllerMap.LB) && !leftBumperEngaged) {
 			leftBumperEngaged = true;
@@ -279,6 +296,9 @@ public class Robot extends TimedRobot {
 		avocadoSlideSwitch.update(); // Operator A
 		avocadoTurningControl(); // operator Y
 	}
+	// public boolean avocadoUp(){
+	// 	return false;
+	// }
 
 	private void climbingArm() {
 		double armPivot = controllers[OPERATOR].getRawAxis(ControllerMap.leftY);
@@ -315,13 +335,19 @@ public class Robot extends TimedRobot {
 		else
 			lNum = 0;
 
-		if (lNum == 0 && dif == 0 && Motors.talonLeft.getSelectedSensorVelocity(0) > 100)
+		if (lNum == 0 && dif == 0)
 			Motors.drive.arcadeDrive(0, 0);
 		else {
-			if (controllers[DRIVER].getRawButton(ControllerMap.Y))
+			if (controllers[DRIVER].getRawButton(ControllerMap.A))
 				Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum);
-			else
-				Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT * Math.max(Math.sqrt(pdp.getVoltage()) - 2.162, 1), lNum * Settings.TURN_MULT);
+			else if(controllers[DRIVER].getRawButton(ControllerMap.B)) { // Sicko mode button
+				Motors.talonLeft.enableCurrentLimit(false);
+				Motors.talonRight.enableCurrentLimit(false);
+			} else {
+				Motors.talonLeft.enableCurrentLimit(true);
+				Motors.talonRight.enableCurrentLimit(true);
+				Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum * Settings.TURN_MULT);
+			}
 		}
 	}
 
