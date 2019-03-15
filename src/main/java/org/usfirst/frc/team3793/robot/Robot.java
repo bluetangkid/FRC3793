@@ -221,14 +221,10 @@ public class Robot extends TimedRobot {
 			landingGearSwitch3.update();
 			stabilizeLandingGear();
 			// rightBumper(); // driver
-<<<<<<< HEAD
-			//leftBumper(); // driver
-=======
 			// leftBumper(); // driver
 			// if (!rightBumperEngaged && !leftBumperEngaged) {
 			driveControl(); // work Driver
 			// }
->>>>>>> 2e8757eea7a8b1d1f813a5a68597fbcf3bb48a4f
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
