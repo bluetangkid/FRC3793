@@ -41,6 +41,8 @@ public class Robot extends TimedRobot {
 
 	public static long lastLightSwitch;
 	public static boolean colorState;
+	public static boolean armColl;
+	public static double lastAmp;
 
 	static RoboState state = RoboState.RobotInit;
 	static Thread t;
@@ -270,16 +272,14 @@ public class Robot extends TimedRobot {
 	}
 
 	public void avocadoTurningControl() {
-		if (invincibilityTimer > 0) {
+		if (invincibilityTimer > 0)
 			invincibilityTimer--;
-		}
 		if (Sensors.avocadoLimit.get() && controllers[OPERATOR].getRawButton(ControllerMap.Y)) {
 			isAvocadoTurning = true;
 			startTurn = true;
 		}
-		if (controllers[OPERATOR].getRawButton(ControllerMap.Y)) {
+		if (controllers[OPERATOR].getRawButton(ControllerMap.Y))
 			invincibilityTimer = 2;
-		}
 		if (startTurn && !Sensors.avocadoLimit.get())
 			startTurn = false;
 		if (Sensors.avocadoLimit.get() && !startTurn && isAvocadoTurning) {
@@ -296,15 +296,15 @@ public class Robot extends TimedRobot {
 		avocadoSlideSwitch.update(); // Operator A
 		avocadoTurningControl(); // operator Y
 	}
-	// public boolean avocadoUp(){
-	// 	return false;
-	// }
 
 	private void climbingArm() {
 		double armPivot = controllers[OPERATOR].getRawAxis(ControllerMap.leftY);
 		double armSpin = controllers[OPERATOR].getRawAxis(ControllerMap.rightY);
+		double currCurr = pdp.getCurrent(1);
 
+		if(currCurr/lastAmp < 0.3 || currCurr < 5) armColl = false;
 		if (Math.abs(armPivot) > .1) {
+			if(currCurr/lastAmp > 1.5) armColl = true;
 			Motors.armMotor.set(armPivot * Settings.PIVOT_SPEED);
 		} else {
 			Motors.armMotor.set(0);
@@ -314,6 +314,7 @@ public class Robot extends TimedRobot {
 		} else {
 			Motors.armEndMotor.set(0);
 		}
+		lastAmp = currCurr;
 	}
 
 	private void driveControl() {

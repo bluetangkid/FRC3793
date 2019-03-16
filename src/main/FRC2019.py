@@ -88,8 +88,13 @@ def tape(frame):
 				t = cv2.minAreaRect(contours[i])
 				box = cv2.boxPoints(t)
 				box = np.int0(box)
+				if box[1][0] > box[1][1]:
+					temp = box[1][0]
+					box[1][0] = box[1][1]
+					box[1][1] = temp
+					box[2] += 90
 				cv2.drawContours(frame, [box], -1, YELLOW, 3)
-				if withinTolerance(t[1][0]*t[1][1], cv2.contourArea(contours[i]), 0.2) and (abs(t[2]) < 30 or (abs(t[2]) < 80 and abs(t[2]) > 68)) and (withinTolerance(t[1][0]/t[1][1], 0.364, 0.3) or withinTolerance(t[1][1]/t[1][0], 0.364, 0.3)):
+				if withinTolerance(t[1][0]*t[1][1], cv2.contourArea(contours[i]), 0.2) and abs(t[2]) < 30 and withinTolerance(t[1][0]/t[1][1], 0.364, 0.3):
 					rectangular.append(t)
 
 			cv2.putText(frame, "LEN: " + str(len(rectangular)), (100, HEIGHT-4), FONT, 0.5, (255,100,255), 2)
