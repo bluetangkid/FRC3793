@@ -80,6 +80,7 @@ public class Robot extends TimedRobot {
 
 	static int stabilizeTimer = 0;
 	static boolean isOscillating = false;
+	static int oscillationTimer =0;
 
 	// beltstates
 	static BeltController beltController;
@@ -237,7 +238,7 @@ public class Robot extends TimedRobot {
 		}
 	}
 
-	void stabilizeLandingGear(){
+	public void stabilizeLandingGear(){
 		if(stabilizeTimer < Settings.TIMER_DELAY){ 
 			stabilizeTimer ++;
 		}
@@ -247,10 +248,19 @@ public class Robot extends TimedRobot {
 		}
 
 		if(isOscillating){
-			landingGearSwitch2.b = !landingGearSwitch2.b;
-			landingGearSwitch3.b = !landingGearSwitch3.b;
+			if(oscillationTimer < Settings.OSCILLATION_TIME){
+			oscillationTimer ++;
+			}
+			
+			if(oscillationTimer == Settings.OSCILLATION_TIME){
+				oscillationTimer = 0;
+				landingGearSwitch2.b = !landingGearSwitch2.b;
+				landingGearSwitch3.b = !landingGearSwitch3.b;
+			}
+			
 		}
 	}
+
 	public void leftBumper() {
 		if (controllers[DRIVER].getRawButton(ControllerMap.LB) && !leftBumperEngaged) {
 			leftBumperEngaged = true;
@@ -297,6 +307,18 @@ public class Robot extends TimedRobot {
 		avocadoTurningControl(); // operator Y
 	}
 
+	private void avocadoSlideControl(){
+		try {
+			if(Sensors.lidar.getDistanceIn() < Settings.LIDAR_AVOCADO_DISTANCE && Math.abs(controllers[OPERATOR].getRawAxis(ControllerMap.rightTrigger)) > .1){
+				avocadoSlideSwitch.b = true;
+			}else{
+				avocadoSlideSwitch.b = false;
+			}
+			avocadoSlideSwitch.update();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	private void climbingArm() {
 		double armPivot = controllers[OPERATOR].getRawAxis(ControllerMap.leftY);
 		double armSpin = controllers[OPERATOR].getRawAxis(ControllerMap.rightY);
