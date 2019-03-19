@@ -12,6 +12,7 @@ public interface Settings {
 	public static final float LSTICK_DEADZONE = 0.25f;
 	public static final float BUMPER_DEADZONE = 0.05f;
 	public static final int TIMER_DELAY = 15;
+	public static final int OSCILLATION_TIME = 10;
 	public static final float INCHES_TO_METERS = .0254f;
 	public static final float BLUE = .87f;
 	public static final float RED = .61f;
@@ -31,5 +32,6 @@ public interface Settings {
 	public static final float TARGET_MIN_VOLT = 8.5f;
 	public static final int LIDAR_CONFIG_REGISTER = 0; 
 	public static final int DISTNCE_REGISTER = 143;
+	public static final int LIDAR_AVOCADO_DISTANCE = 6;
 	
 }
