@@ -309,7 +309,7 @@ public class Robot extends TimedRobot {
 		} else {
 			Motors.armMotor.set(0);
 		}
-		if (Math.abs(armSpin) > .1) {
+		if (Math.abs(armSpin) > .15) {
 			Motors.armEndMotor.set(armSpin);
 		} else {
 			Motors.armEndMotor.set(0);
@@ -318,9 +318,7 @@ public class Robot extends TimedRobot {
 	}
 
 	private void driveControl() {
-
-		double dif; // THESE GO FROM -1 to 1 SO IT NEEDS TO BE FIXED, TRIGGERS ONLY ENGAGE HALF WAY
-					// IN(I THONK)
+		double dif;
 
 		double leftY = controllers[DRIVER].getRawAxis(ControllerMap.leftTrigger)
 				- controllers[DRIVER].getRawAxis(ControllerMap.rightTrigger);
@@ -344,6 +342,7 @@ public class Robot extends TimedRobot {
 			else if(controllers[DRIVER].getRawButton(ControllerMap.B)) { // Sicko mode button
 				Motors.talonLeft.enableCurrentLimit(false);
 				Motors.talonRight.enableCurrentLimit(false);
+				Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum * Settings.TURN_MULT);
 			} else {
 				Motors.talonLeft.enableCurrentLimit(true);
 				Motors.talonRight.enableCurrentLimit(true);
