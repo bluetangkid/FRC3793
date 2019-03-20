@@ -20,7 +20,7 @@ public class Sensors {
 	public static SerialPort jeVois1;
 	public static SerialPort jeVois2;
 
-	public static Ultrasonic backDist;
+	public static Ultrasonic downDist;
 
 	public static DigitalInput avocadoLimit;
 	public static DigitalInput beltLimit;

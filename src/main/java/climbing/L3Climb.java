@@ -19,7 +19,7 @@ public class L3Climb extends Action {
     }
 
     public boolean isComplete() {
-        return phase >= 5;
+        return phase >= 4;
     }
 
     public void set() {
@@ -36,7 +36,17 @@ public class L3Climb extends Action {
                 armP = new ArmPivot();
                 time = System.currentTimeMillis();
             }
-            if() phase = 2;
+            if(Sensors.lidar.getDistanceIn() > 19) phase = 2;
+        } else if(phase == 2) {
+            Motors.armEndMotor.set(-1);
+            if(Sensors.downDist.getRangeInches() < 4) {
+                armP.controller.disable();
+                phase = 3;
+            }
+        } else if(phase == 3) {
+            Motors.drive.arcadeDrive(0.6, 0);
+            Motors.armMotor.set(-1);
+            if(Sensors.lidar.getDistanceIn() < 4) phase = 4;
         }
     }
 }
