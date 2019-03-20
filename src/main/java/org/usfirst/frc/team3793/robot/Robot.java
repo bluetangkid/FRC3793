@@ -75,8 +75,8 @@ public class Robot extends TimedRobot {
 
 	static toggleSwitch hingeSwitch;
 
-	static toggleSwitch landingGearSwitch2;
-	static toggleSwitch landingGearSwitch3;
+	public static toggleSwitch landingGearSwitch2;
+	public static toggleSwitch landingGearSwitch3;
 
 	static int stabilizeTimer = 0;
 	static boolean isOscillating = false;
@@ -412,9 +412,9 @@ public class Robot extends TimedRobot {
 	}
 
 	public void grabHatch() {
-		MovementController.addAction(new AvocadoSlide(0, 0, this));
+		MovementController.addAction(new SolenoidAction(Motors.avocadoSlide));
 		MovementController.addAction(new AvocadoTurn(0, 0, this));
-		MovementController.addAction(new AvocadoSlide(0, 0, this));
+		MovementController.addAction(new SolenoidAction(Motors.avocadoSlide));
 	}
 
 	public float setColors() {

@@ -5,7 +5,7 @@ import org.usfirst.frc.team3793.robot.Robot;
 import org.usfirst.frc.team3793.robot.Motors;
 import org.usfirst.frc.team3793.robot.Sensors;
 
-public class AvocadoTurn extends MovementAction {
+public class AvocadoTurn extends MotorAction {
     Robot robot;
     boolean isAvocadoTurning = true;
     int delayTimer = 0;
@@ -20,7 +20,7 @@ public class AvocadoTurn extends MovementAction {
         return !isAvocadoTurning;
     }
 
-    public void spin() {
+    public void set() {
         // 1330 miliseconds, doesn't work
         delayTimer++;
         if (Sensors.avocadoLimit.get() && delayTimer > Settings.TIMER_DELAY)
@@ -28,10 +28,5 @@ public class AvocadoTurn extends MovementAction {
 
         if (isAvocadoTurning) Motors.avocadoMotor.set(-1);
         else Motors.avocadoMotor.set(0);
-    }
-
-    public Speed getSpeed() {
-        spin();
-        return new Speed(0, 0);
     }
 }

@@ -1,5 +1,6 @@
 package movement;
 
+import org.usfirst.frc.team3793.robot.Motors;
 import org.usfirst.frc.team3793.robot.Sensors;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
@@ -10,10 +11,10 @@ import edu.wpi.first.wpilibj.PIDOutput;
  * @author Warren Funk, Ethan Durham, Faris Prasetiawan
  *
  */
-public class Turn extends MovementAction implements PIDOutput {
+public class Turn extends DriveAction implements PIDOutput {
 	// 0.58s oscillaty
-	final static float kP = .1f;// .05
-	final static float kI = 0.00000f;// .000001
+	final static float kP = 0.1f;// .05
+	final static float kI = 0f;// .000001
 	final static float kD = 1f;// 1
 	final static float kF = 0f;
 	final static float kTolerance = 1;
@@ -25,11 +26,10 @@ public class Turn extends MovementAction implements PIDOutput {
 		System.out.println(" Initializing Turn");
 		this.degrees = Sensors.navX.getYaw() + (degrees);
 		targetDegrees = degrees;
-		if (this.degrees > 180) {
+		if (this.degrees > 180)
 			this.degrees = -180 + this.degrees % 180;
-		} else if (this.degrees < -180) {
+		else if (this.degrees < -180)
 			this.degrees = 180 - this.degrees % 180;
-		}
 
 		controller = new PIDController(kP, kI, kD, kF, Sensors.navX, this, 0.005);
 		controller.setInputRange(-180.0f, 180.0f);
@@ -41,22 +41,12 @@ public class Turn extends MovementAction implements PIDOutput {
 	}
 
 	/**
-	 * @return required {@link Speed} to turn correctly
-	 */
-	public Speed getSpeed() {
-		return PID;
-	}
-
-	/**
 	 * @return whether or not the turn is within tolerance according to the PID
 	 *         controller
 	 */
 	public boolean isComplete() {
-
-		if (onSetpoint()) {
-			framedoodad++;
-		} else
-			framedoodad = 0;
+		if (onSetpoint()) framedoodad++;
+		else framedoodad = 0;
 
 		if (framedoodad > 9) {
 			System.out.println("Turn is Complete");
@@ -67,12 +57,12 @@ public class Turn extends MovementAction implements PIDOutput {
 
 	@Override
 	public void pidWrite(double output) { //nice
-		PID = new Speed(maxSpeed * output, maxSpeed * output);
+		Motors.drive.tankDrive(maxSpeed * output, maxSpeed * output);
 	}
 
 	public boolean onSetpoint() {
 		return Sensors.navX.getYaw() > controller.getSetpoint() - 3
-				&& Sensors.navX.getYaw() < controller.getSetpoint() + 3;
+			&& Sensors.navX.getYaw() < controller.getSetpoint() + 3;
 	}
 
 	public void resetStartPos() {

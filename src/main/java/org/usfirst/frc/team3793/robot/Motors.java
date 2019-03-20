@@ -57,8 +57,8 @@ public class Motors {
 		talonRight.configPeakCurrentLimit(0);
 		talonLeft.configContinuousCurrentLimit(40);
 		talonRight.configContinuousCurrentLimit(40);
-		Motors.talonLeft.enableCurrentLimit(true);
-		Motors.talonRight.enableCurrentLimit(true);
+		talonLeft.enableCurrentLimit(true);
+		talonRight.enableCurrentLimit(true);
 		victorLeft = new WPI_VictorSPX(RobotMap.VICTOR_LEFT.getPin());
 		victorRight = new WPI_VictorSPX(RobotMap.VICTOR_RIGHT.getPin());
 		left = new SpeedControllerGroup(talonLeft, victorLeft);
