@@ -7,8 +7,8 @@ package org.usfirst.frc.team3793.robot;
  *
  */
 public interface Settings {
-	public static final double SPEED_MULT = 1.0f;
-	public static final double TURN_MULT = 0.5f;
+	public static final double SPEED_MULT = 1.0;
+	public static final double TURN_MULT = 0.65;
 	public static final float LSTICK_DEADZONE = 0.25f;
 	public static final float BUMPER_DEADZONE = 0.05f;
 	public static final int TIMER_DELAY = 15;
@@ -32,5 +32,5 @@ public interface Settings {
 	public static final float MAX_DRIVE_CURRENT = 120;//in amps, lso warren told me to do this and i am clueless
 	public static final int LIDAR_CONFIG_REGISTER = 0; 
 	public static final int DISTNCE_REGISTER = 143;
-	
+
 }

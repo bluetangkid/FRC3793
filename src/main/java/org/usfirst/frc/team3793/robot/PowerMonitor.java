@@ -10,7 +10,6 @@ public class PowerMonitor {
     static double maxCurr;
     static double maxBeltCurr;
     static double resistance;
-    static ArrayList<Double> resistances;
 
     static void init() {
         lowestVoltage = 50;
@@ -22,8 +21,7 @@ public class PowerMonitor {
         maxCompressorCurr = 10;
         maxBeltCurr = 0;
         // belt is 12 talon srx right is 2 victor srx right 3 arm is 1 talonSRX left is 14 VictorSrx left 13 Arm spin 0 Avocado is 15 for sure
-        resistance = 0;
-        resistances = new ArrayList<Double>();
+        resistance = Robot.pdp.getVoltage()/Robot.pdp.getTotalCurrent();
     }//Use current spike to increase power to arm pivot motor, NOT IMPLEMENTED
 
     static void evaluate() {
@@ -37,13 +35,6 @@ public class PowerMonitor {
         if(Robot.pdp.getCurrent(12) > maxBeltCurr) maxBeltCurr = Robot.pdp.getCurrent(12);
         if(Robot.pdp.getTotalCurrent() > maxCurr) maxCurr = Robot.pdp.getTotalCurrent();
         if(Robot.pdp.getVoltage() < lowestVoltage) lowestVoltage = Robot.pdp.getVoltage();
-        resistances.add(Robot.pdp.getVoltage()/Robot.pdp.getTotalCurrent());
-        if(resistances.size() > 5) resistances.remove(0);
-        resistance = 0;
-        for(int i = 0; i < resistances.size(); i++){
-            resistance += resistances.get(i);
-        }
-        resistance /= 5;
         if(System.currentTimeMillis() % 1500 == 0) {
             System.out.println("Max Currents");
             System.out.println("Drive: " + maxDriveCurrent);
@@ -54,5 +45,5 @@ public class PowerMonitor {
             System.out.println("Total: " + maxCurr);
             System.out.println("Resistance " + resistance);
         }
-    }
+   }
 }

@@ -70,6 +70,7 @@ public class Robot extends TimedRobot {
 	public static NetworkTableEntry avocadoState;
 	public static NetworkTableEntry hippieState;
 	public static NetworkTableEntry avoSlideState;
+	public static NetworkTableEntry LIDARDist;
 
 	static toggleSwitch hingeSwitch;
 
@@ -102,7 +103,8 @@ public class Robot extends TimedRobot {
 		avocadoState = main.add("Avocado", "Up").getEntry();
 		hippieState = main.add("Hippie", "Down").getEntry();
 		avoSlideState = main.add("Avo Slide", "In").getEntry();
-		pdp = new PowerDistributionPanel();
+		LIDARDist = main.add("LIDAR", 0).getEntry();
+		//pdp = new PowerDistributionPanel(4);
 		Motors.initialize();
 		Sensors.initialize();
 
@@ -141,7 +143,7 @@ public class Robot extends TimedRobot {
 		teleopInit();
 		state = RoboState.AutonomousInit;
 
-		PowerMonitor.init();
+		//PowerMonitor.init();
 
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
 	}
@@ -176,7 +178,8 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopPeriodic() {
-		PowerMonitor.evaluate();
+		LIDARDist.setDouble(Sensors.lidar.getDistanceIn()-6);
+		//PowerMonitor.evaluate();
 		// degreeSync();
 		// -------------------------- CONTROLLER GARBO --------------------------
 		if (singleControllerMode && Master.getRawButton(ControllerMap.leftClick)) {
@@ -278,9 +281,6 @@ public class Robot extends TimedRobot {
 		avocadoSlideSwitch.update(); // Operator A
 		avocadoTurningControl(); // operator Y
 	}
-	// public boolean avocadoUp(){
-	// 	return false;
-	// }
 
 	private void climbingArm() {
 		double armPivot = controllers[OPERATOR].getRawAxis(ControllerMap.leftY);
@@ -299,10 +299,7 @@ public class Robot extends TimedRobot {
 	}
 
 	private void driveControl() {
-
-		double dif; // THESE GO FROM -1 to 1 SO IT NEEDS TO BE FIXED, TRIGGERS ONLY ENGAGE HALF WAY
-					// IN(I THONK)
-
+		double dif;
 		double leftY = controllers[DRIVER].getRawAxis(ControllerMap.leftTrigger)
 				- controllers[DRIVER].getRawAxis(ControllerMap.rightTrigger);
 		if (Math.abs(leftY) < Settings.BUMPER_DEADZONE)
@@ -322,8 +319,10 @@ public class Robot extends TimedRobot {
 		else {
 			if (controllers[DRIVER].getRawButton(ControllerMap.Y))
 				Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum);
-			else
-				Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT * Math.max(Math.sqrt(pdp.getVoltage()) - 2.162, 1), lNum * Settings.TURN_MULT);
+			else{
+				//Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT * Math.max(Math.sqrt(pdp.getVoltage()) - 2.162, 1), lNum * Settings.TURN_MULT);
+				Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT  , lNum * Settings.TURN_MULT);
+			}
 		}
 	}
 
