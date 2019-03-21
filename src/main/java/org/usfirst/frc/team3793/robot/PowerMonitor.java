@@ -1,5 +1,4 @@
 package org.usfirst.frc.team3793.robot;
-import java.util.ArrayList;
 public class PowerMonitor {
     static double maxDriveCurrent;
     static double lowestVoltage;
@@ -10,6 +9,7 @@ public class PowerMonitor {
     static double maxCurr;
     static double maxBeltCurr;
     static double resistance;
+    static double theoreticalMax;
 
     static void init() {
         lowestVoltage = 50;
@@ -35,15 +35,21 @@ public class PowerMonitor {
         if(Robot.pdp.getCurrent(12) > maxBeltCurr) maxBeltCurr = Robot.pdp.getCurrent(12);
         if(Robot.pdp.getTotalCurrent() > maxCurr) maxCurr = Robot.pdp.getTotalCurrent();
         if(Robot.pdp.getVoltage() < lowestVoltage) lowestVoltage = Robot.pdp.getVoltage();
-        if(System.currentTimeMillis() % 1500 == 0) {
-            System.out.println("Max Currents");
-            System.out.println("Drive: " + maxDriveCurrent);
-            System.out.println("Compressor: " + maxCompressorCurr);
-            System.out.println("Arm: " + maxArmCurr);
-            System.out.println("Arm Pivot: " + maxArmPivotCurr);
-            System.out.println("Avocado: " + maxAvocadoCurr);
-            System.out.println("Total: " + maxCurr);
-            System.out.println("Resistance " + resistance);
-        }
-   }
+        // if(System.currentTimeMillis() % 1500 == 0) {
+        //     System.out.println("Max Currents");
+        //     System.out.println("Drive: " + maxDriveCurrent);
+        //     System.out.println("Compressor: " + maxCompressorCurr);
+        //     System.out.println("Arm: " + maxArmCurr);
+        //     System.out.println("Arm Pivot: " + maxArmPivotCurr);
+        //     System.out.println("Avocado: " + maxAvocadoCurr);
+        //     System.out.println("Total: " + maxCurr);
+        //     System.out.println("Resistance " + resistance);
+        // }
+        theoreticalMax = Settings.TARGET_MIN_VOLT/resistance;
+
+        double driveBudget;
+        driveBudget = theoreticalMax - (Robot.pdp.getTotalCurrent() - driveCurrent);
+        Motors.talonLeft.configContinuousCurrentLimit((int)(driveBudget/4f));
+        Motors.talonRight.configContinuousCurrentLimit((int)(driveBudget/4f));
+    }
 }

@@ -76,7 +76,7 @@ def ball(frame):
 
 def tape(frame):
 	#BGR Filter values, VALUES are bgr, NOT RGB
-	gamerImage = prepImage(frame.copy(), [240, 240, 20], [255, 255, 200])
+	gamerImage = prepImage(frame.copy(), [160, 230, 0], [255, 255, 60])
 		
 	#draw contours to another copy
 	fcopy = gamerImage.copy()
@@ -86,13 +86,18 @@ def tape(frame):
 			rectangular = [] # A rectangle is ((x, y), (width, height), angle)
 			for i in range(len(contours)):
 				t = cv2.minAreaRect(contours[i])
-				if t[2] > 90:
-					t[2] -= 180
-				if withinTolerance(t[1][0]*t[1][1], cv2.contourArea(t), 0.2) and abs(t[2]) < 30 and withinTolerance(t[1][0]/t[1][1], 0.364, 0.3):
+				box = cv2.boxPoints(t)
+				box = np.int0(box)
+				if box[1][0] > box[1][1]:
+					temp = box[1][0]
+					box[1][0] = box[1][1]
+					box[1][1] = temp
+					box[2] += 90
+				cv2.drawContours(frame, [box], -1, YELLOW, 3)
+				if withinTolerance(t[1][0]*t[1][1], cv2.contourArea(contours[i]), 0.2) and abs(t[2]) < 30 and withinTolerance(t[1][0]/t[1][1], 0.364, 0.3):
 					rectangular.append(t)
-			jevois.sendSerial("Recctang" + str(rectangular))
 
-			sorted(rectangular, key=xPos, reverse=True)
+			cv2.putText(frame, "LEN: " + str(len(rectangular)), (100, HEIGHT-4), FONT, 0.5, (255,100,255), 2)
 
 			if len(rectangular) == 2:
 				targetCoordinateTape = (rectangular[0][0][0] + rectangular[1][0][0]) / 2
@@ -118,8 +123,6 @@ def tape(frame):
 				targetAngleTape = (targetCoordinateTape*DPP) - VIEW_ANGLE/2
 				#jevois.sendSerial("T" + str(targetAngleTape) + ",")
 				jevois.sendSerial(str(targetAngleTape))
-
-				return contours
 		except Exception as E:
 			jevois.sendSerial(str(E))
 
@@ -139,8 +142,7 @@ class FRC2019:
 		# Capture frame-by-frame
 		frame = inframe.getCvBGR()
 
-		tapeContours = tape(frame)
-		cv2.drawContours(frame, tapeContours, -1, GREEN, 3)
+		tape(frame)
 
 		cv2.putText(frame, "FPS: " + str(int(frameRate)), (0, HEIGHT-4), FONT, 0.5, (255,255,255), 2)
 		outframe.sendCv(frame)

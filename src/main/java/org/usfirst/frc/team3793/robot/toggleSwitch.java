@@ -24,7 +24,7 @@ public class toggleSwitch {
     Object obj;
     Method method;
 
-    boolean b = false;
+    public boolean b = false;
 
     int timer = 0;
 

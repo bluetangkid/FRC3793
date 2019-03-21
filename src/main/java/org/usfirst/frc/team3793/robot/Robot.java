@@ -41,6 +41,8 @@ public class Robot extends TimedRobot {
 
 	public static long lastLightSwitch;
 	public static boolean colorState;
+	public static boolean armColl;
+	public static double lastAmp;
 
 	static RoboState state = RoboState.RobotInit;
 	static Thread t;
@@ -74,8 +76,12 @@ public class Robot extends TimedRobot {
 
 	static toggleSwitch hingeSwitch;
 
-	static toggleSwitch landingGearSwitch2;
-	static toggleSwitch landingGearSwitch3;
+	public static toggleSwitch landingGearSwitch2;
+	public static toggleSwitch landingGearSwitch3;
+
+	static int stabilizeTimer = 0;
+	static boolean isOscillating = false;
+	static int oscillationTimer =0;
 
 	// beltstates
 	static BeltController beltController;
@@ -219,6 +225,7 @@ public class Robot extends TimedRobot {
 			}
 			landingGearSwitch2.update();
 			landingGearSwitch3.update();
+			stabilizeLandingGear();
 			// rightBumper(); // driver
 			// leftBumper(); // driver
 			// if (!rightBumperEngaged && !leftBumperEngaged) {
@@ -231,6 +238,29 @@ public class Robot extends TimedRobot {
 			Motors.blinkin2019.set(setColors());
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	public void stabilizeLandingGear(){
+		if(stabilizeTimer < Settings.TIMER_DELAY){ 
+			stabilizeTimer ++;
+		}
+		if(controllers[OPERATOR].getRawButton(ControllerMap.LB) && stabilizeTimer == Settings.TIMER_DELAY){
+			stabilizeTimer = 0;
+		isOscillating = !isOscillating;
+		}
+
+		if(isOscillating){
+			if(oscillationTimer < Settings.OSCILLATION_TIME){
+			oscillationTimer ++;
+			}
+			
+			if(oscillationTimer == Settings.OSCILLATION_TIME){
+				oscillationTimer = 0;
+				landingGearSwitch2.b = !landingGearSwitch2.b;
+				landingGearSwitch3.b = !landingGearSwitch3.b;
+			}
+			
 		}
 	}
 
@@ -255,16 +285,14 @@ public class Robot extends TimedRobot {
 	}
 
 	public void avocadoTurningControl() {
-		if (invincibilityTimer > 0) {
+		if (invincibilityTimer > 0)
 			invincibilityTimer--;
-		}
 		if (Sensors.avocadoLimit.get() && controllers[OPERATOR].getRawButton(ControllerMap.Y)) {
 			isAvocadoTurning = true;
 			startTurn = true;
 		}
-		if (controllers[OPERATOR].getRawButton(ControllerMap.Y)) {
+		if (controllers[OPERATOR].getRawButton(ControllerMap.Y))
 			invincibilityTimer = 2;
-		}
 		if (startTurn && !Sensors.avocadoLimit.get())
 			startTurn = false;
 		if (Sensors.avocadoLimit.get() && !startTurn && isAvocadoTurning) {
@@ -282,20 +310,36 @@ public class Robot extends TimedRobot {
 		avocadoTurningControl(); // operator Y
 	}
 
+	private void avocadoSlideControl(){
+		try {
+			if(Sensors.lidar.getDistanceIn() < Settings.LIDAR_AVOCADO_DISTANCE && Math.abs(controllers[OPERATOR].getRawAxis(ControllerMap.rightTrigger)) > .1){
+				avocadoSlideSwitch.b = true;
+			}else{
+				avocadoSlideSwitch.b = false;
+			}
+			avocadoSlideSwitch.update();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	private void climbingArm() {
 		double armPivot = controllers[OPERATOR].getRawAxis(ControllerMap.leftY);
 		double armSpin = controllers[OPERATOR].getRawAxis(ControllerMap.rightY);
+		double currCurr = pdp.getCurrent(1);
 
+		if(currCurr/lastAmp < 0.3 || currCurr < 5) armColl = false;
 		if (Math.abs(armPivot) > .1) {
+			if(currCurr/lastAmp > 1.5) armColl = true;
 			Motors.armMotor.set(armPivot * Settings.PIVOT_SPEED);
 		} else {
 			Motors.armMotor.set(0);
 		}
-		if (Math.abs(armSpin) > .1) {
+		if (Math.abs(armSpin) > .15) {
 			Motors.armEndMotor.set(armSpin);
 		} else {
 			Motors.armEndMotor.set(0);
 		}
+		lastAmp = currCurr;
 	}
 
 	private void driveControl() {
@@ -314,14 +358,19 @@ public class Robot extends TimedRobot {
 		else
 			lNum = 0;
 
-		if (lNum == 0 && dif == 0 && Motors.talonLeft.getSelectedSensorVelocity(0) > 100)
+		if (lNum == 0 && dif == 0)
 			Motors.drive.arcadeDrive(0, 0);
 		else {
-			if (controllers[DRIVER].getRawButton(ControllerMap.Y))
+			if (controllers[DRIVER].getRawButton(ControllerMap.A))
 				Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum);
-			else{
-				//Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT * Math.max(Math.sqrt(pdp.getVoltage()) - 2.162, 1), lNum * Settings.TURN_MULT);
-				Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT  , lNum * Settings.TURN_MULT);
+			else if(controllers[DRIVER].getRawButton(ControllerMap.B)) { // Sicko mode button
+				Motors.talonLeft.enableCurrentLimit(false);
+				Motors.talonRight.enableCurrentLimit(false);
+				Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum * Settings.TURN_MULT);
+			} else {
+				Motors.talonLeft.enableCurrentLimit(true);
+				Motors.talonRight.enableCurrentLimit(true);
+				Motors.drive.arcadeDrive(-dif * Settings.SPEED_MULT, lNum * Settings.TURN_MULT);
 			}
 		}
 	}
@@ -365,9 +414,9 @@ public class Robot extends TimedRobot {
 	}
 
 	public void grabHatch() {
-		MovementController.addAction(new AvocadoSlide(0, 0, this));
+		MovementController.addAction(new SolenoidAction(Motors.avocadoSlide));
 		MovementController.addAction(new AvocadoTurn(0, 0, this));
-		MovementController.addAction(new AvocadoSlide(0, 0, this));
+		MovementController.addAction(new SolenoidAction(Motors.avocadoSlide));
 	}
 
 	public float setColors() {

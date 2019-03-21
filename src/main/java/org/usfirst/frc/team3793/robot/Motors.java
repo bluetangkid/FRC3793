@@ -53,12 +53,17 @@ public class Motors {
 
 		talonLeft = new WPI_TalonSRX(RobotMap.TALON_LEFT.getPin());
 		talonRight = new WPI_TalonSRX(RobotMap.TALON_RIGHT.getPin());
+		talonLeft.configPeakCurrentLimit(0);
+		talonRight.configPeakCurrentLimit(0);
+		talonLeft.configContinuousCurrentLimit(40);
+		talonRight.configContinuousCurrentLimit(40);
+		talonLeft.enableCurrentLimit(true);
+		talonRight.enableCurrentLimit(true);
 		victorLeft = new WPI_VictorSPX(RobotMap.VICTOR_LEFT.getPin());
 		victorRight = new WPI_VictorSPX(RobotMap.VICTOR_RIGHT.getPin());
 		left = new SpeedControllerGroup(talonLeft, victorLeft);
 		right = new SpeedControllerGroup(talonRight, victorRight);
 		drive = new DifferentialDrive(left, right);
-		drive.setSafetyEnabled(false);
 		drive.setDeadband(0);
 
 		armEndMotor = new WPI_VictorSPX(RobotMap.END_ARM_MOTOR.getPin());
@@ -68,7 +73,6 @@ public class Motors {
 		// blinkin = new Spark(RobotMap.BLINKIN.getPin());
 
 		armMotor = new Spark(RobotMap.ARM_MOTOR.getPin());
-		// nice
 		avocadoMotor = new Talon(RobotMap.AVACADO_MOTOR.getPin());
 
 		beltMotor = new Spark(RobotMap.BELT_MOTOR.getPin());

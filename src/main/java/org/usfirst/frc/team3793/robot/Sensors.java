@@ -2,14 +2,10 @@ package org.usfirst.frc.team3793.robot;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Ultrasonic;
-import edu.wpi.first.wpilibj.SerialPort.Port;
-import edu.wpi.cscore.UsbCamera;
-import edu.wpi.cscore.MjpegServer;
 
 /**
  * Similar to {@link Motors}, this class stores all of the sensors to make them
@@ -24,10 +20,7 @@ public class Sensors {
 	public static SerialPort jeVois1;
 	public static SerialPort jeVois2;
 
-	public static Ultrasonic backDist;
-
-	public static UsbCamera visionCam;
-	public static MjpegServer camServer;
+	public static Ultrasonic downDist;
 
 	public static DigitalInput avocadoLimit;
 	public static DigitalInput beltLimit;

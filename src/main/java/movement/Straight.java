@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
  * 
  * @author Warren Funk and Ethan Durham
  */
-public class Straight extends MovementAction implements PIDOutput {
+public class Straight extends DriveAction implements PIDOutput {
 	float distance;
 	double xPos;
 	double yPos;
@@ -44,11 +44,8 @@ public class Straight extends MovementAction implements PIDOutput {
 	/**
 	 * @return {@link Speed} required to go in a straight line
 	 */
-	public Speed getSpeed() {
-		if (distance - distTraveled() < 0.8 && speedMult >.5) {
-			speedMult -= .05;
-		}
-		return PID;
+	public void setSpeed() {
+		
 	}
 
 	/**
@@ -65,6 +62,7 @@ public class Straight extends MovementAction implements PIDOutput {
 	public boolean isComplete() {
 		if (distTraveled() >= distance) {
 			System.out.println(" Straight Complete");
+			controller.disable();
 			MovementController.addAction(new Turn(degrees - Sensors.navX.getYaw(), 0.8f));
 		}
 		return distTraveled() >= distance;
@@ -75,7 +73,7 @@ public class Straight extends MovementAction implements PIDOutput {
 		xPos += Motors.talonRight.getSelectedSensorVelocity(0) * (System.currentTimeMillis() - time) * (1d/1000d);
 		yPos += Motors.talonLeft.getSelectedSensorVelocity(0) * (System.currentTimeMillis() - time) * (1d/1000d);
 		time = System.currentTimeMillis();
-		PID = new Speed(maxSpeed * output * speedMult, -maxSpeed * (1/output) * speedMult);
+		Motors.drive.tankDrive(maxSpeed * output * speedMult, -maxSpeed * (1/output) * speedMult);
 	}
 	public void resetStartPos(){
 		super.resetStartPos();
