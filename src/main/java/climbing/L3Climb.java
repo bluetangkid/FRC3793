@@ -11,7 +11,6 @@ public class L3Climb extends Action {
     Straight straight;
     ArmPivot armP;
     boolean s;
-    long time;
 
     public L3Climb() {
         super();
@@ -34,7 +33,6 @@ public class L3Climb extends Action {
                 Robot.landingGearSwitch2.b = true;
                 Robot.landingGearSwitch3.b = false;
                 armP = new ArmPivot();
-                time = System.currentTimeMillis();
             }
             if(Sensors.lidar.getDistanceIn() > 19) phase = 2;
         } else if(phase == 2) {

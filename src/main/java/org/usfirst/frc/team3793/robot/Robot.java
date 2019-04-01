@@ -111,8 +111,16 @@ public class Robot extends TimedRobot {
 		avoSlideState = main.add("Avo Slide", "In").getEntry();
 		LIDARDist = main.add("LIDAR", 0).getEntry();
 		//pdp = new PowerDistributionPanel(4);
+		try{
 		Motors.initialize();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		try{
 		Sensors.initialize();
+		} catch(Exception e){
+			e.printStackTrace();
+		}
 
 		controllers[DRIVER] = driverController;
 		controllers[OPERATOR] = operatorController;
@@ -156,8 +164,10 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		teleopPeriodic();
+		//teleopPeriodic();
 		state = RoboState.Autonomous;
+		moveToHatch();
+
 	}
 
 	@Override
@@ -180,6 +190,8 @@ public class Robot extends TimedRobot {
 		landingGearSwitch2.b = false;
 		landingGearSwitch3.b = true;
 		state = RoboState.TeleopInit;
+		//hingeSwitch.b = true;
+		//avocadoSlideSwitch.b = true;
 	}
 
 	@Override
@@ -213,10 +225,11 @@ public class Robot extends TimedRobot {
 
 		// ---------------------------- ARCADE DRIVE ----------------------------
 		try {
+			driveControl();
 			avocadoControl(); // both work operator
+			hingeSwitch.update();// opperator Y button
 			climbingArm(); // operator RIGHT STICK
 			beltController.update(); // operator X - UP AND B - DOWN Button
-			hingeSwitch.update();// opperator Y button
 			if (controllers[OPERATOR].getRawButton(ControllerMap.start)) {
 				landingGearSwitch2.b = false;
 			}
@@ -225,11 +238,11 @@ public class Robot extends TimedRobot {
 			}
 			landingGearSwitch2.update();
 			landingGearSwitch3.update();
-			stabilizeLandingGear();
+			//stabilizeLandingGear();
 			// rightBumper(); // driver
 			// leftBumper(); // driver
 			// if (!rightBumperEngaged && !leftBumperEngaged) {
-			driveControl(); // work Driver
+			//driveControl(); // work Driver
 			// }
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -238,6 +251,8 @@ public class Robot extends TimedRobot {
 			Motors.blinkin2019.set(setColors());
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		if(controllers[DRIVER].getRawButton(ControllerMap.LB)){
 		}
 	}
 
@@ -375,26 +390,13 @@ public class Robot extends TimedRobot {
 		}
 	}
 
-	public void degreeSync() {
-		String[] info = null;
-		try {
-			info = Sensors.jeVois1.readString().split(",");
-			for (int i = 0; i < info.length; i++) {
-				String temp = info[i];
-				if (temp.length() > 1) {
-					System.out.println(temp);
-					degToTape = Float.parseFloat(temp);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	public void moveToHatch() {
-		// float angle = degToTape;
-		// MovementController.addAction((new Turn(180 - angle, .8f)));
-		// double distance = 2;// (double) Sensors.backDist.getRangeInches() *
+		if(!hasDone){
+			hasDone = true;
+		 float angle = degToTape;
+		 MovementController.addAction((new Turn(angle, .8f)));
+		}
+		 // double distance = 2;// (double) Sensors.backDist.getRangeInches() *
 		// INCHES_TO_METERS;
 		// if (angle > 0) {
 		// MovementController.addAction((new Turn(90 - angle, .8f)));

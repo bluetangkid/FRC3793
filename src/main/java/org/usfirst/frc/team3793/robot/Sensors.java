@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Ultrasonic;
+import util.*;
 
 /**
  * Similar to {@link Motors}, this class stores all of the sensors to make them
@@ -29,12 +30,11 @@ public class Sensors {
 	public static Lidar lidar;
 
 	public static void initialize() {
+		new JeVois().start();
 		vacuumPivotSwitch = new DigitalInput(4);
-		System.out.println(SerialPort.Port.values());
 
 		avocadoLimit = new DigitalInput(RobotMap.AVOCADO_LIMIT_SWITCH.getPin());
 		// beltLimit = new DigitalInput(RobotMap.BELT_LIMIT.getPin());
-		// jeVois1 = new SerialPort(115200, SerialPort.Port.kUSB);
 		lidar = new Lidar();
 		lidar.start();
 		navX = new AHRS(SPI.Port.kMXP);
