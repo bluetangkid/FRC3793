@@ -30,8 +30,8 @@ public class L3Climb extends Action {
             }
         } else if(phase == 1){
             if(s) {
-                Robot.landingGearSwitch2.b = true;
-                Robot.landingGearSwitch3.b = false;
+                Robot.landingGearSwitchExtend.b = true;
+                Robot.landingGearSwitchRetract.b = false;
                 armP = new ArmPivot();
             }
             if(Sensors.lidar.getDistanceIn() > 19) phase = 2;

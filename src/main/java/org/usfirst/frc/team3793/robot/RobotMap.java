@@ -25,11 +25,13 @@ public enum RobotMap {
 	AVACADO_MOTOR(7), // 6
 	AVACADO_SLIDE(0), 
 	AVOCADO_LIMIT_SWITCH(8), 
+	
 	//avocado up sensor returns true if the avocado is up
 	AVOCADO_LIDAR(98), // TBD
+	
 	// BELT - succ up ball
 	BELT_MOTOR(9), // 7
-	// BELT_LIMIT(9),
+	
 	// BLINKIN - lights
 	BLINKIN(6), // 9
 
@@ -37,8 +39,9 @@ public enum RobotMap {
 	COMPRESSOR(0),
 
 	// LANDING GEAR - used to lift up back end of robot to climb
-	LANDING_GEAR2(2),
-	LANDING_GEAR3(3),
+	LANDING_GEAR_EXTEND(2),
+	LANDING_GEAR_RETRACT(3),
+	LANDING_GEAR_STOP(4),
 
 	// HIPPY - used to change the height of the output of ball.
 	HINGE(1),

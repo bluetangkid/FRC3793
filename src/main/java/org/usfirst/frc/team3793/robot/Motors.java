@@ -41,8 +41,9 @@ public class Motors {
 
 	public static Compressor compressor;
 	public static Solenoid avocadoSlide;
-	public static Solenoid landingGear2;
-	public static Solenoid landingGear3;
+	public static Solenoid landingGearExtend;
+	public static Solenoid landingGearRetract;
+	public static Solenoid landingGearStop;
 	public static Solenoid hinge;
 
 	/**
@@ -83,8 +84,9 @@ public class Motors {
 		}
 		compressor = new Compressor(RobotMap.COMPRESSOR.getPin());
 		avocadoSlide = new Solenoid(RobotMap.AVACADO_SLIDE.getPin());
-		landingGear2 = new Solenoid(RobotMap.LANDING_GEAR2.getPin());
-		landingGear3 = new Solenoid(RobotMap.LANDING_GEAR3.getPin());
+		landingGearExtend = new Solenoid(RobotMap.LANDING_GEAR_EXTEND.getPin());
+		landingGearRetract = new Solenoid(RobotMap.LANDING_GEAR_RETRACT.getPin());
+		landingGearStop = new Solenoid(RobotMap.LANDING_GEAR_STOP.getPin());
 		hinge = new Solenoid(RobotMap.HINGE.getPin());
 
 		Motors.victorRight.follow(Motors.talonRight);
