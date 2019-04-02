@@ -19,12 +19,12 @@ import edu.wpi.first.wpilibj.GenericHID;
  */
 public class toggleSwitch {
 
-    GenericHID controller;
-    int buttonNum;
-    Object obj;
-    Method method;
+    private GenericHID controller;
+    private int buttonNum;
+    private Object obj;
+    private Method method;
 
-    public boolean b = false;
+    private boolean b = false;
 
     int timer = 0;
 
@@ -37,27 +37,29 @@ public class toggleSwitch {
         this.method = method;
     }
 
-    void update() {
+    void buttonUpdate() {
         timer++;
 
         if(timer >= TIMER_DELAY && controller.getRawButton(buttonNum)){
             timer = 0;
             b = !b;
         }
-        try {
-            method.invoke(obj, b);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        reflect();
     }
+
     public void reflect(){
-        b = !b;
         try {
             method.invoke(obj, b);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    public void setB(boolean x){
+        b = x;
+    }
+
+    
     public boolean getB(){
         return b;
     }

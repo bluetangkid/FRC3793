@@ -76,6 +76,8 @@ public class Robot extends TimedRobot {
 
 	static toggleSwitch hingeSwitch;
 
+	public static landingGearController landingGearControl;
+
 	public static toggleSwitch landingGearSwitchExtend;
 	public static toggleSwitch landingGearSwitchRetract;
 	public static toggleSwitch landingGearSwitchStop;
@@ -111,15 +113,15 @@ public class Robot extends TimedRobot {
 		hippieState = main.add("Hippie", "Down").getEntry();
 		avoSlideState = main.add("Avo Slide", "In").getEntry();
 		LIDARDist = main.add("LIDAR", 0).getEntry();
-		//pdp = new PowerDistributionPanel(4);
-		try{
-		Motors.initialize();
-		} catch(Exception e) {
+		// pdp = new PowerDistributionPanel(4);
+		try {
+			Motors.initialize();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		try{
-		Sensors.initialize();
-		} catch(Exception e){
+		try {
+			Sensors.initialize();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -165,7 +167,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		//teleopPeriodic();
+		// teleopPeriodic();
 		state = RoboState.Autonomous;
 		moveToHatch();
 
@@ -186,15 +188,17 @@ public class Robot extends TimedRobot {
 					Motors.landingGearRetract, Solenoid.class.getMethod("set", boolean.class));
 			landingGearSwitchStop = new toggleSwitch(controllers[OPERATOR], ControllerMap.LB, Motors.landingGearStop,
 					Solenoid.class.getMethod("set", boolean.class));
+			landingGearControl = new landingGearController(controllers[OPERATOR], ControllerMap.back,
+					ControllerMap.start, landingGearSwitchExtend, landingGearSwitchRetract, landingGearSwitchStop);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		landingGearSwitchExtend.b = false;
-		landingGearSwitchRetract.b = true;
+		landingGearSwitchExtend.setB(false);
+		landingGearSwitchRetract.setB(true);
+		hingeSwitch.setB(true);
+		avocadoSlideSwitch.setB(true);
 		state = RoboState.TeleopInit;
-		//hingeSwitch.b = true;
-		//avocadoSlideSwitch.b = true;
 	}
 
 	@Override
@@ -228,31 +232,17 @@ public class Robot extends TimedRobot {
 
 		// ---------------------------- ARCADE DRIVE ----------------------------
 		try {
+			landingGearControl();
 			driveControl();
 			avocadoControl(); // both work operator
-			hingeSwitch.update();// opperator Y button
+			hingeSwitch.buttonUpdate();// opperator Y button
 			climbingArm(); // operator RIGHT STICK
 			beltController.update(); // operator X - UP AND B - DOWN Button
-			if (controllers[OPERATOR].getRawButton(ControllerMap.start)) {
-				landingGearSwitchExtend.b = false;
-			}
-			if (controllers[OPERATOR].getRawButton(ControllerMap.back)) {
-				landingGearSwitchRetract.b = false;
-			}
-			landingGearSwitchExtend.update();
-			landingGearSwitchRetract.update();
-			landingGearSwitchStop.update();
-			avocadoControl(); // both work operator
-			climbingArm(); // operator RIGHT STICK
-			beltController.update(); // operator X - UP AND B - DOWN Button
-			hingeSwitch.update();// opperator Y button
-			
-			
-			stabilizeLandingGear();
+
 			// rightBumper(); // driver
 			// leftBumper(); // driver
 			// if (!rightBumperEngaged && !leftBumperEngaged) {
-			//driveControl(); // work Driver
+			// driveControl(); // work Driver
 			// }
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -262,31 +252,22 @@ public class Robot extends TimedRobot {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if(controllers[DRIVER].getRawButton(ControllerMap.LB)){
+		if (controllers[DRIVER].getRawButton(ControllerMap.LB)) {
 		}
 	}
 
-	public void stabilizeLandingGear() {
-		if (stabilizeTimer < Settings.TIMER_DELAY) {
-			stabilizeTimer++;
-		}
-		if (controllers[OPERATOR].getRawButton(ControllerMap.LB) && stabilizeTimer == Settings.TIMER_DELAY) {
-			stabilizeTimer = 0;
-			isOscillating = !isOscillating;
-		}
+	public void landingGearControl() {
 
-		if (isOscillating) {
-			if (oscillationTimer < Settings.OSCILLATION_TIME) {
-				oscillationTimer++;
-			}
-
-			if (oscillationTimer == Settings.OSCILLATION_TIME) {
-				oscillationTimer = 0;
-				landingGearSwitchExtend.b = !landingGearSwitchExtend.b;
-				landingGearSwitchRetract.b = !landingGearSwitchRetract.b;
-			}
-
-		}
+		landingGearControl.update();
+		// if (controllers[OPERATOR].getRawButton(ControllerMap.start)) {
+		// 	// landingGearSwitchExtend.b = false;
+		// }
+		// if (controllers[OPERATOR].getRawButton(ControllerMap.back)) {
+		// 	// landingGearSwitchRetract.b = false;
+		// }
+		// landingGearSwitchExtend.buttonUpdate();
+		// landingGearSwitchRetract.buttonUpdate();
+		// landingGearSwitchStop.buttonUpdate();
 	}
 
 	public void leftBumper() {
@@ -331,7 +312,7 @@ public class Robot extends TimedRobot {
 	}
 
 	private void avocadoControl() {
-		avocadoSlideSwitch.update(); // Operator A
+		avocadoSlideSwitch.buttonUpdate(); // Operator A
 		avocadoTurningControl(); // operator Y
 	}
 
@@ -339,11 +320,11 @@ public class Robot extends TimedRobot {
 		try {
 			if (Sensors.lidar.getDistanceIn() < Settings.LIDAR_AVOCADO_DISTANCE
 					&& Math.abs(controllers[OPERATOR].getRawAxis(ControllerMap.rightTrigger)) > .1) {
-				avocadoSlideSwitch.b = true;
+				// avocadoSlideSwitch.b = true;
 			} else {
-				avocadoSlideSwitch.b = false;
+				// avocadoSlideSwitch.b = false;
 			}
-			avocadoSlideSwitch.update();
+			avocadoSlideSwitch.buttonUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -405,12 +386,12 @@ public class Robot extends TimedRobot {
 	}
 
 	public void moveToHatch() {
-		if(!hasDone){
+		if (!hasDone) {
 			hasDone = true;
-		 float angle = degToTape;
-		 MovementController.addAction((new Turn(angle, .8f)));
+			float angle = degToTape;
+			MovementController.addAction((new Turn(angle, .8f)));
 		}
-		 // double distance = 2;// (double) Sensors.backDist.getRangeInches() *
+		// double distance = 2;// (double) Sensors.backDist.getRangeInches() *
 		// INCHES_TO_METERS;
 		// if (angle > 0) {
 		// MovementController.addAction((new Turn(90 - angle, .8f)));
