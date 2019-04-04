@@ -260,16 +260,16 @@ public class Robot extends TimedRobot {
 
 	public void landingGearControl() {
 
-		landingGearControl.update();
-		// if (controllers[OPERATOR].getRawButton(ControllerMap.start)) {
-		// 	// landingGearSwitchExtend.b = false;
-		// }
-		// if (controllers[OPERATOR].getRawButton(ControllerMap.back)) {
-		// 	// landingGearSwitchRetract.b = false;
-		// }
-		// landingGearSwitchExtend.buttonUpdate();
-		// landingGearSwitchRetract.buttonUpdate();
-		// landingGearSwitchStop.buttonUpdate();
+		//landingGearControl.update();
+		if (landingGearSwitchRetract.buttonPressed()) {
+			landingGearSwitchExtend.setB(false);
+		}
+		if (landingGearSwitchExtend.buttonPressed()) {
+			landingGearSwitchRetract.setB(false);
+		}
+		landingGearSwitchExtend.buttonUpdate();
+		landingGearSwitchRetract.buttonUpdate();
+		landingGearSwitchStop.buttonUpdate();
 	}
 
 	public void leftBumper() {
