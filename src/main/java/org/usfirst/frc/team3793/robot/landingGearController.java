@@ -39,39 +39,39 @@ public class landingGearController {
     void update(){
         boolean extendPressed = controller.getRawButton(extendButton);
         boolean retractPressed = controller.getRawButton(retractButton);
-        if(timer<Settings.TIMER_DELAY){
-            timer ++;
-        }
+    //     if(timer<Settings.TIMER_DELAY){
+    //         timer ++;
+    //     }
 
-        if(timer == Settings.TIMER_DELAY){
+    //     if(timer == Settings.TIMER_DELAY){
             
-            if(extendPressed){
-                timer =0;
+    //         if(extendPressed){
+    //             timer =0;
 
-                if(!extend.getB()){
-                    extend.setB(true);
-                    retract.setB(false);
-                    System.out.println("xxxxx");
-                    //stop.setB(false);
-                }else if(extend.getB() && !stop.getB()){
-                    //extend.setB(true);
-                    //retract.setB(false);
-                    //stop.setB(true);
-                }
+    //             if(!extend.getB()){
+    //                 extend.setB(true);
+    //                 retract.setB(false);
+    //                 System.out.println("xxxxx");
+    //                 //stop.setB(false);
+    //             }else if(extend.getB() && !stop.getB()){
+    //                 //extend.setB(true);
+    //                 //retract.setB(false);
+    //                 //stop.setB(true);
+    //             }
                 
-            }
+    //         }
 
-            if(retractPressed){
-                timer =0;
-                extend.setB(false);
-                //stop.setB(false);
-                retract.setB(true);
-                System.out.println("yuyyyyyyyy");
-            }
-        }
+    //         if(retractPressed){
+    //             timer =0;
+    //             extend.setB(false);
+    //             //stop.setB(false);
+    //             retract.setB(true);
+    //             System.out.println("yuyyyyyyyy");
+    //         }
+    //     }
         
-        extend.reflect();
-        retract.reflect();
-        //stop.reflect();
-    }
+    //     extend.reflect();
+    //     retract.reflect();
+    //     //stop.reflect();
+     }
 }
