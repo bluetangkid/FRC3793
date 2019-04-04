@@ -29,6 +29,10 @@ public class toggleSwitch {
     int timer = 0;
 
     final int TIMER_DELAY = 15;
+    toggleSwitch(GenericHID controller, int buttonNum){
+        this.buttonNum = buttonNum;
+        this.controller = controller;
+    }
 
     toggleSwitch(GenericHID controller, int buttonNum, Object obj, Method method) {
         this.buttonNum = buttonNum;
@@ -38,13 +42,17 @@ public class toggleSwitch {
     }
 
     void buttonUpdate() {
+        button();
+        reflect();
+    }
+
+    public void button(){
         timer++;
 
         if(timer >= TIMER_DELAY && controller.getRawButton(buttonNum)){
             timer = 0;
             b = !b;
         }
-        reflect();
     }
 
     public void reflect(){

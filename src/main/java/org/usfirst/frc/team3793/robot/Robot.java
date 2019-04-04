@@ -68,6 +68,8 @@ public class Robot extends TimedRobot {
 	// nice
 	public static toggleSwitch avocadoSlideSwitch;
 
+	public static toggleSwitch avocadoRotationSwitch;
+
 	public static ShuffleboardTab main;
 	public static NetworkTableEntry avocadoState;
 	public static NetworkTableEntry hippieState;
@@ -180,6 +182,7 @@ public class Robot extends TimedRobot {
 		beltController = new BeltController(controllers[OPERATOR], Motors.beltMotor, ControllerMap.X, ControllerMap.B);
 
 		try {
+			avocadoRotationSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.Y);
 			landingGearSwitchExtend = new toggleSwitch(controllers[OPERATOR], ControllerMap.back,
 					Motors.landingGearExtend, Solenoid.class.getMethod("set", boolean.class));
 			landingGearSwitchRetract = new toggleSwitch(controllers[OPERATOR], ControllerMap.start,
@@ -293,24 +296,31 @@ public class Robot extends TimedRobot {
 	}
 
 	public void avocadoTurningControl() {
-		if (invincibilityTimer > 0)
-			invincibilityTimer--;
-		if (Sensors.avocadoLimit.get() && controllers[OPERATOR].getRawButton(ControllerMap.Y)) {
-			isAvocadoTurning = true;
-			startTurn = true;
-		}
-		if (controllers[OPERATOR].getRawButton(ControllerMap.Y))
-			invincibilityTimer = 2;
-		if (startTurn && !Sensors.avocadoLimit.get())
-			startTurn = false;
-		if (Sensors.avocadoLimit.get() && !startTurn && isAvocadoTurning) {
-			avocadoUp = !avocadoUp;
-			isAvocadoTurning = false;
-		}
-		if (isAvocadoTurning || invincibilityTimer != 0)
-			Motors.avocadoMotor.set(-1);
-		else
-			Motors.avocadoMotor.set(0);
+		avocadoRotationSwitch.button();
+		int set = (avocadoRotationSwitch.getB()) ? 1:0;
+		set = set*2 -1;
+
+		Motors.avocadoMotor.set(set);
+		// if (invincibilityTimer > 0)
+		// 	invincibilityTimer--;
+		// if (Sensors.avocadoLimit.get() && controllers[OPERATOR].getRawButton(ControllerMap.Y)) {
+		// 	isAvocadoTurning = true;
+		// 	startTurn = true;
+		// }
+		// if (controllers[OPERATOR].getRawButton(ControllerMap.Y))
+		// 	invincibilityTimer = 2;
+		// if (startTurn && !Sensors.avocadoLimit.get())
+		// 	startTurn = false;
+		// if (Sensors.avocadoLimit.get() && !startTurn && isAvocadoTurning) {
+		// 	avocadoUp = !avocadoUp;
+		// 	isAvocadoTurning = false;
+		// }
+		// if (isAvocadoTurning || invincibilityTimer != 0)
+		// 	Motors.avocadoMotor.set(-1);
+		// else
+		// 	Motors.avocadoMotor.set(0);
+
+		
 	}
 
 	private void avocadoControl() {
