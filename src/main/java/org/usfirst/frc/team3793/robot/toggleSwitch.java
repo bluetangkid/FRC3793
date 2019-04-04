@@ -63,4 +63,8 @@ public class toggleSwitch {
     public boolean getB(){
         return b;
     }
+
+    public boolean buttonPressed(){
+        return controller.getRawButton(buttonNum);
+    }
 }

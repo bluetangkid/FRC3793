@@ -44,26 +44,34 @@ public class landingGearController {
         }
 
         if(timer == Settings.TIMER_DELAY){
-            timer =0;
+            
             if(extendPressed){
+                timer =0;
+
                 if(!extend.getB()){
                     extend.setB(true);
                     retract.setB(false);
-                }else{
-                    stop.setB(true);
+                    System.out.println("xxxxx");
+                    //stop.setB(false);
+                }else if(extend.getB() && !stop.getB()){
+                    //extend.setB(true);
+                    //retract.setB(false);
+                    //stop.setB(true);
                 }
                 
             }
 
             if(retractPressed){
+                timer =0;
                 extend.setB(false);
-                stop.setB(false);
+                //stop.setB(false);
                 retract.setB(true);
+                System.out.println("yuyyyyyyyy");
             }
         }
         
         extend.reflect();
         retract.reflect();
-        stop.reflect();
+        //stop.reflect();
     }
 }

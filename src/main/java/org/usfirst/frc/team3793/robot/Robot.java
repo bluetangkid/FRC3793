@@ -131,7 +131,7 @@ public class Robot extends TimedRobot {
 			Master = controllers[DRIVER];
 			System.out.println("controller 0");
 		}
-		Motors.compressor.setClosedLoopControl(false);
+		Motors.compressor.setClosedLoopControl(true);
 
 		state = RoboState.RobotInit;
 		t = new MovementController(this);
@@ -167,9 +167,11 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		// teleopPeriodic();
+		//teleopPeriodic();
+		//Motors.compressor.setClosedLoopControl(false);
+		landingGearControl();
 		state = RoboState.Autonomous;
-		moveToHatch();
+		//moveToHatch();
 
 	}
 
@@ -178,10 +180,6 @@ public class Robot extends TimedRobot {
 		beltController = new BeltController(controllers[OPERATOR], Motors.beltMotor, ControllerMap.X, ControllerMap.B);
 
 		try {
-			hingeSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.RB, Motors.hinge,
-					Solenoid.class.getMethod("set", boolean.class));
-			avocadoSlideSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.A, Motors.avocadoSlide,
-					Solenoid.class.getMethod("set", boolean.class));
 			landingGearSwitchExtend = new toggleSwitch(controllers[OPERATOR], ControllerMap.back,
 					Motors.landingGearExtend, Solenoid.class.getMethod("set", boolean.class));
 			landingGearSwitchRetract = new toggleSwitch(controllers[OPERATOR], ControllerMap.start,
@@ -190,7 +188,11 @@ public class Robot extends TimedRobot {
 					Solenoid.class.getMethod("set", boolean.class));
 			landingGearControl = new landingGearController(controllers[OPERATOR], ControllerMap.back,
 					ControllerMap.start, landingGearSwitchExtend, landingGearSwitchRetract, landingGearSwitchStop);
-
+			hingeSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.RB, Motors.hinge,
+					Solenoid.class.getMethod("set", boolean.class));
+			avocadoSlideSwitch = new toggleSwitch(controllers[OPERATOR], ControllerMap.A, Motors.avocadoSlide,
+					Solenoid.class.getMethod("set", boolean.class));
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
