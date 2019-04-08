@@ -31,8 +31,8 @@ public class L2Climb extends Action {
             }
         } else if(phase == 1){
             if(s) {
-                Robot.landingGearSwitchExtend.b = true;
-                Robot.landingGearSwitchRetract.b = false;
+                Robot.landingGearSwitchExtend.setB(true);
+                Robot.landingGearSwitchRetract.setB(false);
                 armP = new ArmPivot();
                 time = System.currentTimeMillis();
             }
