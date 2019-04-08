@@ -11,23 +11,23 @@ package org.usfirst.frc.team3793.robot;
  * Add your docs here.
  */
 public class ControllerMap {
-    static final int A = 1;
-    static final int B = 2;
-    static final int X = 3;
-    static final int Y = 4;
-    static final int LB = 5;
-    static final int RB = 6;
-    static final int back = 7;
-    static final int start = 8;
-    static final int leftClick = 9;
-    static final int rightClick = 10;
+    public static final int A = 1;
+    public static final int B = 2;
+    public static final int X = 3;
+    public static final int Y = 4;
+    public static final int LB = 5;
+    public static final int RB = 6;
+    public static final int back = 7;
+    public static final int start = 8;
+    public static final int leftClick = 9;
+    public static final int rightClick = 10;
 
-    static final int leftX = 0;
-    static final int leftY = 1;
-    static final int leftTrigger = 2;
-    static final int rightTrigger = 3;
-    static final int rightX = 4;
-    static final int rightY = 5;
+    public static final int leftX = 0;
+    public static final int leftY = 1;
+    public static final int leftTrigger = 2;
+    public static final int rightTrigger = 3;
+    public static final int rightX = 4;
+    public static final int rightY = 5;
     static public boolean xButtonEnabled = false;
     static public boolean bButtonEnabled = false;
 }

@@ -1,9 +1,13 @@
 package movement;
 
 import java.util.ArrayDeque;
+
+import org.usfirst.frc.team3793.robot.ControllerMap;
 import org.usfirst.frc.team3793.robot.Motors;
 import org.usfirst.frc.team3793.robot.Robot;
 import org.usfirst.frc.team3793.robot.Sensors;
+
+import edu.wpi.first.wpilibj.RobotState;
 
 import org.usfirst.frc.team3793.robot.RoboState;
 
@@ -34,6 +38,7 @@ public class MovementController extends Thread {
 		actions = new ArrayDeque<Action>();
 		// Make speed for everything 0.8f(reccomended)
 		//actions.add(new Straight(3, 0.8f));
+		//actions.add(new Turn(90,.8f));
 		// Put actions here for autonomous like so: actions.add(new Turn(1, 90, 0.7));
 
 		while (!Thread.interrupted()) {
@@ -50,7 +55,7 @@ public class MovementController extends Thread {
 						action.resetStartPos();
 					}
 				}
-				if (action != null) {
+				if (action != null && (Robot.controllers[Robot.DRIVER].getRawButton(ControllerMap.LB) || Robot.getState().equals(RoboState.Autonomous))) {
 					action.set();
 				}
 			}

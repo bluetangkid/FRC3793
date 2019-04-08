@@ -15,6 +15,7 @@ import movement.MovementController;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import movement.*;
+import util.JeVois;
 import org.usfirst.frc.team3793.robot.PowerMonitor;
 
 //Equation for Drift on tile where y is drift in clicks and x is velocity in clicks/100 ms
@@ -37,7 +38,6 @@ public class Robot extends TimedRobot {
 	private static boolean singleControllerMode = true;
 	public static int controllerSelector = 0;
 	private static GenericHID Master = null;
-	public static float degToTape = 0;
 
 	public static long lastLightSwitch;
 	public static boolean colorState;
@@ -231,7 +231,6 @@ public class Robot extends TimedRobot {
 			driveControl();
 			avocadoControl(); // both work operator
 			hingeSwitch.update();// opperator Y button
-			climbingArm(); // operator RIGHT STICK
 			beltController.update(); // operator X - UP AND B - DOWN Button
 			if (controllers[OPERATOR].getRawButton(ControllerMap.start)) {
 				landingGearSwitchExtend.b = false;
@@ -407,8 +406,7 @@ public class Robot extends TimedRobot {
 	public void moveToHatch() {
 		if(!hasDone){
 			hasDone = true;
-		 float angle = degToTape;
-		 MovementController.addAction((new Turn(angle, .8f)));
+			MovementController.addAction((new Turn((float)JeVois.getTargetDeg(), .7f)));
 		}
 		 // double distance = 2;// (double) Sensors.backDist.getRangeInches() *
 		// INCHES_TO_METERS;

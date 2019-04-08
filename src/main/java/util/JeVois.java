@@ -5,7 +5,7 @@ import org.usfirst.frc.team3793.robot.Sensors;
 import edu.wpi.first.wpilibj.SerialPort;
 
 public class JeVois extends Thread{
-    private double targetDeg;
+    private static double targetDeg;
     public JeVois() {}
 
     public void run(){
@@ -20,13 +20,13 @@ public class JeVois extends Thread{
         }
         while(true) {
             String[] info = null;
-            System.out.println(Sensors.jeVois1.getBytesReceived());
             try {
                 if(Sensors.jeVois1.getBytesReceived() > 0) {
                     info = Sensors.jeVois1.readString().split(",");
                     for (int i = 0; i < info.length; i++) {
                         String temp = info[i];
                         targetDeg = Float.parseFloat(temp);
+                        System.out.println(targetDeg);
                     }
                 }
             } catch (Exception e) {
@@ -41,7 +41,7 @@ public class JeVois extends Thread{
         }
     }
 
-    public synchronized double getTargetDeg(){
+    public static synchronized double getTargetDeg(){
         return targetDeg;
     }
 }

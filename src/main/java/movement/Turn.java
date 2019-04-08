@@ -57,7 +57,7 @@ public class Turn extends DriveAction implements PIDOutput {
 
 	@Override
 	public void pidWrite(double output) { //nice
-		Motors.drive.tankDrive(maxSpeed * output, maxSpeed * output);
+		Motors.drive.tankDrive(maxSpeed * output, -maxSpeed * output);
 	}
 
 	public boolean onSetpoint() {
