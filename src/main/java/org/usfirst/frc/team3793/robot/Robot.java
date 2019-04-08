@@ -97,9 +97,6 @@ public class Robot extends TimedRobot {
 
 	static boolean hasDone = false;
 
-	static int rightBumperTimer = 0;
-	static int leftBumperTimer = 0;
-
 	static boolean rightBumperEngaged = false;
 	static boolean leftBumperEngaged = false;
 	static int invincibilityTimer = 0;
@@ -142,8 +139,14 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void disabledInit() {
+		try {
+			MovementController.clearActions();
+		} catch(Exception e){
+			e.printStackTrace();
+		}
 		state = RoboState.Disabled;
 		Motors.compressor.setClosedLoopControl(true);
+	
 	}
 
 	@Override
@@ -237,26 +240,17 @@ public class Robot extends TimedRobot {
 
 		// ---------------------------- ARCADE DRIVE ----------------------------
 		try {
+			avocadoControl();
 			landingGearControl();
 			driveControl();
-			avocadoControl(); // both work operator
+			 // both work operator
 			hingeSwitch.buttonUpdate();// opperator Y button
 			beltController.update(); // operator X - UP AND B - DOWN Button
-			if (controllers[OPERATOR].getRawButton(ControllerMap.start)) {
-				landingGearSwitchExtend.setB(false);
-			}
-			if (controllers[OPERATOR].getRawButton(ControllerMap.back)) {
-				landingGearSwitchRetract.setB(false);
-			}
-			landingGearSwitchExtend.buttonUpdate();
-			landingGearSwitchRetract.buttonUpdate();
-			landingGearSwitchStop.buttonUpdate();
-			avocadoControl(); // both work operator
-			climbingArm(); // operator RIGHT STICK
-			beltController.update(); // operator X - UP AND B - DOWN Button
+			//climbingArm(); // operator RIGHT STICK
+			
 
-			// rightBumper(); // driver
-			// leftBumper(); // driver
+			rightBumper(); // driver
+			leftBumper(); // driver
 			// if (!rightBumperEngaged && !leftBumperEngaged) {
 			// driveControl(); // work Driver
 			// }
@@ -276,6 +270,7 @@ public class Robot extends TimedRobot {
 
 		//landingGearControl.update();
 		if (landingGearSwitchRetract.buttonPressed()) {
+			landingGearSwitchStop.setB(false);
 			landingGearSwitchExtend.setB(false);
 		}
 		if (landingGearSwitchExtend.buttonPressed()) {
@@ -289,11 +284,23 @@ public class Robot extends TimedRobot {
 	public void leftBumper() {
 		if (controllers[DRIVER].getRawButton(ControllerMap.LB) && !leftBumperEngaged) {
 			leftBumperEngaged = true;
-			moveToHatch();
+			MovementController.addAction((new Turn((float)JeVois.getTargetDeg(), .8f)));
 		}
 
 		if (!controllers[DRIVER].getRawButton(ControllerMap.LB) && leftBumperEngaged) {
 			leftBumperEngaged = false;
+			MovementController.clearActions();
+		}
+	}
+
+	void rightBumper(){
+		if (controllers[DRIVER].getRawButton(ControllerMap.RB) && !rightBumperEngaged) {
+			rightBumperEngaged = true;
+			MovementController.addAction((new Turn(180, 1f)));
+		}
+
+		if (!controllers[DRIVER].getRawButton(ControllerMap.RB) && rightBumperEngaged) {
+			rightBumperEngaged = false;
 			MovementController.clearActions();
 		}
 	}
@@ -308,9 +315,14 @@ public class Robot extends TimedRobot {
 
 	public void avocadoTurningControl() {
 		avocadoRotationSwitch.button();
-		int set = (avocadoRotationSwitch.getB()) ? 1:0;
-		set = set*2 -1;
-
+		int set;
+		if(avocadoRotationSwitch.getB()){
+			set = 1;
+		} else {
+			set = -1;
+		}
+		System.out.println(Motors.avocadoMotor.get());
+		
 		Motors.avocadoMotor.set(set);
 		// if (invincibilityTimer > 0)
 		// 	invincibilityTimer--;

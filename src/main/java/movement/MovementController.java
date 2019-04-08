@@ -23,8 +23,7 @@ import org.usfirst.frc.team3793.robot.RoboState;
 
 public class MovementController extends Thread {
 	public static ArrayDeque<Action> actions;
-	Action action;
-	boolean teleopEnabled = false;
+	static Action action;
 	Robot r;
 	int timer = 0;
 
@@ -55,7 +54,7 @@ public class MovementController extends Thread {
 						action.resetStartPos();
 					}
 				}
-				if (action != null && (Robot.controllers[Robot.DRIVER].getRawButton(ControllerMap.LB) || Robot.getState().equals(RoboState.Autonomous))) {
+				if (action != null && (Robot.controllers[Robot.DRIVER].getRawButton(ControllerMap.LB) || Robot.getState().equals(RoboState.Autonomous) || Robot.controllers[Robot.DRIVER].getRawButton(ControllerMap.RB))) {
 					action.set();
 				}
 			}
@@ -75,5 +74,6 @@ public class MovementController extends Thread {
 
 	public static synchronized void clearActions(){
 		actions.clear();
+		action = null;
 	}
 }

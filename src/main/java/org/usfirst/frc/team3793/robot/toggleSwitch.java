@@ -47,9 +47,11 @@ public class toggleSwitch {
     }
 
     public void button(){
+        if(timer < TIMER_DELAY){
         timer++;
+        }
 
-        if(timer >= TIMER_DELAY && controller.getRawButton(buttonNum)){
+        if(timer == TIMER_DELAY && controller.getRawButton(buttonNum)){
             timer = 0;
             b = !b;
         }

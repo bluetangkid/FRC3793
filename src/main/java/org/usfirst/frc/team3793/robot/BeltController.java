@@ -7,6 +7,10 @@
 
 package org.usfirst.frc.team3793.robot;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.Talon;
+
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
 import edu.wpi.first.wpilibj.GenericHID;
 
 /**
@@ -16,7 +20,7 @@ import edu.wpi.first.wpilibj.GenericHID;
  */
 public class BeltController {
     GenericHID controller;
-    Spark motor;
+    Talon motor;
     int timer = 0;
     final int TIMER_DELAY = 15;
 
@@ -29,7 +33,7 @@ public class BeltController {
     enum beltStates {GOING_UP, MIDPOINT, GOING_DOWN, STOPPED };
     beltStates beltState = beltStates.STOPPED;
 
-    BeltController(GenericHID controller, Spark motor, int buttonNum, int buttonNum2){
+    BeltController(GenericHID controller, Talon motor, int buttonNum, int buttonNum2){
         this.controller = controller;
         this.motor = motor;
         this.buttonUp = buttonNum;

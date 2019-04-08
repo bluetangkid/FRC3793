@@ -1,5 +1,6 @@
 package org.usfirst.frc.team3793.robot;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
@@ -35,8 +36,8 @@ public class Motors {
 	public static Spark blinkin;
 
 	public static Spark armMotor;
-	public static Talon avocadoMotor;
-	public static Spark beltMotor;
+	public static Spark avocadoMotor;
+	public static Talon beltMotor;
 	public static Spark blinkin2019;
 
 	public static Compressor compressor;
@@ -74,9 +75,9 @@ public class Motors {
 		// blinkin = new Spark(RobotMap.BLINKIN.getPin());
 
 		armMotor = new Spark(RobotMap.ARM_MOTOR.getPin());
-		avocadoMotor = new Talon(RobotMap.AVACADO_MOTOR.getPin());
+		avocadoMotor = new Spark(RobotMap.AVACADO_MOTOR.getPin());
 
-		beltMotor = new Spark(RobotMap.BELT_MOTOR.getPin());
+		beltMotor = new Talon(RobotMap.BELT_MOTOR.getPin());
 		try{
 		blinkin2019 = new Spark(RobotMap.BLINKIN.getPin());
 		}catch(Exception e){

@@ -15,11 +15,12 @@ public class Turn extends DriveAction implements PIDOutput {
 	// 0.58s oscillaty
 	final static float kP = 0.1f;// .05
 	final static float kI = 0f;// .000001
-	final static float kD = 1f;// 1
+	final static float kD = 1.6f;// 1
 	final static float kF = 0f;
 	final static float kTolerance = 1;
 	public int framedoodad = 0;
 	public float targetDegrees = 0;
+	private double output;
 
 	public Turn(float degrees, float maxSpeed) {
 		super((int) Math.signum(degrees), maxSpeed);
@@ -56,7 +57,11 @@ public class Turn extends DriveAction implements PIDOutput {
 	}
 
 	@Override
-	public void pidWrite(double output) { //nice
+	public void pidWrite(double output) { 
+		this.output = output;
+	}
+
+	public void set(){
 		Motors.drive.tankDrive(maxSpeed * output, -maxSpeed * output);
 	}
 
