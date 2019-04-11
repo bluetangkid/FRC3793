@@ -172,7 +172,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void autonomousPeriodic() {
-		//teleopPeriodic();
+		teleopPeriodic();
 		//Motors.compressor.setClosedLoopControl(false);
 		landingGearControl();
 		state = RoboState.Autonomous;
@@ -204,8 +204,8 @@ public class Robot extends TimedRobot {
 		}
 		landingGearSwitchExtend.setB(false);
 		landingGearSwitchRetract.setB(true);
-		hingeSwitch.setB(true);
-		avocadoSlideSwitch.setB(true);
+		hingeSwitch.setB(false);
+		avocadoSlideSwitch.setB(false);
 		state = RoboState.TeleopInit;
 	}
 
@@ -236,8 +236,6 @@ public class Robot extends TimedRobot {
 
 		state = RoboState.Teleop;
 
-		Scheduler.getInstance().run();
-
 		// ---------------------------- ARCADE DRIVE ----------------------------
 		try {
 			avocadoControl();
@@ -246,7 +244,7 @@ public class Robot extends TimedRobot {
 			 // both work operator
 			hingeSwitch.buttonUpdate();// opperator Y button
 			beltController.update(); // operator X - UP AND B - DOWN Button
-			//climbingArm(); // operator RIGHT STICK
+			climbingArm(); // operator RIGHT STICK
 			
 
 			rightBumper(); // driver
@@ -321,9 +319,9 @@ public class Robot extends TimedRobot {
 		} else {
 			set = -1;
 		}
-		System.out.println(Motors.avocadoMotor.get());
+		//System.out.println(Motors.avocadoMotor.get());
 		
-		Motors.avocadoMotor.set(set);
+		Motors.avocadoMotor.set(set * .9);
 		// if (invincibilityTimer > 0)
 		// 	invincibilityTimer--;
 		// if (Sensors.avocadoLimit.get() && controllers[OPERATOR].getRawButton(ControllerMap.Y)) {
@@ -368,13 +366,13 @@ public class Robot extends TimedRobot {
 	private void climbingArm() {
 		double armPivot = controllers[OPERATOR].getRawAxis(ControllerMap.leftY);
 		double armSpin = controllers[OPERATOR].getRawAxis(ControllerMap.rightY);
-		double currCurr = pdp.getCurrent(1);
+		//double currCurr = pdp.getCurrent(1);
 
-		if (currCurr / lastAmp < 0.3 || currCurr < 5)
-			armColl = false;
+		//if (currCurr / lastAmp < 0.3 || currCurr < 5)
+			//armColl = false;
 		if (Math.abs(armPivot) > .1) {
-			if (currCurr / lastAmp > 1.5)
-				armColl = true;
+			//if (currCurr / lastAmp > 1.5)
+				//armColl = true;
 			Motors.armMotor.set(armPivot * Settings.PIVOT_SPEED);
 		} else {
 			Motors.armMotor.set(0);
@@ -384,7 +382,7 @@ public class Robot extends TimedRobot {
 		} else {
 			Motors.armEndMotor.set(0);
 		}
-		lastAmp = currCurr;
+		//lastAmp = currCurr;
 	}
 
 	private void driveControl() {
@@ -467,12 +465,24 @@ public class Robot extends TimedRobot {
 			e.printStackTrace();
 		}
 
-		if (avocadoUp && !isAvocadoTurning) {
-			avocadoState.setString("Up");
-			color = Settings.GREEN;
-		} else if (!avocadoUp && !isAvocadoTurning) {
-			avocadoState.setString("Down");
-			color = Settings.YELLOW;
+		// if (avocadoUp && !isAvocadoTurning) {
+		// 	avocadoState.setString("Up");
+		// 	color = Settings.GREEN;
+		// } else if (!avocadoUp && !isAvocadoTurning) {
+		// 	avocadoState.setString("Down");
+		// 	color = Settings.YELLOW;
+		// }
+
+		try{
+			if(!avocadoRotationSwitch.getB()){
+				avocadoState.setString("Up");
+				color = Settings.GREEN;
+			}else if(avocadoRotationSwitch.getB()){
+				avocadoState.setString("Down");
+				color = Settings.YELLOW;
+			}
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 
 		if (beltMovingUp()) {

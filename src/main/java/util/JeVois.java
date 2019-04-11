@@ -26,7 +26,6 @@ public class JeVois extends Thread{
                     for (int i = 0; i < info.length; i++) {
                         String temp = info[i];
                         targetDeg = Float.parseFloat(temp);
-                        System.out.println(targetDeg);
                     }
                 }
             } catch (Exception e) {

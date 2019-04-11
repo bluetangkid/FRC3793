@@ -22,9 +22,8 @@ public enum RobotMap {
 	ARM_MOTOR(8),
 
 	// AVOCADO - avocado shaped object that rotates/ slides out to pick up a latch
-	AVACADO_MOTOR(7), // 6
+	AVACADO_MOTOR(7),
 	AVACADO_SLIDE(0), 
-	AVOCADO_LIMIT_SWITCH(8), 
 	
 	//avocado up sensor returns true if the avocado is up
 	AVOCADO_LIDAR(98), // TBD

@@ -32,8 +32,6 @@ public class Sensors {
 	public static void initialize() {
 		new JeVois().start();
 		vacuumPivotSwitch = new DigitalInput(4);
-
-		avocadoLimit = new DigitalInput(RobotMap.AVOCADO_LIMIT_SWITCH.getPin());
 		// beltLimit = new DigitalInput(RobotMap.BELT_LIMIT.getPin());
 		lidar = new Lidar();
 		lidar.start();
