@@ -24,14 +24,16 @@ public class toggleSwitch {
     private Object obj;
     private Method method;
 
+    int delay;
     private boolean b = false;
 
     int timer = 0;
 
-    final int TIMER_DELAY = 15;
+    
     toggleSwitch(GenericHID controller, int buttonNum){
         this.buttonNum = buttonNum;
         this.controller = controller;
+        delay = Settings.TIMER_DELAY;
     }
 
     toggleSwitch(GenericHID controller, int buttonNum, Object obj, Method method) {
@@ -39,6 +41,14 @@ public class toggleSwitch {
         this.controller = controller;
         this.obj = obj;
         this.method = method;
+        delay = Settings.TIMER_DELAY;
+    }
+    toggleSwitch(GenericHID controller, int buttonNum, Object obj, Method method, int delay) {
+        this.buttonNum = buttonNum;
+        this.controller = controller;
+        this.obj = obj;
+        this.method = method;
+        this.delay = delay;
     }
 
     void buttonUpdate() {
@@ -47,11 +57,11 @@ public class toggleSwitch {
     }
 
     public void button(){
-        if(timer < TIMER_DELAY){ // TODO: Use timer class
+        if(timer < delay){ // TODO: Use timer class
             timer++;
         }
 
-        if(timer == TIMER_DELAY && controller.getRawButton(buttonNum)){
+        if(timer == delay && controller.getRawButton(buttonNum)){
             timer = 0;
             b = !b;
         }

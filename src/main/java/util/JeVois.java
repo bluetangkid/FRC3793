@@ -29,13 +29,13 @@ public class JeVois extends Thread{
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+               // e.printStackTrace();
             }
 
             try {
                 Thread.sleep(5);
             } catch(Exception e){
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
     }

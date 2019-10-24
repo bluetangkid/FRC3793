@@ -33,8 +33,6 @@ public class Motors {
 
 	// ------------------------------ Other Motors ------------------------------
 
-	public static Spark blinkin;
-
 	public static Spark armMotor;
 	public static Spark avocadoMotor;
 	public static Talon beltMotor;

@@ -8,10 +8,11 @@ package org.usfirst.frc.team3793.robot;
  */
 public interface Settings {
 	public static final double SPEED_MULT = 1.0;
-	public static final double TURN_MULT = 0.65;
+	public static final double TURN_MULT = 0.7;
 	public static final float LSTICK_DEADZONE = 0.25f;
 	public static final float BUMPER_DEADZONE = 0.05f;
 	public static final int TIMER_DELAY = 15;
+	public static final int TIMER_LANDING_GEAR_DELAY = 5;
 	public static final int OSCILLATION_TIME = 10;
 	public static final float INCHES_TO_METERS = .0254f;
 	public static final float BLUE = .87f;
